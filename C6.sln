@@ -1,0 +1,130 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C6", "C6\C6.csproj", "{AF8B1AEB-6418-41DF-B728-E35508C71DE7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C6.Tests", "C6.Tests\C6.Tests.csproj", "{067456C0-086C-46A8-B37F-1405717B7BFC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C6.UserGuideExamples", "C6.UserGuideExamples\C6.UserGuideExamples.csproj", "{578F1302-76F1-4669-A44A-EC4E3883A27D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C6.MyTests", "C6.MyTests\C6.MyTests.csproj", "{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug with Static Contract Checking|Any CPU = Debug with Static Contract Checking|Any CPU
+		Debug with Static Contract Checking|x64 = Debug with Static Contract Checking|x64
+		Debug with Static Contract Checking|x86 = Debug with Static Contract Checking|x86
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release with Contract Reference Assembly|Any CPU = Release with Contract Reference Assembly|Any CPU
+		Release with Contract Reference Assembly|x64 = Release with Contract Reference Assembly|x64
+		Release with Contract Reference Assembly|x86 = Release with Contract Reference Assembly|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AF8B1AEB-6418-41DF-B728-E35508C71DE7}.Debug with Static Contract Checking|Any CPU.ActiveCfg = Debug with Static Contract Checking|Any CPU
+		{AF8B1AEB-6418-41DF-B728-E35508C71DE7}.Debug with Static Contract Checking|Any CPU.Build.0 = Debug with Static Contract Checking|Any CPU
+		{AF8B1AEB-6418-41DF-B728-E35508C71DE7}.Debug with Static Contract Checking|x64.ActiveCfg = Debug with Static Contract Checking|x64
+		{AF8B1AEB-6418-41DF-B728-E35508C71DE7}.Debug with Static Contract Checking|x64.Build.0 = Debug with Static Contract Checking|x64
+		{AF8B1AEB-6418-41DF-B728-E35508C71DE7}.Debug with Static Contract Checking|x86.ActiveCfg = Debug with Static Contract Checking|x86
+		{AF8B1AEB-6418-41DF-B728-E35508C71DE7}.Debug with Static Contract Checking|x86.Build.0 = Debug with Static Contract Checking|x86
+		{AF8B1AEB-6418-41DF-B728-E35508C71DE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF8B1AEB-6418-41DF-B728-E35508C71DE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF8B1AEB-6418-41DF-B728-E35508C71DE7}.Debug|x64.ActiveCfg = Debug|x64
+		{AF8B1AEB-6418-41DF-B728-E35508C71DE7}.Debug|x64.Build.0 = Debug|x64
+		{AF8B1AEB-6418-41DF-B728-E35508C71DE7}.Debug|x86.ActiveCfg = Debug|x86
+		{AF8B1AEB-6418-41DF-B728-E35508C71DE7}.Debug|x86.Build.0 = Debug|x86
+		{AF8B1AEB-6418-41DF-B728-E35508C71DE7}.Release with Contract Reference Assembly|Any CPU.ActiveCfg = Release with Contract Reference Assembly|Any CPU
+		{AF8B1AEB-6418-41DF-B728-E35508C71DE7}.Release with Contract Reference Assembly|Any CPU.Build.0 = Release with Contract Reference Assembly|Any CPU
+		{AF8B1AEB-6418-41DF-B728-E35508C71DE7}.Release with Contract Reference Assembly|x64.ActiveCfg = Release with Contract Reference Assembly|x64
+		{AF8B1AEB-6418-41DF-B728-E35508C71DE7}.Release with Contract Reference Assembly|x64.Build.0 = Release with Contract Reference Assembly|x64
+		{AF8B1AEB-6418-41DF-B728-E35508C71DE7}.Release with Contract Reference Assembly|x86.ActiveCfg = Release with Contract Reference Assembly|x86
+		{AF8B1AEB-6418-41DF-B728-E35508C71DE7}.Release with Contract Reference Assembly|x86.Build.0 = Release with Contract Reference Assembly|x86
+		{AF8B1AEB-6418-41DF-B728-E35508C71DE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF8B1AEB-6418-41DF-B728-E35508C71DE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF8B1AEB-6418-41DF-B728-E35508C71DE7}.Release|x64.ActiveCfg = Release|x64
+		{AF8B1AEB-6418-41DF-B728-E35508C71DE7}.Release|x64.Build.0 = Release|x64
+		{AF8B1AEB-6418-41DF-B728-E35508C71DE7}.Release|x86.ActiveCfg = Release|x86
+		{AF8B1AEB-6418-41DF-B728-E35508C71DE7}.Release|x86.Build.0 = Release|x86
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Debug with Static Contract Checking|Any CPU.ActiveCfg = Debug|Any CPU
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Debug with Static Contract Checking|Any CPU.Build.0 = Debug|Any CPU
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Debug with Static Contract Checking|x64.ActiveCfg = Debug|Any CPU
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Debug with Static Contract Checking|x64.Build.0 = Debug|Any CPU
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Debug with Static Contract Checking|x86.ActiveCfg = Debug|x86
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Debug with Static Contract Checking|x86.Build.0 = Debug|x86
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Debug|x64.Build.0 = Debug|Any CPU
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Debug|x86.Build.0 = Debug|Any CPU
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Release with Contract Reference Assembly|Any CPU.ActiveCfg = Release|Any CPU
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Release with Contract Reference Assembly|Any CPU.Build.0 = Release|Any CPU
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Release with Contract Reference Assembly|x64.ActiveCfg = Release|Any CPU
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Release with Contract Reference Assembly|x64.Build.0 = Release|Any CPU
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Release with Contract Reference Assembly|x86.ActiveCfg = Release|Any CPU
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Release with Contract Reference Assembly|x86.Build.0 = Release|Any CPU
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Release|x64.ActiveCfg = Release|Any CPU
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Release|x64.Build.0 = Release|Any CPU
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Release|x86.ActiveCfg = Release|Any CPU
+		{067456C0-086C-46A8-B37F-1405717B7BFC}.Release|x86.Build.0 = Release|Any CPU
+		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Debug with Static Contract Checking|Any CPU.ActiveCfg = Debug|Any CPU
+		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Debug with Static Contract Checking|Any CPU.Build.0 = Debug|Any CPU
+		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Debug with Static Contract Checking|x64.ActiveCfg = Debug|Any CPU
+		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Debug with Static Contract Checking|x64.Build.0 = Debug|Any CPU
+		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Debug with Static Contract Checking|x86.ActiveCfg = Debug|x86
+		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Debug with Static Contract Checking|x86.Build.0 = Debug|x86
+		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Debug|x64.Build.0 = Debug|Any CPU
+		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Debug|x86.Build.0 = Debug|Any CPU
+		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Release with Contract Reference Assembly|Any CPU.ActiveCfg = Release|Any CPU
+		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Release with Contract Reference Assembly|Any CPU.Build.0 = Release|Any CPU
+		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Release with Contract Reference Assembly|x64.ActiveCfg = Release|Any CPU
+		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Release with Contract Reference Assembly|x64.Build.0 = Release|Any CPU
+		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Release with Contract Reference Assembly|x86.ActiveCfg = Release|Any CPU
+		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Release with Contract Reference Assembly|x86.Build.0 = Release|Any CPU
+		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Release|x64.ActiveCfg = Release|Any CPU
+		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Release|x64.Build.0 = Release|Any CPU
+		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Release|x86.ActiveCfg = Release|Any CPU
+		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Release|x86.Build.0 = Release|Any CPU
+		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Debug with Static Contract Checking|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Debug with Static Contract Checking|Any CPU.Build.0 = Debug|Any CPU
+		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Debug with Static Contract Checking|x64.ActiveCfg = Debug|Any CPU
+		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Debug with Static Contract Checking|x64.Build.0 = Debug|Any CPU
+		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Debug with Static Contract Checking|x86.ActiveCfg = Debug|x86
+		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Debug with Static Contract Checking|x86.Build.0 = Debug|x86
+		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Debug|x64.Build.0 = Debug|Any CPU
+		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Debug|x86.Build.0 = Debug|Any CPU
+		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Release with Contract Reference Assembly|Any CPU.ActiveCfg = Release|Any CPU
+		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Release with Contract Reference Assembly|Any CPU.Build.0 = Release|Any CPU
+		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Release with Contract Reference Assembly|x64.ActiveCfg = Release|Any CPU
+		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Release with Contract Reference Assembly|x64.Build.0 = Release|Any CPU
+		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Release with Contract Reference Assembly|x86.ActiveCfg = Release|Any CPU
+		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Release with Contract Reference Assembly|x86.Build.0 = Release|Any CPU
+		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Release|x64.ActiveCfg = Release|Any CPU
+		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Release|x64.Build.0 = Release|Any CPU
+		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Release|x86.ActiveCfg = Release|Any CPU
+		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
