@@ -4,6 +4,11 @@ using System.Text;
 using SCG = System.Collections.Generic;
 using SC = System.Collections;
 
+using C6.Contracts;
+
+using static  C6.Contracts.ContractMessage;
+using static System.Diagnostics.Contracts.Contract;
+
 namespace C6.Collections
 {
     public class HashedArrayList<T> : SCG.IEnumerable<T>
@@ -11,7 +16,6 @@ namespace C6.Collections
         #region Fields
 
         public static readonly T[] EmptyArray = new T[0];
-
         private T[] _items;
         private SCG.HashSet<KeyValuePair<T, int>> _itemIndex;
         #endregion
@@ -23,6 +27,15 @@ namespace C6.Collections
 
         public HashedArrayList(SCG.IEnumerable<T> items, SCG.IEqualityComparer<T> equalityComparer = null)
         {
+            #region Code Contracts
+            // Argument must be non-null
+            Requires(items != null, ArgumentMustBeNonNull);
+
+            // not the same instance
+            Ensures(!ReferenceEquals(_items, items));
+
+            #endregion
+
             // allowsNull = false - by default !
             EqualityComparer = equalityComparer ?? SCG.EqualityComparer<T>.Default; // ??? Default
 
@@ -49,6 +62,10 @@ namespace C6.Collections
 
         public HashedArrayList(int capacity = 0, SCG.IEqualityComparer<T> equalityComparer = null) // why 0 ???
         {
+            #region Code Contracts            
+            Requires(capacity < 0, ArgumentMustBeNonNegative);
+            #endregion
+
             Capacity = capacity;
             EqualityComparer = equalityComparer ?? SCG.EqualityComparer<T>.Default;
         }
