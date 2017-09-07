@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Text;
 
 using C6.Collections;
 
@@ -14,7 +15,12 @@ namespace C6.UserGuideExamples
     {
         public static void Main()
         {
-            HashedArrayList<int> hal = new HashedArrayList<int>();
+            var ls = new ArrayList<int> { 5, 6, 7, 8 };
+            var sb = new StringBuilder();
+            var rest = 100;
+            Console.WriteLine(ls.Show(sb, ref rest, null));
+            Console.WriteLine(rest);
+            return;
             // Construct list using collection initializer
             //var list = new ArrayList<int>() { 2, 3, 5, 5, 7, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33};
             var list = new ArrayList<int>() { 2, 3};
@@ -33,7 +39,7 @@ namespace C6.UserGuideExamples
             //var items = new ArrayList<int>() { 3, 13, 7, 17};
             //Console.WriteLine(ArrayList<int>.EmptyArray);           
 
-            return;
+            
             
             var dupl = list.FindDuplicates(5);
             Console.WriteLine(dupl);

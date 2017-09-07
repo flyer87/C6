@@ -700,14 +700,6 @@ namespace C6
 
         // View
 
-        //public bool IsValid
-        //{
-        //    get
-        //    {
-        //        return default(bool);
-        //    }
-        //}
-
         public int Offset
         {
             get
@@ -716,7 +708,15 @@ namespace C6
                 return default(int);
             }
         }
-       
+
+        //public bool IsValid
+        //{
+        //    get
+        //    {
+        //        return default(bool);
+        //    }
+        //}
+
         public IList<T> Underlying
         {
             get

@@ -2,24 +2,66 @@
 using C6.Collections;
 using System.Diagnostics.Contracts;
 
+
 namespace C6.MyTests
 {
     class Program
     {
         static void Main(string[] args)
         {
-            // Construct list using collection initializer
-            var list = new ArrayList<int> { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47 };
-            var list2 = new ArrayList<String>();
-            //list2.Add(null);
-            //list.Insert(-1, 1);
-
-            var view = list.View(2, 1);
-            Console.WriteLine("First: " + view.First);
-            Console.WriteLine("Last: " + view.Last);
-            Console.WriteLine("Offset: " + view.Offset);
-            //Console.WriteLine("Print: " + view.Print());
-            //Console.WriteLine("Print: " + list.Print());
+            var sq = new Square(1, "");
+            Console.WriteLine(sq.Squared());
         }
+    }
+
+    public abstract class Shape
+    {
+        private string name;
+
+        public Shape(string s)
+        {
+            // calling the set accessor of the Id property.
+            Id = s;
+        }
+
+        public string Id
+        {
+            get { return name; }
+
+            set { name = value; }
+        }
+        
+        // Area is a read-only property - only a get accessor is needed:
+        public abstract double Area { get; protected set; }
+
+        public override string ToString()
+        {
+            return Id + " Area = " + string.Format("{0:F2}", Area);
+        }
+
+        public bool Squared() => false;
+    }
+
+
+    public class Square : Shape
+    {
+        private int side;
+
+        public Square(int side, string id)
+            : base(id)
+        {
+            this.side = side;
+        }
+
+        public override double Area
+        {
+            get {
+                // Given the side, return the area of a square:
+                return side * side;
+            }
+
+            protected set { value = 2; }
+        }
+        
     }
 }
