@@ -6,7 +6,18 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 
+
+
+
 using C6.Collections;
+
+
+
+
+using static C6.Contracts.ContractMessage;
+
+
+using SCG = System.Collections.Generic;
 
 
 namespace C6.UserGuideExamples
@@ -14,12 +25,14 @@ namespace C6.UserGuideExamples
     public class ListExample
     {
         public static void Main()
-        {
-            var ls = new ArrayList<int> { 5, 6, 7, 8 };
-            var sb = new StringBuilder();
-            var rest = 100;
-            Console.WriteLine(ls.Show(sb, ref rest, null));
-            Console.WriteLine(rest);
+        {            
+            // Act
+            var items = Enumerable.Range(0, 5).ToArray();
+            //var collection = new ArrayList<int>(items);
+            var collection = new HashedArrayList<int>(items);
+            var choose = collection.Choose();
+
+
             return;
             // Construct list using collection initializer
             //var list = new ArrayList<int>() { 2, 3, 5, 5, 7, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33};

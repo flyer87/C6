@@ -163,7 +163,8 @@ namespace C6
                 Ensures(Result<int>() >= 0);
 
                 // Returns the same as the number of items in the enumerator
-                Ensures(Result<int>() == this.Count()); // ??? Why Enumerator's Count is used here
+                // Ensures(Result<int>() == Count); // ??? Why Enumerator's Count is used here
+                // Ensures(Result<int>() == this.Count());
 
 
                 return default(int);

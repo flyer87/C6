@@ -37,7 +37,7 @@ namespace C6.Tests
         /// <returns>
         ///     An empty collection value.
         /// </returns>
-        protected abstract ICollectionValue<T> GetEmptyCollectionValue<T>(bool allowsNull = false);
+        protected abstract ICollectionValue<T> GetEmptyCollectionValue<T>(bool allowsNull = false);        
 
         /// <summary>
         ///     Creates a collection value containing the items in the enumerable.
@@ -95,7 +95,7 @@ namespace C6.Tests
         // TODO: Are there better tests to perform here?
 
         [Test]
-        public void AllowsNull_EmptyCollectionAllowsNull_True()
+        public virtual void AllowsNull_EmptyCollectionAllowsNull_True()
         {
             // Arrange
             var collection = GetEmptyCollectionValue<string>(allowsNull: true);
@@ -121,7 +121,7 @@ namespace C6.Tests
         }
 
         [Test]
-        public void AllowsNull_AllowsNull_True()
+        public virtual void AllowsNull_AllowsNull_True()
         {
             // Arrange
             var collection = GetCollectionValue(Enumerable.Empty<string>(), allowsNull: true);
@@ -241,6 +241,7 @@ namespace C6.Tests
 
             // Act & Assert
             Assert.That(() => collection.Choose(), Violates.PreconditionSaying(CollectionMustBeNonEmpty));
+            //Assert.That(() => collection.Choose(), Throws.TypeOf<PreconditionException>());            
         }
 
         [Test]

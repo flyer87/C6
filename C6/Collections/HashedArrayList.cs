@@ -1,17 +1,36 @@
-﻿using System;
+﻿//using System;
+//using System.Linq;
+//using System.Text;
+
+//using C6.Collections;
+
+//using SCG = System.Collections.Generic;
+//using SC = System.Collections;
+
+//using C6.Contracts;
+
+//using static System.Diagnostics.Contracts.Contract;
+//using static C6.Contracts.ContractMessage;
+//using static C6.Speed;
+
+using System;
+using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
-
-using C6.Collections;
-
-using SCG = System.Collections.Generic;
-using SC = System.Collections;
 
 using C6.Contracts;
 
 using static System.Diagnostics.Contracts.Contract;
+
+using static C6.Collections.ExceptionMessages;
 using static C6.Contracts.ContractMessage;
+using static C6.EventTypes;
 using static C6.Speed;
+
+using SC = System.Collections;
+using SCG = System.Collections.Generic;
+
 
 namespace C6.Collections
 {
@@ -34,21 +53,24 @@ namespace C6.Collections
         {
             #region Code Contracts
 
+            // ReSharper disable InvocationIsSkipped
             // Argument must be non-null
             Requires(items != null, ArgumentMustBeNonNull);
 
             // not the same instance
             Ensures(!ReferenceEquals(_items, items));
+            // ReSharper enable InvocationIsSkipped
 
             #endregion
 
             // allowsNull = false - by default !
+            IsValid = true;
             EqualityComparer = equalityComparer ?? SCG.EqualityComparer<T>.Default; // ??? Default
 
-            var collection = items as SCG.ICollection<T>;
             var collectionValues = items as ICollectionValue<T>;
-
-            if (collectionValues != null) // ??? what is the idea with this check. It might not cast or what
+            var collection = items as SCG.ICollection<T>;
+            
+            if (collectionValues != null) 
             {
                 _items = collectionValues.IsEmpty ? EmptyArray : collectionValues.ToArray();
                 Count = collectionValues.Count;
@@ -70,11 +92,12 @@ namespace C6.Collections
         {
             #region Code Contracts            
 
-            Requires(capacity < 0, ArgumentMustBeNonNegative);
+            Requires(capacity >= 0, ArgumentMustBeNonNegative);
 
             #endregion
 
-            Capacity = capacity;
+            IsValid = true;
+            Capacity = capacity;                    
             EqualityComparer = equalityComparer ?? SCG.EqualityComparer<T>.Default;
         }
 
@@ -83,20 +106,12 @@ namespace C6.Collections
 
         #endregion
 
-        public SCG.IEnumerator<T> GetEnumerator() // to_base; base class CollectionValueBase
-        {
-            for (int i = 0; i < _items.Length; i++)
-            {
-                yield return _items[i];
-            }
-        }
+        #region Explicit implementations
 
         SC.IEnumerator SC.IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
         }
-
-        #region Explicit implementations
 
         // already implemented?
         //SC.IEnumerator SC.IEnumerable.GetEnumerator() => GetEnumerator();
@@ -105,11 +120,40 @@ namespace C6.Collections
 
         #region Properties
 
-        public int Capacity { get; private set; } //from HAL
+        public int Capacity
+        {
+            get { return _items.Length; }
+            set
+            {
+                #region Code Contracts
+                //Capacity should at least as big the number of items
+                Requires(value >= Count);
+
+                // Capacity is at least as big as the number of items
+                Ensures(Capacity >= Count);
+
+                Ensures(Capacity == value); 
+                #endregion
+
+                if (value > 0)
+                {
+                    if (value == _items.Length)
+                    {
+                        return;
+                    }
+
+                    Array.Resize(ref _items, value);
+                }
+                else
+                {
+                    _items = EmptyArray;
+                }
+            }
+        } //from HAL
 
         public bool IsValid { get; }
 
-        public virtual int Count { get; protected set; } // to_base
+        public int Count { get; protected set; } // to_base
 
         public bool AllowsNull => false; // by defintion!
 
@@ -119,11 +163,20 @@ namespace C6.Collections
 
         public virtual SCG.IEqualityComparer<T> EqualityComparer { get; } // ??? virtual
 
-        public T Choose() => _items[Count - 1]; //to_base
+        public T Choose() => _items[0]; //to_base: virtual // Count - 1
 
         #endregion
 
         #region Public methods
+
+        public SCG.IEnumerator<T> GetEnumerator()
+        {
+            //yield return default(T);
+            for (int i = 0; i < Count; i++)
+            {
+                yield return _items[i];
+            }
+        }
 
         public void CopyTo(T[] array, int arrayIndex) => Array.Copy(_items, 0, array, arrayIndex, Count); //to_base
 
