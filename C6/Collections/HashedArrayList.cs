@@ -34,13 +34,19 @@ using SCG = System.Collections.Generic;
 
 namespace C6.Collections
 {
-    public class HashedArrayList<T> : ICollectionValue<T>
+    public class HashedArrayList<T> : IListenable<T>
     {
         #region Fields
 
         public static readonly T[] EmptyArray = new T[0];
         private T[] _items;
         private SCG.HashSet<KeyValuePair<T, int>> _itemIndex;
+
+        private event EventHandler _collectionChanged;
+        private event EventHandler<ClearedEventArgs> _collectionCleared;
+        private event EventHandler<ItemAtEventArgs<T>> _itemInsertedAt, _itemRemovedAt;
+        private event EventHandler<ItemCountEventArgs<T>> _itemsAdded, _itemsRemoved;        
+               
 
         #endregion Fields
 
@@ -120,6 +126,12 @@ namespace C6.Collections
 
         #region Properties
 
+        #region IListenable
+        public virtual EventTypes ActiveEvents { get; private set; }        
+        public virtual EventTypes ListenableEvents => All;
+        #endregion
+
+
         public int Capacity
         {
             get { return _items.Length; }
@@ -197,6 +209,93 @@ namespace C6.Collections
 
         #endregion
 
+        #region Events        
+        public event EventHandler CollectionChanged
+        {
+            add
+            {
+                _collectionChanged += value;
+                ActiveEvents |= Changed;
+            }
+            remove
+            {
+                _collectionChanged -= value;
+                if (_collectionChanged == null) {
+                    ActiveEvents &= ~Changed;
+                }
+            }
+        }
+        public event EventHandler<ClearedEventArgs> CollectionCleared
+        {
+            add
+            {
+                _collectionCleared += value;
+                ActiveEvents |= Cleared;
+            }
+            remove
+            {
+                _collectionCleared -= value;
+                if (_collectionCleared == null) {                    
+                    ActiveEvents &= ~Cleared;
+                }
+            }
+        }
+        public event EventHandler<ItemAtEventArgs<T>> ItemInserted
+        {
+            add {
+                _itemInsertedAt += value;
+                ActiveEvents |= Inserted;
+            }
+            remove {
+                _itemInsertedAt -= value;
+                if (_itemInsertedAt == null) {
+                    ActiveEvents &= ~Inserted;
+                }
+            }
+        }
+        public event EventHandler<ItemAtEventArgs<T>> ItemRemovedAt
+        {
+            add {
+                _itemRemovedAt += value;
+                ActiveEvents |= RemovedAt;
+            }
+            remove {
+                _itemRemovedAt -= value;
+                if (_itemRemovedAt == null) {
+                    ActiveEvents &= ~RemovedAt;
+                }                
+            }
+        }
+        public event EventHandler<ItemCountEventArgs<T>> ItemsAdded
+        {
+            add
+            {
+                _itemsAdded += value;
+                ActiveEvents |= Added;
+            }
+            remove {
+                _itemsAdded -= value;
+                if (_itemsAdded == null) {
+                    ActiveEvents &= ~Added;
+                }
+            }
+        }
+        public event EventHandler<ItemCountEventArgs<T>> ItemsRemoved
+        {
+            add
+            {
+                _itemsRemoved += value;
+                ActiveEvents |= Removed;
+            }
+            remove
+            {
+                _itemsRemoved -= value;
+                if (_itemsRemoved == null) {
+                    ActiveEvents &= ~Removed;
+                }
+            }
+        }
+        #endregion
 
     }
 }

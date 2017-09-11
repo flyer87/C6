@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using static C6.EventTypes;
+
 using C6.Collections;
 using C6.Tests.Helpers;
 using NUnit.Framework;
@@ -18,7 +20,7 @@ namespace C6.Tests.Collections
     }
 
     [TestFixture]
-    public class HashedArrayListListTests : ICollectionValueTests {
+    public class HashedArrayListListTests : IListenableTests {
 
         [Ignore("Not relevant")]
         public override void AllowsNull_AllowsNull_True()
@@ -32,9 +34,9 @@ namespace C6.Tests.Collections
             base.AllowsNull_EmptyCollectionAllowsNull_True();
         }
 
-        protected override ICollectionValue<T> GetEmptyCollectionValue<T>(bool allowsNull = false) => new HashedArrayList<T>();
-        
-        protected override ICollectionValue<T> GetCollectionValue<T>(IEnumerable<T> enumerable, bool allowsNull = false) => new HashedArrayList<T>(enumerable);
+        protected override EventTypes ListenableEvents => None; // Why All? -Up to us, could be changed to non-All for some tests
+        protected override IListenable<T> GetEmptyListenable<T>(bool allowsNull = false) => new HashedArrayList<T>();
+        protected override IListenable<T> GetListenable<T>(IEnumerable<T> enumerable, bool allowsNull = false) => new HashedArrayList<T>(enumerable);        
     }
 
     

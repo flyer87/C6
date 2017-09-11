@@ -1268,7 +1268,7 @@ namespace C6.Collections
             remove
             {
                 _itemInserted -= value;
-                if (_itemInserted == null)
+                if (_itemInserted == null) // ??? Why only when _itemInserted == null
                 {
                     ActiveEvents &= ~Inserted;
                 }
