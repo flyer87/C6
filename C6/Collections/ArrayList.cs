@@ -355,7 +355,6 @@ namespace C6.Collections
             // TODO: Avoid creating an array? Requires a lot of extra code, since we need to properly handle items already added from a bad enumerable
             // A bad enumerator will throw an exception here            
             var array = items.ToArray();
-
             if (array.IsEmpty())
             {
                 return false;
