@@ -159,7 +159,7 @@ namespace C6.Collections
         }
 
         public ArrayList(int capacity = 0, SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false) 
-            : base(allowsNull)
+            : base(allowsNull)            
         {
             #region Code Contracts
 
@@ -485,7 +485,7 @@ namespace C6.Collections
             //RequireValidity();
             #endregion
             var duplicates = new Duplicates(this, item);            
-            _collValues.Add(duplicates);            
+            _collValues.Add(duplicates); // ???        
 
             return duplicates;
         }
@@ -674,7 +674,7 @@ namespace C6.Collections
         // TODO: Defer execution
         public virtual ICollectionValue<KeyValuePair<T, int>> ItemMultiplicities()
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException(); // ???
         }
 
         public virtual int LastIndexOf(T item)

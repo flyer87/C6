@@ -280,7 +280,7 @@
     <CodeContractsRuntimeThrowOnFailure>True</CodeContractsRuntimeThrowOnFailure>
     <CodeContractsRuntimeCallSiteRequires>False</CodeContractsRuntimeCallSiteRequires>
     <CodeContractsRuntimeSkipQuantifiers>False</CodeContractsRuntimeSkipQuantifiers>
-    <CodeContractsRunCodeAnalysis>True</CodeContractsRunCodeAnalysis>
+    <CodeContractsRunCodeAnalysis>False</CodeContractsRunCodeAnalysis>
     <CodeContractsNonNullObligations>True</CodeContractsNonNullObligations>
     <CodeContractsBoundsObligations>True</CodeContractsBoundsObligations>
     <CodeContractsArithmeticObligations>True</CodeContractsArithmeticObligations>
@@ -384,6 +384,7 @@
     <Compile Include="Collections\CollectionValueBaseH.cs" />
     <Compile Include="Collections\CollectionValueDebugView.cs" />
     <Compile Include="Collections\HashedArrayList.cs" />
+    <Compile Include="Collections\IMyCollection.cs" />
     <Compile Include="ComparerFactory.cs" />
     <Compile Include="Contracts\ContractMessage.cs" />
     <Compile Include="Contracts\ContractHelperExtensions.cs" />

@@ -25,13 +25,15 @@ namespace C6.UserGuideExamples
     public class ListExample
     {
         public static void Main()
-        {            
-            // Act
-            var items = Enumerable.Range(0, 5).ToArray();
-            //var collection = new ArrayList<int>(items);
-            var collection = new HashedArrayList<int>(items);
-            var choose = collection.Choose();
+        {
+            var collection = new HashedArrayList<int> { 1, 2, 3, 4 };
+            //var collection = new HashedArrayList<string>();
 
+            var items = new HashedArrayList<int>(collection);
+            items.Add(5);
+
+            // Act            
+            Console.WriteLine(collection.ContainsRange(items));
 
             return;
             // Construct list using collection initializer

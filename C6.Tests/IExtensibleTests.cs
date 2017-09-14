@@ -196,7 +196,7 @@ namespace C6.Tests
         }
 
         [Test]
-        public void Add_AllowsNullAddNull_ReturnsTrue()
+        public virtual void Add_AllowsNullAddNull_ReturnsTrue()
         {
             // Arrange
             var collection = GetStringExtensible(Random, allowsNull: true);
@@ -229,8 +229,8 @@ namespace C6.Tests
         {
             // Arrange
             var items = GetUppercaseStrings(Random);
-            var collection = GetExtensible(items, CaseInsensitiveStringComparer.Default);
-            var duplicateItem = items.Choose(Random).ToLower();
+            var collection = GetExtensible(items, CaseInsensitiveStringComparer.Default); // , CaseInsensitiveStringComparer.Default
+            var duplicateItem = items.Choose(Random).ToLower();//.ToLower();
 
             // Act
             var result = collection.Add(duplicateItem);
@@ -352,9 +352,9 @@ namespace C6.Tests
             Assert.That(() => collection.AddRange(items), Violates.PreconditionSaying(ItemsMustBeNonNull));
         }
 
-        [Test]
-        public void AddRange_AllowNullAddNull_True()
-        {
+        [Test]        
+        public virtual void AddRange_AllowNullAddNull_True()
+        {            
             // Arrange
             var items = GetStrings(Random);
             var collection = GetExtensible(items, ReferenceEqualityComparer, allowsNull: true);

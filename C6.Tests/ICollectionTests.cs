@@ -363,7 +363,7 @@ namespace C6.Tests
 
         [Test]
         public void ContainsRange_AllowNullEnumerableContainingNull_True()
-        {
+        {            
             // Arrange
             var items = GetStrings(Random).WithNull(Random);
             var collection = GetCollection(items, allowsNull: true);
@@ -409,7 +409,23 @@ namespace C6.Tests
         {
             // Arrange
             var collection = GetStringCollection(Random);
+            var items = collection.Append(GetLowercaseString(Random)).ShuffledCopy(Random);
+            
+            // Act
+            var containsRange = collection.ContainsRange(items);
+
+            // Assert
+            Assert.That(containsRange, Is.False);
+        }
+
+        [Test]
+        public void ContainsRange_LargerRangeThanCollectionWithDuplicateItem_False()
+        {
+            Run.If(AllowsDuplicates);
+            // Arrange
+            var collection = GetStringCollection(Random);
             var items = collection.Append(collection.Choose()).ShuffledCopy(Random);
+            
 
             // Act
             var containsRange = collection.ContainsRange(items);
@@ -524,6 +540,8 @@ namespace C6.Tests
         [Test]
         public void CountDuplicates_RandomCollectionWithCountEqualItems_Count()
         {
+            Run.If(AllowsDuplicates);
+
             // Arrange
             var item = GetLowercaseString(Random);
             var count = GetCount(Random);

@@ -127,7 +127,7 @@ namespace C6
         ///     The collection's <see cref="IExtensible{T}.EqualityComparer"/> is used to determine item equality.
         /// </remarks>
         [Pure]
-        new bool Contains(T item);
+        new bool Contains(T item);        
 
         /// <summary>
         ///     Checks whether the collection contains all the items in the specified <see cref="SCG.IEnumerable{T}"/>. If the
