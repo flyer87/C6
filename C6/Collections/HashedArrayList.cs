@@ -116,7 +116,7 @@ namespace C6.Collections
             #endregion
 
             IsValid = true;
-            EqualityComparer = equalityComparer ?? SCG.EqualityComparer<T>.Default;
+            EqualityComparer = equalityComparer ?? SCG.EqualityComparer<T>.Default; // !!! should be before Capacity = capacity
             Capacity = capacity;
         }
 
@@ -185,7 +185,7 @@ namespace C6.Collections
         #region IListenable
 
         public virtual EventTypes ActiveEvents { get; private set; }
-        public virtual EventTypes ListenableEvents => None;
+        public virtual EventTypes ListenableEvents => All;
 
         #endregion
 
@@ -206,6 +206,12 @@ namespace C6.Collections
         #region ICollection
 
         public Speed ContainsSpeed => Constant;
+
+        #endregion
+
+        #region ISequenced
+        public EnumerationDirection Direction { get; }
+
 
         #endregion
 
@@ -260,7 +266,7 @@ namespace C6.Collections
 
             #endregion
 
-            if (FindOrAddToHashPrivate(item)) {
+            if (FindOrAddToHashPrivate(item, Count)) {
                 // ? Does it work
                 return false;
             }
@@ -300,7 +306,7 @@ namespace C6.Collections
             var oldIndex = index;
             var countAdded = 0;
             foreach (var item in items) {
-                if (FindOrAddToHashPrivate(item)) {
+                if (FindOrAddToHashPrivate(item, index)) {
                     continue;
                 }
                 _items[index++] = item;
@@ -389,7 +395,7 @@ namespace C6.Collections
             return true;
         }
 
-        public bool UpdateOrAdd(T item)
+        public virtual bool UpdateOrAdd(T item)
         {
             #region Code Contracts
 
@@ -402,7 +408,7 @@ namespace C6.Collections
             return UpdateOrAdd(item, out oldItem);
         }
 
-        public bool UpdateOrAdd(T item, out T oldItem)
+        public virtual bool UpdateOrAdd(T item, out T oldItem)
         {
             #region Code Contracts                                  
 
@@ -411,7 +417,8 @@ namespace C6.Collections
 
             #endregion
 
-            if (Update(item, out oldItem)) {
+            if (Update(item, out oldItem))
+            {
                 return true;
             }
 
@@ -688,7 +695,7 @@ namespace C6.Collections
             }
         }
 
-        private bool FindOrAddToHashPrivate(T item)
+        private bool FindOrAddToHashPrivate(T item, int index)
         {
             #region Code Contract            
 
@@ -697,7 +704,7 @@ namespace C6.Collections
             if (_itemIndex.ContainsKey(item)) {
                 return true;
             }
-            _itemIndex[item] = Count;
+            _itemIndex[item] = index;
             return false;
         }
 
@@ -845,10 +852,10 @@ namespace C6.Collections
             OnCollectionChanged();
         }
 
-        private void RaiseForUpdate(T item, object olditem)
+        private void RaiseForUpdate(T item, T olditem)
         {
-            OnItemsAdded(item, 1);
-            OnItemsRemoved(item, 1);
+            OnItemsRemoved(olditem, 1);
+            OnItemsAdded(item, 1);            
             OnCollectionChanged();
         }
 
@@ -860,7 +867,7 @@ namespace C6.Collections
 
         private void OnCollectionCleared(bool full, int count, int? start = null) => _collectionCleared?.Invoke(this, new ClearedEventArgs(full, count, start));
 
-        private void OnItemsRemoved(T item, int count) => _itemRemovedAt?.Invoke(this, new ItemAtEventArgs<T>(item, count));
+        private void OnItemsRemoved(T item, int count) => _itemsRemoved?.Invoke(this, new ItemCountEventArgs<T>(item, count));
 
         #endregion
 
@@ -933,7 +940,7 @@ namespace C6.Collections
             public override int Count
             {
                 get {
-                    //CheckVersion();
+                    CheckVersion();
 
                     return List.Count;
                 }
@@ -944,7 +951,8 @@ namespace C6.Collections
                 get {
                     CheckVersion();
                     // TODO: Always use Linear?
-                    return _list == null ? Linear : Constant;
+                    //return _list == null ? Linear : Constant;
+                    return Constant;
                 }
             }
 
@@ -978,7 +986,8 @@ namespace C6.Collections
 
                 CheckVersion();
                 int index;
-                if ((index = _base.IndexOf(_item)) >= 0) {
+                if ((index = _base.IndexOf(_item)) >= 0)
+                {
                     yield return _base._items[index];
                 }
             }
@@ -1177,5 +1186,7 @@ namespace C6.Collections
 
 
         #endregion
+        
+
     }
 }

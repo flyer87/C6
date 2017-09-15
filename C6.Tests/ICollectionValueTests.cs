@@ -25,6 +25,8 @@ namespace C6.Tests
     {
         #region Factories
 
+        protected abstract bool AllowsNull { get; }
+
         /// <summary>
         ///     Creates an empty collection value.
         /// </summary>

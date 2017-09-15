@@ -231,6 +231,7 @@
   <ItemGroup>
     <Compile Include="Collections\ArrayListTests.cs" />
     <Compile Include="Collections\HashedArrayListTests.cs" />
+    <Compile Include="MyCollEventHolder.cs" />
     <Compile Include="ComparerFactoryTests.cs" />
     <Compile Include="Helpers\BadEnumerable.cs" />
     <Compile Include="Helpers\BadEnumerableException.cs" />

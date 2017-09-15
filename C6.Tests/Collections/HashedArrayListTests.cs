@@ -27,7 +27,7 @@ namespace C6.Tests.Collections
         public override void AllowsNull_AllowsNull_True()
         {
             base.AllowsNull_AllowsNull_True();
-        }
+        }       
 
         [Ignore("Not relevant")]
         public override void AllowsNull_EmptyCollectionAllowsNull_True()
@@ -47,8 +47,9 @@ namespace C6.Tests.Collections
             base.Add_AllowsNullAddNull_ReturnsTrue();
         }
 
-        protected override EventTypes ListenableEvents => None; // Why All? -Up to us, could be changed to non-All for some tests
-        
+        protected override EventTypes ListenableEvents => All; // Why All? -Up to us, could be changed to non-All for some tests
+
+        protected override bool AllowsNull => false;
         protected override bool AllowsDuplicates => false;
         protected override bool DuplicatesByCounting => true;
         protected override bool IsFixedSize => false;

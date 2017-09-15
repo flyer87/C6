@@ -2163,7 +2163,7 @@ namespace C6.Collections
             {
                 get
                 {
-                    //CheckVersion();
+                    CheckVersion();
                     
                     return List.Count;
                 }

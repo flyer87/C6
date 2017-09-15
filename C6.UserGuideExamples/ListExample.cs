@@ -8,7 +8,6 @@ using System.Text;
 
 
 
-
 using C6.Collections;
 
 
@@ -26,14 +25,16 @@ namespace C6.UserGuideExamples
     {
         public static void Main()
         {
-            var collection = new HashedArrayList<int> { 1, 2, 3, 4 };
-            //var collection = new HashedArrayList<string>();
+            var collection = new HashedArrayList<int> { 1,2,3,4 };
+            var d = collection.FindDuplicates(1).GetEnumerator();
+            d.MoveNext();
+            collection.Add(5);
+            d.MoveNext();
 
-            var items = new HashedArrayList<int>(collection);
-            items.Add(5);
+                        
 
             // Act            
-            Console.WriteLine(collection.ContainsRange(items));
+
 
             return;
             // Construct list using collection initializer
@@ -162,5 +163,21 @@ namespace C6.UserGuideExamples
 
             return;
         }
+    }
+
+    public class CaseInsensitiveStringComparer : SCG.IEqualityComparer<string>, SCG.IComparer<string>
+    {
+        private CaseInsensitiveStringComparer() { }
+
+        public static CaseInsensitiveStringComparer Default => new CaseInsensitiveStringComparer();
+
+        public int GetHashCode(string item) => ToLower(item).GetHashCode();
+
+        public bool Equals(string x, string y) => ToLower(x).Equals(ToLower(y));
+
+        // ReSharper disable once StringCompareToIsCultureSpecific
+        public int Compare(string x, string y) => ToLower(x).CompareTo(ToLower(y));
+
+        private string ToLower(string item) => item?.ToLower() ?? string.Empty;
     }
 }

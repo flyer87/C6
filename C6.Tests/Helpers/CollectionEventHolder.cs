@@ -22,6 +22,7 @@ namespace C6.Tests.Helpers
             throw new NotImplementedException();
         }
 
-        public CollectionEventConstraint<T> For(IListenable<T> collection) => new CollectionEventConstraint<T>(collection, _expectedEvents);
+        public CollectionEventConstraint<T> For(IListenable<T> collection) =>
+            new CollectionEventConstraint<T>(collection, _expectedEvents);
     }
 }
