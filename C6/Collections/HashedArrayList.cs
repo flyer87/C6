@@ -35,7 +35,7 @@ using SCG = System.Collections.Generic;
 
 namespace C6.Collections
 {
-    public class HashedArrayList<T> : ICollection<T>
+    public class HashedArrayList<T> : IList<T>
     {
         #region Fields
 
@@ -51,7 +51,7 @@ namespace C6.Collections
 
         private event EventHandler _collectionChanged;
         private event EventHandler<ClearedEventArgs> _collectionCleared;
-        private event EventHandler<ItemAtEventArgs<T>> _itemInsertedAt, _itemRemovedAt;
+        private event EventHandler<ItemAtEventArgs<T>> _itemInserted, _itemRemovedAt;
         private event EventHandler<ItemCountEventArgs<T>> _itemsAdded, _itemsRemoved;
 
         private int _version, _sequencedHashCodeVersion = -1, _unsequencedHashCodeVersion = -1;
@@ -124,16 +124,7 @@ namespace C6.Collections
             : this(0, equalityComparer) { }
 
         #endregion
-
-        #region Explicit implementations
-
-        SC.IEnumerator SC.IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        #endregion
-
+       
         #region Properties
 
         public int Capacity
@@ -198,6 +189,7 @@ namespace C6.Collections
         public bool IsFixedSize => false; // can add and remove 
 
         public bool IsReadOnly => false;
+        
 
         public virtual SCG.IEqualityComparer<T> EqualityComparer { get; } // ??? virtual
 
@@ -210,14 +202,31 @@ namespace C6.Collections
         #endregion
 
         #region ISequenced
-        public EnumerationDirection Direction { get; }
+        public EnumerationDirection Direction => EnumerationDirection.Forwards;
+        #endregion
 
+        #region IIndexed
+        public Speed IndexingSpeed => Constant;
+        #endregion
 
+        #region IList
+        public T First => _items[0]; // View: _offset
+        public T Last => _items[Count];
+        public int Offset => default(int); // !!!
+        public IList<T> Underlying => new HashedArrayList<T>(); // !!!
         #endregion
 
         #endregion
 
         #region Public methods
+
+        #region IDisposable
+        public virtual void Dispose()
+        {
+            Dispose(false);
+        }
+
+         #endregion
 
         #region ICollectionValue
 
@@ -235,8 +244,6 @@ namespace C6.Collections
                 yield return _items[i];
             }
         }
-
-
 
         public override string ToString() => ToString(null, null); // to_base(override, the Object's)
 
@@ -336,15 +343,6 @@ namespace C6.Collections
         #endregion
 
         #region ICollection
-
-        public virtual int IndexOf(T item)
-        {
-            int index;
-            if (_itemIndex.TryGetValue(item, out index)) {
-                return index;
-            }
-            return ~Count;
-        }
 
         public ICollectionValue<KeyValuePair<T, int>> ItemMultiplicities()
         {
@@ -582,6 +580,311 @@ namespace C6.Collections
 
         #endregion
 
+        #region ISequenced
+        public IDirectedCollectionValue<T> Backwards() => new Range(this, Count - 1, Count, EnumerationDirection.Backwards);
+
+        public int GetSequencedHashCode()
+        {
+            if (_sequencedHashCodeVersion != _version)
+            {
+                _sequencedHashCodeVersion = _version;
+                _sequencedHashCode = this.GetSequencedHashCode(EqualityComparer);
+            }
+
+            return _sequencedHashCode;
+        }
+
+        public bool SequencedEquals(ISequenced<T> otherCollection)
+        {
+            #region Code Contract
+            //RequireValidity();
+            #endregion
+            return this.SequencedEquals(otherCollection, EqualityComparer);
+        }
+
+
+        #endregion
+
+        #region IIndexed
+
+ 
+        public T this[int index]
+        {
+            get { return _items[index]; } // View: offset +
+            set {
+                #region Code Contracst
+                // No Require for the stter at IIndexed level ???
+                #endregion
+                UpdateVersion();
+
+                // View: index += offsetField;
+                var oldItem = _items[index];
+
+                if (EqualityComparer.Equals(value, oldItem))
+                { // ???
+                    _items[index] = value;
+                    _itemIndex[value] = index;
+                }
+                else
+                {// ???
+                    _items[index] = value;
+                    _itemIndex[value] = index;
+                }
+                // Allready there: Exception; C5 throws, but why ???
+
+                RaiseForIndexSetter(oldItem, value, index); // View: (_underlying ?? this).
+            }
+        }
+
+        public IDirectedCollectionValue<T> GetIndexRange(int startIndex, int count)
+            => new Range(this, startIndex, count, EnumerationDirection.Forwards);
+
+        public virtual int IndexOf(T item)
+        {
+            int index;
+            if (_itemIndex.TryGetValue(item, out index))
+            {
+                return index;
+            }
+            return ~Count;
+        }
+
+        public int LastIndexOf(T item) => IndexOf(item);
+
+        public T RemoveAt(int index)
+        {
+            #region Code Contracts
+            //Ensure from ArrayList           
+            #endregion
+            var item = RemoveAtPrivate(index);
+            /*View: (_underlying ?? this).*/ RaiseForRemovedAt(item, index);
+            return item;
+        }
+     
+        public void RemoveIndexRange(int startIndex, int count)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
+        #region IList
+
+        public virtual void Insert(int index, T item)
+        {
+            #region Code Contracts
+            //RequireValidity();
+            // If collection changes, the version is updated
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+
+            #endregion
+
+            InsertPrivate(index, item);
+            /*(_underlying ?? this).*/RaiseForInsert(index, item);
+        }
+
+        public void InsertFirst(T item) => Insert(0, item); // View: offset ???
+
+        public void InsertLast(T item) => Insert(Count, item); 
+
+        public void InsertRange(int index, SCG.IEnumerable<T> items)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsSorted(Comparison<T> comparison)
+        {
+            #region Code Contract
+            //RequireValidity();
+            #endregion
+
+            // TODO: Can we check that comparison doesn't alter the collection?
+            for (var i = 1; i < Count; i++) // View: +offset
+            {
+                if (comparison(_items[i - 1], _items[i]) > 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public bool IsSorted(SCG.IComparer<T> comparer) => IsSorted((comparer ?? SCG.Comparer<T>.Default).Compare);
+
+        public bool IsSorted() => IsSorted(SCG.Comparer<T>.Default);
+
+        public IList<T> LastViewOf(T item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string Print()
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual T RemoveFirst() => RemoveAt(0); //View: offset
+               
+        public virtual T RemoveLast() => RemoveAt(Count - 1); 
+               
+        public virtual void Reverse()
+        {
+            throw new NotImplementedException();
+        }
+               
+        public virtual void Shuffle()
+        {
+            throw new NotImplementedException();
+        }
+               
+        public virtual void Shuffle(Random random)
+        {
+            throw new NotImplementedException();
+        }
+               
+        public virtual IList<T> Slide(int offset, int count)
+        {
+            throw new NotImplementedException();
+        }
+               
+        public virtual IList<T> Slide(int offset)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void Sort(SCG.IComparer<T> comparer)
+        {
+            #region Code Contracts
+            //RequireValidity();
+            // If collection changes, the version is updated            
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+
+            #endregion
+
+            if (comparer == null)
+            {
+                comparer = SCG.Comparer<T>.Default;
+            }
+
+            if (IsSorted(comparer))
+            {
+                return;
+            }
+
+            UpdateVersion();
+            Array.Sort(_items, 0, Count, comparer); // View: offset
+            //View: DisposeOverlappingViewsPrivate(false);
+            /*(_underlying ?? this).*/RaiseForSort();
+        }
+
+        public virtual void Sort() => Sort((SCG.IComparer<T>)null);
+
+        public virtual void Sort(Comparison<T> comparison) => Sort(comparison.ToComparer()); // Why ToComparer, but not comparison;
+
+        public bool TrySlide(int offset)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool TrySlide(int offset, int count)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IList<T> View(int startIndex, int count)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IList<T> ViewOf(T item)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Explicit implementations
+
+        SC.IEnumerator SC.IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        void SC.ICollection.CopyTo(Array array, int index)
+        {
+            try
+            {
+                Array.Copy(_items, 0, array, index, Count);
+            }
+            catch (ArrayTypeMismatchException)
+            {
+                throw new ArgumentException("Target array type is not compatible with the type of items in the collection.");
+            }
+        }
+
+        void SCG.IList<T>.RemoveAt(int index) => RemoveAt(index);
+
+        bool SC.ICollection.IsSynchronized => false;
+
+        object SC.ICollection.SyncRoot { get; } = new object();
+
+        int SC.IList.Add(object value)
+        {
+            try
+            {
+                return Add((T)value) ? Count - 1 : -1;
+            }
+            catch (InvalidCastException)
+            {
+                throw new ArgumentException($"The value \"{value}\" is not of type \"{typeof(T)}\" and cannot be used in this generic collection.{Environment.NewLine}Parameter name: {nameof(value)}");
+            }
+        }
+
+        bool SC.IList.Contains(object value) => IsCompatibleObject(value) && Contains((T)value);
+
+        int SC.IList.IndexOf(object value) => IsCompatibleObject(value) ? Math.Max(-1, IndexOf((T)value)) : -1;
+
+        void SC.IList.Insert(int index, object value)
+        {
+            try
+            {
+                Insert(index, (T)value);
+            }
+            catch (InvalidCastException)
+            {
+                throw new ArgumentException($"The value \"{value}\" is not of type \"{typeof(T)}\" and cannot be used in this generic collection.{Environment.NewLine}Parameter name: {nameof(value)}");
+            }
+        }
+
+        void SC.IList.Remove(object value)
+        {
+            if (IsCompatibleObject(value))
+            {
+                Remove((T) value);
+            }
+        }        
+
+        void SC.IList.RemoveAt(int index) => RemoveAt(index);
+
+        object SC.IList.this[int index]
+        {
+            get { return this[index]; }
+            set
+            {
+                try
+                {
+                    this[index] = (T)value;
+                }
+                catch (InvalidCastException)
+                {
+                    throw new ArgumentException($"The value \"{value}\" is not of type \"{typeof(T)}\" and cannot be used in this generic collection.{Environment.NewLine}Parameter name: {nameof(value)}");
+                }
+            }
+        }
+
         #endregion
 
         #region Events        
@@ -617,12 +920,12 @@ namespace C6.Collections
         public event EventHandler<ItemAtEventArgs<T>> ItemInserted
         {
             add {
-                _itemInsertedAt += value;
+                _itemInserted += value;
                 ActiveEvents |= Inserted;
             }
             remove {
-                _itemInsertedAt -= value;
-                if (_itemInsertedAt == null) {
+                _itemInserted -= value;
+                if (_itemInserted == null) {
                     ActiveEvents &= ~Inserted;
                 }
             }
@@ -823,6 +1126,34 @@ namespace C6.Collections
 
         private void UpdateVersion() => _version++;
 
+        private static bool IsCompatibleObject(object value) => value is T; // || value == null && default(T) == null;
+
+        private void Dispose(bool disposingUnderlying)
+        {
+            //if (IsValid)
+            //{
+            //    if (_underlying != null) // view
+            //    {
+            //        IsValid = false;
+            //        if (!disposingUnderlying && _views != null) // the purpose of disposingUnderlying
+            //            _views.Remove(_myWeakReference);
+            //        _underlying = null;
+            //        _views = null; // shared ref. for _view! Does this set other views to null ??? No!
+            //        // only the current view's field (_view) starts to point to null.
+            //        _myWeakReference = null;
+            //    }
+            //    else // proper list
+            //    {
+            //        //isValid = false;
+            //        if (_views != null)
+            //            foreach (ArrayList<T> view in _views)
+            //                view.Dispose(true); // How can we assure that the nodes are deleted?
+            //        Clear();
+
+            //    }
+            //}
+        }
+
         private void RaiseForAdd(T item)
         {
             OnItemsAdded(item, 1);
@@ -859,6 +1190,34 @@ namespace C6.Collections
             OnCollectionChanged();
         }
 
+        private void RaiseForIndexSetter(T oldItem, T newItem, int index)
+        {
+            if (ActiveEvents != null)
+            {
+                OnItemRemovedAt(oldItem, index);
+                OnItemsRemoved(oldItem, 1);
+                OnItemInserted(newItem, index);
+                OnItemsAdded(newItem, 1);
+            }
+        }
+
+        private void RaiseForRemovedAt(T item, int index)
+        {
+            OnItemRemovedAt(item, index);
+            OnItemsRemoved(item, 1);
+            OnCollectionChanged();
+        }
+
+        private void RaiseForInsert(int index, T item)
+        {
+            OnItemInserted(item, index);
+            OnItemsAdded(item, 1);
+            OnCollectionChanged();
+        }
+
+        private void RaiseForSort() => OnCollectionChanged();
+
+
         #region InvokingMethods
 
         private void OnItemsAdded(T item, int count) => _itemsAdded?.Invoke(this, new ItemCountEventArgs<T>(item, count));
@@ -868,6 +1227,10 @@ namespace C6.Collections
         private void OnCollectionCleared(bool full, int count, int? start = null) => _collectionCleared?.Invoke(this, new ClearedEventArgs(full, count, start));
 
         private void OnItemsRemoved(T item, int count) => _itemsRemoved?.Invoke(this, new ItemCountEventArgs<T>(item, count));
+
+        private void OnItemInserted(T item, int index) => _itemInserted?.Invoke(this, new ItemAtEventArgs<T>(item, index));
+
+        private void OnItemRemovedAt(T item, int index) => _itemRemovedAt?.Invoke(this, new ItemAtEventArgs<T>(item, index));
 
         #endregion
 
@@ -1185,8 +1548,178 @@ namespace C6.Collections
         }
 
 
+        [Serializable]
+        [DebuggerTypeProxy(typeof(CollectionValueDebugView<>))]
+        [DebuggerDisplay("{DebuggerDisplay}")]
+        private sealed class Range : CollectionValueBase<T>, IDirectedCollectionValue<T>
+        {
+            #region Fields
+
+            private readonly HashedArrayList<T> _base;
+            private readonly int _version, _startIndex, _count, _sign;
+            private readonly EnumerationDirection _direction;
+
+            #endregion
+
+            #region Constructors
+
+            /// <summary>
+            ///     Initializes a new instance of the <see cref="Range"/> class that starts at the specified index and spans the next
+            ///     <paramref name="count"/> items in the specified direction.
+            /// </summary>
+            /// <param name="list">
+            ///     The underlying <see cref="HashedArrayList{T}"/>.
+            /// </param>
+            /// <param name="startIndex">
+            ///     The zero-based <see cref="HashedArrayList{T}"/> index at which the range starts.
+            /// </param>
+            /// <param name="count">
+            ///     The number of items in the range.
+            /// </param>
+            /// <param name="direction">
+            ///     The direction of the range.
+            /// </param>
+            public Range(HashedArrayList<T> list, int startIndex, int count, EnumerationDirection direction)
+            {
+                #region Code Contracts
+
+                // Argument must be non-null
+                Requires(list != null, ArgumentMustBeNonNull);
+
+                // Argument must be within bounds
+                Requires(-1 <= startIndex, ArgumentMustBeWithinBounds);
+                Requires(startIndex < list.Count || startIndex == 0 && count == 0, ArgumentMustBeWithinBounds);
+
+                // Argument must be within bounds
+                Requires(0 <= count, ArgumentMustBeWithinBounds);
+                Requires(direction.IsForward() ? startIndex + count <= list.Count : count <= startIndex + 1, ArgumentMustBeWithinBounds);
+
+                // Argument must be valid enum constant
+                Requires(Enum.IsDefined(typeof(EnumerationDirection), direction), EnumMustBeDefined);
+
+
+                Ensures(_base != null);
+                Ensures(_version == _base._version);
+                Ensures(_sign == (direction.IsForward() ? 1 : -1));
+                Ensures(-1 <= _startIndex);
+                Ensures(_startIndex < _base.Count || _startIndex == 0 && _base.Count == 0);
+                Ensures(-1 <= _startIndex + _sign * _count);
+                Ensures(_startIndex + _sign * _count <= _base.Count);
+
+                #endregion
+
+                _base = list;
+                _version = list._version;
+                _sign = (int)direction;
+                _startIndex = startIndex;
+                _count = count;
+                _direction = direction;
+            }
+
+            #endregion
+
+            #region Properties
+
+            public override bool AllowsNull => CheckVersion() & _base.AllowsNull;
+
+            public override int Count
+            {
+                get
+                {
+                    CheckVersion();
+                    return _count;
+                }
+            }
+
+            public override Speed CountSpeed
+            {
+                get
+                {
+                    CheckVersion();
+                    return Constant;
+                }
+            }
+
+            public EnumerationDirection Direction
+            {
+                get
+                {
+                    CheckVersion();
+                    return _direction;
+                }
+            }
+
+            #endregion
+
+            #region Public Methods
+
+            public IDirectedCollectionValue<T> Backwards()
+            {
+                CheckVersion();
+                var startIndex = _startIndex + (_count - 1) * _sign;
+                var direction = Direction.Opposite();
+                return new Range(_base, startIndex, _count, direction);
+            }
+
+            public override T Choose()
+            {
+                CheckVersion();
+                // Select the highest index in the range
+                var index = _direction.IsForward() ? _startIndex + _count - 1 : _startIndex;
+                return _base._items[index];
+            }
+
+            public override void CopyTo(T[] array, int arrayIndex)
+            {
+                CheckVersion();
+                if (_direction.IsForward())
+                {
+                    // Copy array directly
+                    Array.Copy(_base._items, _startIndex, array, arrayIndex, _count); //View:  _base.Offset!!
+                }
+                else
+                {
+                    // Use enumerator instead of copying and then reversing
+                    base.CopyTo(array, arrayIndex);
+                }
+            }
+
+            public override bool Equals(object obj) => CheckVersion() & base.Equals(obj);
+
+            public override SCG.IEnumerator<T> GetEnumerator()
+            {
+                var items = _base._items;
+                for (var i = 0; i < Count; i++)
+                {
+                    yield return items[_startIndex + _sign * i]; //View:  _base.Offset!!
+                }
+            }
+
+            public override int GetHashCode()
+            {
+                CheckVersion();
+                return base.GetHashCode();
+            }
+
+            public override T[] ToArray()
+            {
+                CheckVersion();
+                return base.ToArray();
+            }
+
+            #endregion
+
+            #region Private Members
+
+            private string DebuggerDisplay => _version == _base._version ? ToString() : "Expired collection value; original collection was modified since range was created.";
+
+            private bool CheckVersion() => _base.CheckVersion(_version);
+
+            #endregion
+        }
+
+
         #endregion
-        
 
     }
 }

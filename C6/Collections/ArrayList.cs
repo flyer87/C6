@@ -787,7 +787,7 @@ namespace C6.Collections
         // Explicitly check against null to avoid using the (slower) equality comparer
         public virtual bool RemoveDuplicates(T item) => item == null ? RemoveAllWhere(x => x == null) : RemoveAllWhere(x => Equals(item, x));
 
-        public virtual T RemoveFirst() => RemoveAt(0);
+        public virtual T RemoveFirst() => RemoveAt(0); // ??? View ofset, not 0
 
         public virtual void RemoveIndexRange(int startIndex, int count)
         {

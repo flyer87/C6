@@ -149,6 +149,8 @@ namespace C6.Tests
         [Test]
         public void Backwards_AllowsNull_Expected()
         {
+            Run.If(AllowsNull);
+
             // Arrange
             var items = GetStrings(Random).WithNull(Random);
             var collection = GetSequence(items, allowsNull: true);

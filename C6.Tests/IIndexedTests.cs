@@ -115,6 +115,8 @@ namespace C6.Tests
         [Test]
         public void ItemGet_RandomCollectionWithNull_Null()
         {
+            Run.If(AllowsNull);
+
             // Arrange
             var items = GetStrings(Random).WithNull(Random);
             var collection = GetIndexed(items, allowsNull: true);
@@ -388,6 +390,7 @@ namespace C6.Tests
         [Test]
         public void IndexOf_AllowsNull_PositiveIndex()
         {
+            Run.If(AllowsNull);
             // Arrange
             var items = GetStrings(Random).WithNull(Random);
             var collection = GetIndexed(items, allowsNull: true);
@@ -513,6 +516,8 @@ namespace C6.Tests
         [Test]
         public void LastIndexOf_AllowsNull_PositiveIndex()
         {
+            Run.If(AllowsNull);
+
             // Arrange
             var items = GetStrings(Random).WithNull(Random);
             var collection = GetIndexed(items, allowsNull: true);
@@ -574,6 +579,7 @@ namespace C6.Tests
         [Test]
         public void LastIndexOf_DuplicateItems_CountMinusOne()
         {
+            Run.If(AllowsDuplicates);
             // Arrange
             var count = GetCount(Random);
             var item = Random.GetString();
@@ -721,6 +727,8 @@ namespace C6.Tests
         [Test]
         public void RemoveAt_RandomCollectionWithNullRemoveNull_Null()
         {
+            Run.If(AllowsNull);
+
             // Arrange
             var items = GetStrings(Random).WithNull(Random);
             var collection = GetIndexed(items, allowsNull: true);

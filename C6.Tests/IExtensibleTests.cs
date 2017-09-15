@@ -196,8 +196,9 @@ namespace C6.Tests
         }
 
         [Test]
-        public virtual void Add_AllowsNullAddNull_ReturnsTrue()
+        public void Add_AllowsNullAddNull_ReturnsTrue()
         {
+            Run.If(AllowsNull);
             // Arrange
             var collection = GetStringExtensible(Random, allowsNull: true);
 
@@ -356,8 +357,9 @@ namespace C6.Tests
         }
 
         [Test]        
-        public virtual void AddRange_AllowNullAddNull_True()
-        {            
+        public void AddRange_AllowNullAddNull_True()
+        {     
+            Run.If(AllowsNull);       
             // Arrange
             var items = GetStrings(Random);
             var collection = GetExtensible(items, ReferenceEqualityComparer, allowsNull: true);

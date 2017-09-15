@@ -8,6 +8,7 @@ using System.Text;
 
 using C6.Collections;
 using C6.Tests.Contracts;
+using C6.Tests.Helpers;
 
 using NUnit.Framework;
 using NUnit.Framework.Internal;
@@ -97,8 +98,10 @@ namespace C6.Tests
         // TODO: Are there better tests to perform here?
 
         [Test]
-        public virtual void AllowsNull_EmptyCollectionAllowsNull_True()
+        public void AllowsNull_EmptyCollectionAllowsNull_True()
         {
+            Run.If(AllowsNull);
+
             // Arrange
             var collection = GetEmptyCollectionValue<string>(allowsNull: true);
 
@@ -123,8 +126,10 @@ namespace C6.Tests
         }
 
         [Test]
-        public virtual void AllowsNull_AllowsNull_True()
+        public void AllowsNull_AllowsNull_True()
         {
+            Run.If(AllowsNull);
+
             // Arrange
             var collection = GetCollectionValue(Enumerable.Empty<string>(), allowsNull: true);
 
