@@ -683,16 +683,16 @@ namespace C6.Collections
             /*(_underlying ?? this).*/RaiseForInsert(index, item);
         }
 
-        public void InsertFirst(T item) => Insert(0, item); // View: offset ???
+        public virtual void InsertFirst(T item) => Insert(0, item); // View: offset ???
 
-        public void InsertLast(T item) => Insert(Count, item); 
+        public virtual void InsertLast(T item) => Insert(Count, item); 
 
-        public void InsertRange(int index, SCG.IEnumerable<T> items)
+        public virtual void InsertRange(int index, SCG.IEnumerable<T> items)
         {
             throw new NotImplementedException();
         }
 
-        public bool IsSorted(Comparison<T> comparison)
+        public virtual bool IsSorted(Comparison<T> comparison)
         {
             #region Code Contract
             //RequireValidity();
@@ -710,16 +710,11 @@ namespace C6.Collections
             return true;
         }
 
-        public bool IsSorted(SCG.IComparer<T> comparer) => IsSorted((comparer ?? SCG.Comparer<T>.Default).Compare);
+        public virtual bool IsSorted(SCG.IComparer<T> comparer) => IsSorted((comparer ?? SCG.Comparer<T>.Default).Compare);
 
-        public bool IsSorted() => IsSorted(SCG.Comparer<T>.Default);
+        public virtual bool IsSorted() => IsSorted(SCG.Comparer<T>.Default);        
 
-        public IList<T> LastViewOf(T item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string Print()
+        public virtual string Print()
         {
             throw new NotImplementedException();
         }
@@ -730,9 +725,22 @@ namespace C6.Collections
                
         public virtual void Reverse()
         {
-            throw new NotImplementedException();
+            #region Code Contracts            
+            #endregion
+
+            if (Count <=1 )
+            {
+                return;
+            }
+
+            UpdateVersion();
+
+            Array.Reverse(_items, Offset, Count);
+            //View: DisposeOverlappingViewsPrivate(true);
+            /*View: (_underlying ?? this).*/ RaiseForReverse();
         }
-               
+        
+                
         public virtual void Shuffle()
         {
             throw new NotImplementedException();
@@ -798,6 +806,11 @@ namespace C6.Collections
         }
 
         public IList<T> ViewOf(T item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual IList<T> LastViewOf(T item)
         {
             throw new NotImplementedException();
         }
@@ -1217,6 +1230,7 @@ namespace C6.Collections
 
         private void RaiseForSort() => OnCollectionChanged();
 
+        private void RaiseForReverse() => OnCollectionChanged();
 
         #region InvokingMethods
 
