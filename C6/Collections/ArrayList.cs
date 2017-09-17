@@ -284,20 +284,14 @@ namespace C6.Collections
                 
         public virtual int Offset => _offsetField;
 
-        public virtual bool IsValid { get; protected set; }
+        public virtual bool IsValid { get; protected set; } // ???
 
         /// <summary>
         /// Null if this list is not a view.
         /// </summary>
         /// <value>Underlying list for view.</value>
         /// ???????? move to Property region
-        public virtual IList<T> Underlying
-        {
-            get
-            {                
-                return _underlying;
-            }
-        }
+        public virtual IList<T> Underlying => _underlying;
         // View ==========
 
         #endregion
@@ -1132,7 +1126,7 @@ namespace C6.Collections
             return View(index, 1);
         }
 
-        public IList<T> Slide(int offset)
+        public IList<T> Slide(int offset) // duplication ???;  => Slide(offset, Count); enough
         {
             TrySlide(offset, Count);
             return this;

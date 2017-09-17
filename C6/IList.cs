@@ -754,6 +754,7 @@ namespace C6
 
         public IList<T> Slide(int offset)
         {
+            // ignore requires ??? duplicate ?!
             Requires(Offset + offset >= 0); // TODO: message 
             Requires(Offset + offset + Count <= Underlying.Count); // TODO: message           
             return default(IList<T>);

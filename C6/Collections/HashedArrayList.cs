@@ -45,9 +45,10 @@ namespace C6.Collections
 
 
         private T[] _items;
-
-        //private SCG.HashSet<KeyValuePair<T, int>> _itemIndex;
         private SCG.Dictionary<T, int> _itemIndex;
+        private WeakViewList<HashedArrayList<T>> _views;
+        private WeakViewList<HashedArrayList<T>>.Node _myWeakReference;
+        private HashedArrayList<T> _underlying;
 
         private event EventHandler _collectionChanged;
         private event EventHandler<ClearedEventArgs> _collectionCleared;
@@ -57,8 +58,9 @@ namespace C6.Collections
         private int _version, _sequencedHashCodeVersion = -1, _unsequencedHashCodeVersion = -1;
         private int _sequencedHashCode, _unsequencedHashCode;
 
+        private int UnderlyingCount => (Underlying ?? this).Count;
 
-        #endregion Fields
+    #endregion Fields
 
         #region Constructors
 
@@ -212,13 +214,14 @@ namespace C6.Collections
         #region IList
         public T First => _items[0]; // View: _offset
         public T Last => _items[Count];
-        public int Offset => default(int); // !!!
-        public IList<T> Underlying => new HashedArrayList<T>(); // !!!
-        #endregion
+        public virtual int Offset { get; protected set; }
+        public virtual IList<T> Underlying => _underlying;
 
         #endregion
 
-        #region Public methods
+        #endregion
+
+        #region Public methods 
 
         #region IDisposable
         public virtual void Dispose()
@@ -240,7 +243,7 @@ namespace C6.Collections
 
             var version = _version;
             //yield return default(T); ???
-            for (int i = 0; CheckVersion(version) && i < Count; i++) {
+            for (int i = Offset; CheckVersion(version) && i < Offset + Count; i++) {
                 yield return _items[i];
             }
         }
@@ -252,7 +255,6 @@ namespace C6.Collections
 
         public bool Show(StringBuilder stringBuilder, ref int rest, IFormatProvider formatProvider)
             => Showing.Show(this, stringBuilder, ref rest, formatProvider); // to_base(virtual), here: no       
-
 
         public T[] ToArray() // to_base(virtual)
         {
@@ -273,17 +275,13 @@ namespace C6.Collections
 
             #endregion
 
-            if (FindOrAddToHashPrivate(item, Count)) {
-                // ? Does it work
+            if (FindOrAddToHashPrivate(item, Count)) { // ???                
                 return false;
-            }
+            }            
 
-            UpdateVersion();
-
-            InsertPrivate(Count, item);
-            // !!! reindex(size + offsetField);
-            /*View: underl.*/
-            RaiseForAdd(item); //View: for underlying;
+            InsertUnderlyingArrayPrivate(Count, item);
+            ReindexPrivate(Offset + Count + 1);
+            (_underlying ?? this).RaiseForAdd(item); //*View: 
             return true;
         }
 
@@ -302,11 +300,11 @@ namespace C6.Collections
             var countToAdd = array.Length;
             // View: underl.Count
             // =========
-            EnsureCapacity(Count + countToAdd);
-            var index = Count; // make it better
+            EnsureCapacity(UnderlyingCount + countToAdd);
+            var index = UnderlyingCount; // make it better
             // make space - irrelevant for Add(: from the end)
-            if (index < Count) {
-                Array.Copy(_items, index, _items, index + countToAdd, Count - index);
+            if (index < UnderlyingCount) {
+                Array.Copy(_items, index, _items, index + countToAdd, UnderlyingCount - index);
             }
 
             // copy the relevants
@@ -322,8 +320,8 @@ namespace C6.Collections
 
             // shrink the space if too much space is allocated
             if (countAdded < countToAdd) {
-                Array.Copy(_items, oldIndex + countToAdd, _items, index, Count - oldIndex);
-                Array.Clear(_items, Count + countAdded, countToAdd - countAdded); //#to_delete: kolkoto sa ostanali ne zapalnati
+                Array.Copy(_items, oldIndex + countToAdd, _items, index, UnderlyingCount - oldIndex);
+                Array.Clear(_items, UnderlyingCount + countAdded, countToAdd - countAdded); //#to_delete: kolkoto sa ostanali ne zapalnati
             }
             if (countAdded <= 0) {
                 return false;
@@ -331,11 +329,15 @@ namespace C6.Collections
 
             UpdateVersion();
 
-            Count += countAdded; // Views: under_count
+            Count += countAdded; // Views
+            if (_underlying != null)
+            {
+                _underlying.Count += countAdded;
+            }
             ReindexPrivate(index);
             //View: fix views
-            /*under.*/
-            RaiseForAddRange(array);
+            FixViewsAfterInsertPrivate(countAdded, index - countAdded); // == oldIndex
+            (_underlying ?? this).RaiseForAddRange(array); // View
 
             return true;
         }
@@ -384,12 +386,12 @@ namespace C6.Collections
 
             UpdateVersion();
 
-            oldItem = _items[index]; // View: + offsetField
-            _items[index] = item; // View: + offsetField            
-            _itemIndex[item] = index; // View: offsetField
+            oldItem = _items[Offset + index]; // View: 
+            _items[Offset + index] = item; // View:
+            _itemIndex[item] = Offset + index; // View: 
 
-            /*(underlying ?? this). */
-            RaiseForUpdate(item, oldItem);
+            
+            (_underlying ?? this).RaiseForUpdate(item, oldItem); // View:
             return true;
         }
 
@@ -440,15 +442,15 @@ namespace C6.Collections
 
             // Remove (last) instance of item, since this moves the fewest items
             var index = IndexOf(item);
-
-            if (index >= 0) {
-                removedItem = RemoveAtPrivate(index);
-                RaiseForRemove(removedItem);
-                return true;
+            if (index < 0)
+            {
+                removedItem = default(T);
+                return false;
             }
 
-            removedItem = default(T);
-            return false;
+            removedItem = RemoveAtPrivate(index);
+            RaiseForRemove(removedItem);
+            return true;
         }
 
         public virtual bool RemoveDuplicates(T item) => Remove(item);
@@ -644,7 +646,7 @@ namespace C6.Collections
             int index;
             if (_itemIndex.TryGetValue(item, out index))
             {
-                return index;
+                return index - Offset;// View
             }
             return ~Count;
         }
@@ -678,9 +680,12 @@ namespace C6.Collections
             Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
             #endregion
+            // ???? Check for duplicates
 
-            InsertPrivate(index, item);
-            /*(_underlying ?? this).*/RaiseForInsert(index, item);
+            InsertUnderlyingArrayPrivate(index, item);
+            _itemIndex[item] = index;
+            ReindexPrivate(Offset + index + 1);
+            (_underlying ?? this).RaiseForInsert(index, item); // View:
         }
 
         public virtual void InsertFirst(T item) => Insert(0, item); // View: offset ???
@@ -736,30 +741,63 @@ namespace C6.Collections
             UpdateVersion();
 
             Array.Reverse(_items, Offset, Count);
+            ReindexPrivate(Offset, Offset + Count);
             //View: DisposeOverlappingViewsPrivate(true);
             /*View: (_underlying ?? this).*/ RaiseForReverse();
         }
-        
-                
-        public virtual void Shuffle()
-        {
-            throw new NotImplementedException();
-        }
+
+        public virtual void Shuffle() => Shuffle(new Random());
                
         public virtual void Shuffle(Random random)
         {
-            throw new NotImplementedException();
+            #region Code Contracts
+            //RequireValidity();
+            // If collection changes, the version is updated
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+
+            #endregion
+
+            if (Count <= 1)
+            {
+                return;
+            }
+
+            // Only update version if the collection is shuffled
+            UpdateVersion();
+
+            _items.Shuffle(Offset, Count, random);
+            ReindexPrivate(Offset, Offset + Count);
+            //View: DisposeOverlappingViewsPrivate(false);
+            (_underlying ?? this).RaiseForShuffle();
+        }
+
+        public bool TrySlide(int offset) => TrySlide(offset, Count);
+
+        public bool TrySlide(int offset, int newCount)
+        {            
+            // check the indices
+            var newOffset = Offset + offset;            
+            if (newOffset < 0 || newCount < 0 || newOffset + newCount > Underlying.Count)
+            {
+                return false;
+            }
+
+            UpdateVersion();
+
+            // set the new values: offsetField, Count
+            Offset = newOffset;
+            Count = newCount;
+            return true;
         }
                
         public virtual IList<T> Slide(int offset, int count)
         {
-            throw new NotImplementedException();
+            // There are code contracts checking the offset, count 
+            TrySlide(offset, count);
+            return this;
         }
-               
-        public virtual IList<T> Slide(int offset)
-        {
-            throw new NotImplementedException();
-        }
+
+        public virtual IList<T> Slide(int offset) => Slide(offset, Count);
 
         public virtual void Sort(SCG.IComparer<T> comparer)
         {
@@ -782,6 +820,7 @@ namespace C6.Collections
 
             UpdateVersion();
             Array.Sort(_items, 0, Count, comparer); // View: offset
+            ReindexPrivate(Offset, Offset + Count);
             //View: DisposeOverlappingViewsPrivate(false);
             /*(_underlying ?? this).*/RaiseForSort();
         }
@@ -790,30 +829,39 @@ namespace C6.Collections
 
         public virtual void Sort(Comparison<T> comparison) => Sort(comparison.ToComparer()); // Why ToComparer, but not comparison;
 
-        public bool TrySlide(int offset)
+        public virtual IList<T> View(int startIndex, int count)
         {
-            throw new NotImplementedException();
+            #region Code Contracts            
+            #endregion            
+
+            if (_views == null)
+                _views = new WeakViewList<HashedArrayList<T>>();
+
+            HashedArrayList<T> view = (HashedArrayList<T>)MemberwiseClone();
+
+            view.Offset += startIndex;
+            view.Count = count;
+
+            view._underlying = _underlying ?? this;
+            view._myWeakReference = _views.Add(view);// ??? add this view (retval) to the list of my other views
+            return view;
         }
 
-        public bool TrySlide(int offset, int count)
+        public virtual IList<T> ViewOf(T item)
         {
-            throw new NotImplementedException();
+            #region Code Contracts            
+            #endregion
+
+            int index;
+            if ((index = IndexOf(item)) < 0)
+            {
+                return null;
+            }
+
+            return View(index, 1);
         }
 
-        public IList<T> View(int startIndex, int count)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IList<T> ViewOf(T item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual IList<T> LastViewOf(T item)
-        {
-            throw new NotImplementedException();
-        }
+        public virtual IList<T> LastViewOf(T item) => ViewOf(item);
 
         #endregion
 
@@ -1001,12 +1049,12 @@ namespace C6.Collections
 
         private void ReindexPrivate(int index)
         {
-            ReindexPrivate(index, Count);
+            ReindexPrivate(index, UnderlyingCount);
         }
 
-        private void ReindexPrivate(int index, int end)
+        private void ReindexPrivate(int index, int count)
         {
-            for (var i = index; i < end; i++) {
+            for (var i = index; i < count; i++) {
                 _itemIndex[_items[i]] = i;
             }
         }
@@ -1023,8 +1071,12 @@ namespace C6.Collections
             _itemIndex[item] = index;
             return false;
         }
-
-        private void InsertPrivate(int index, T item)
+        /// <summary>
+        /// Doesn't include _itemIndex[i] = x; reindex(index)
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="item"></param>
+        private void InsertUnderlyingArrayPrivate(int index, T item)
         {
             #region Code Contracts 
 
@@ -1038,18 +1090,78 @@ namespace C6.Collections
 
             UpdateVersion();
 
-            EnsureCapacity(Count + 1);
+            EnsureCapacity(UnderlyingCount + 1);
 
-            //Views: update the index to underindex here
+            index += Offset; //View:
 
             // Moves items one to the right
-            if (index < Count) {
-                Array.Copy(_items, index, _items, index + 1, Count - index);
+            if (index < UnderlyingCount) {
+                Array.Copy(_items, index, _items, index + 1, UnderlyingCount - index); // View:
             }
-            _items[index] = item;
-            Count++;
-            //Views: Count++, und.Count++
-            //Views: FixViewsAfterInsertPrivate(1, index);
+            _items[index] = item;            
+            Count++; // View: Under
+            if (_underlying != null)
+            {
+                _underlying.Count++;
+            }               
+            // !Reindex is up            
+            FixViewsAfterInsertPrivate(1, index);
+        }
+
+        private void FixViewsAfterInsertPrivate(int added, int realInsertionIndex)
+        {
+            if (_views != null)
+                foreach (HashedArrayList<T> view in _views)
+                {
+                    if (view != this)
+                    {
+                        // in the middle
+                        if (view.Offset < realInsertionIndex && realInsertionIndex < view.Offset + view.Count)
+                            view.Count += added;
+                        // before the beginning
+                        if (view.Offset > realInsertionIndex || (view.Offset == realInsertionIndex && view.Count > 0))
+                            view.Offset += added;
+                    }
+                }
+        }
+
+        private void FixViewsBeforeSingleRemovePrivate(int realRemovalIndex)
+        {
+            //if (_views != null)
+            //    foreach (ArrayList<T> view in _views)
+            //    {
+            //        if (view != this)
+            //        {
+            //            if (view._offsetField <= realRemovalIndex && view._offsetField + view.Count > realRemovalIndex)
+            //                view.Count--;
+            //            if (view._offsetField > realRemovalIndex)
+            //                view._offsetField--;
+            //        }
+            //    }
+        }
+
+        private void FixViewsBeforeRemovePrivate(int start, int count)
+        {
+            int clearend = start + count - 1;
+            //if (_views != null)
+            //    foreach (ArrayList<T> view in _views)
+            //    {
+            //        if (view == this)
+            //            continue;
+            //        int viewoffset = view._offsetField, viewend = viewoffset + view.Count - 1;
+            //        if (start < viewoffset)
+            //        {
+            //            if (clearend < viewoffset)
+            //                view._offsetField = viewoffset - count;
+            //            else
+            //            {
+            //                view._offsetField = start;
+            //                view.Count = clearend < viewend ? viewend - clearend : 0;
+            //            }
+            //        }
+            //        else if (start <= viewend)
+            //            view.Count = clearend <= viewend ? view.Count - count : start - viewoffset;
+            //    }
         }
 
         private void InsertRangePrivate(T[] array, int index)
@@ -1110,10 +1222,10 @@ namespace C6.Collections
         }
 
         private T RemoveAtPrivate(int index)
-        {
+        {           
             UpdateVersion();
             // new
-            //View: index += _offsetField;
+            // index += _offsetField; //View:
             //View: FixViewsBeforeSingleRemovePrivate(index);
 
             Count--;
@@ -1133,7 +1245,7 @@ namespace C6.Collections
             _items[underlyingCount] = default(T);
 
             _itemIndex.Remove(item);
-            //??? reindex()
+            ReindexPrivate(Offset + index);
             return item;
         }
 
@@ -1231,6 +1343,8 @@ namespace C6.Collections
         private void RaiseForSort() => OnCollectionChanged();
 
         private void RaiseForReverse() => OnCollectionChanged();
+
+        private void RaiseForShuffle() => OnCollectionChanged();
 
         #region InvokingMethods
 
@@ -1732,6 +1846,62 @@ namespace C6.Collections
             #endregion
         }
 
+        /// <summary>
+        /// Something ???
+        /// </summary>
+        /// <typeparam name="V"></typeparam>
+        private sealed class WeakViewList<V> where V : class
+        {
+            Node start;
+
+            [Serializable]
+            internal class Node
+            {
+                internal WeakReference weakview;
+                internal Node prev, next;
+                internal Node(V view) { weakview = new WeakReference(view); }
+            }
+
+            internal Node Add(V view)
+            {
+                Node newNode = new Node(view);
+                if (start != null) { start.prev = newNode; newNode.next = start; }
+                start = newNode;
+                return newNode;
+            }
+
+            internal void Remove(Node n)
+            {
+                if (n == start) { start = start.next; if (start != null) start.prev = null; }
+                else { n.prev.next = n.next; if (n.next != null) n.next.prev = n.prev; }
+            }
+
+            internal void Clear()
+            {
+                start = null;
+            }
+
+            /// <summary>
+            /// Note that it is safe to call views.Remove(view.myWeakReference) if view
+            /// is the currently yielded object
+            /// </summary>
+            /// <returns></returns>
+            public SCG.IEnumerator<V> GetEnumerator()
+            {
+                Node n = start;
+                while (n != null)
+                {
+                    //V view = n.weakview.Target as V; //This provokes a bug in the beta1 verifyer
+                    object o = n.weakview.Target;
+                    V view = o is V ? (V)o : null;
+                    if (view == null)
+                        Remove(n);
+                    else
+                        yield return view;
+                    n = n.next;
+                }
+            }
+        }
 
         #endregion
 

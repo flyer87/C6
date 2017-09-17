@@ -22,7 +22,7 @@ namespace C6.Tests.Collections
 
 
     [TestFixture]
-    public class HashedArrayListListTests : IIndexedTests
+    public class HashedArrayListListTests : IExtensibleTests
     {
         protected override EventTypes ListenableEvents => All; // Why All? -Up to us, could be changed to non-All for some tests
 
@@ -31,13 +31,13 @@ namespace C6.Tests.Collections
         protected override bool DuplicatesByCounting => true;
         protected override bool IsFixedSize => false;
         protected override bool IsReadOnly => false;
-        protected override Speed ContainsSpeed => Constant;
-        protected override Speed IndexingSpeed => Constant;
+        //protected override Speed ContainsSpeed => Constant;
+        //protected override Speed IndexingSpeed => Constant;
 
-        protected override IIndexed<T> GetEmptyIndexed<T>(IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
+        protected override IExtensible<T> GetEmptyExtensible<T>(IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
             => new HashedArrayList<T>(equalityComparer);
 
-        protected override IIndexed<T> GetIndexed<T>(IEnumerable<T> enumerable, IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
+        protected override IExtensible<T> GetExtensible<T>(IEnumerable<T> enumerable, IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
             => new HashedArrayList<T>(enumerable, equalityComparer);
     }
 }

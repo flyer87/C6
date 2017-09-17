@@ -6,12 +6,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 
-
-
 using C6.Collections;
-
-
-
 
 using static C6.Contracts.ContractMessage;
 
@@ -25,13 +20,11 @@ namespace C6.UserGuideExamples
     {
         public static void Main()
         {
-            var collection = new HashedArrayList<int> { 1,2,3,4 };
-            var d = collection.FindDuplicates(1).GetEnumerator();
-            d.MoveNext();
-            collection.Add(5);
-            d.MoveNext();
+            var hl = new HashedArrayList<int> { 1, 2, 3, 4, 5, 6, 6 };
+            hl.Shuffle(new Random(3));
+            Console.WriteLine(hl);
+          
 
-                        
 
             // Act            
 
