@@ -263,6 +263,7 @@ namespace C6.Tests
         [Test]
         public void GetSequencedHashCode_RandomSequenceWithNull_GeneratedHashCode()
         {
+            Run.If(AllowsDuplicates);
             // Arrange
             var items = GetStrings(Random).WithNull(Random);
             var sequence = GetSequence(items, allowsNull: true);

@@ -1,4 +1,4 @@
-﻿    // This file is part of the C6 Generic Collection Library for C# and CLI
+﻿// This file is part of the C6 Generic Collection Library for C# and CLI
 // See https://github.com/C6/C6/blob/master/LICENSE.md for licensing details.
 
 using System;
@@ -613,9 +613,9 @@ namespace C6.Collections
             (_underlying ?? this).RaiseForInsert(index, item);
         }
 
-        public virtual void InsertFirst(T item) => Insert(0, item);
+        public virtual void InsertFirst(T item) => Insert(0, item); // Offset ???
 
-        public virtual void InsertLast(T item) => Insert(Count, item);
+        public virtual void InsertLast(T item) => Insert(Count, item); // Offset ???
 
         public virtual void InsertRange(int index, SCG.IEnumerable<T> items)
         {
@@ -1082,14 +1082,14 @@ namespace C6.Collections
             return false;
         }
 
-        public virtual IList<T> View(int startIndex, int count)
+        public virtual IList<T> View(int index, int count)
         {            
             if (_views == null)
                 _views = new WeakViewList<ArrayList<T>>();
 
             ArrayList<T> view = (ArrayList<T>)MemberwiseClone();
             
-            view._offsetField = _offsetField + startIndex;
+            view._offsetField = _offsetField + index;
             view.Count = count;            
             
             view._underlying = _underlying ?? this;

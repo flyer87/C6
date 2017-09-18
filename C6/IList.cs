@@ -174,10 +174,10 @@ namespace C6
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="startIndex"></param>
+        /// <param name="index"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        IList<T> View(int startIndex, int count); // names?
+        IList<T> View(int index, int count); // names?
 
         /// <summary>
         /// 
@@ -726,13 +726,13 @@ namespace C6
             }
         }
 
-        public IList<T> View(int startIndex, int count)
+        public IList<T> View(int index, int count)
         {
             // Argument must be within bounds
             Requires(IsValid);
-            Requires(startIndex >= 0, ArgumentMustBeWithinBounds);
+            Requires(index >= 0, ArgumentMustBeWithinBounds);
             Requires(count >= 0, ArgumentMustBeWithinBounds);
-            Requires(startIndex + count <= Count, ArgumentMustBeWithinBounds); // Count == this.Count; this = view. || list.            
+            Requires(index + count <= Count, ArgumentMustBeWithinBounds); // Count == this.Count; this = view. || list.            
 
             return default(IList<T>);
         }
@@ -835,12 +835,10 @@ namespace C6
         {
             // No additional preconditions allowed
 
-
             // Result is a valid index
             Ensures(Contains(item)
                 ? 0 <= Result<int>() && Result<int>() < Count
-                : ~Result<int>() == Count);
-
+                : ~Result<int>() == Count, "mess");
 
             return default(int);
         }
@@ -982,7 +980,7 @@ namespace C6
             Requires(AllowsNull || ForAll(items, item => item != null), ItemsMustBeNonNull);
 
             // Collection must not already contain the items if collection disallows duplicate values
-            Requires(AllowsDuplicates || ForAll(this, item => !Contains(item)), CollectionMustAllowDuplicates);
+            Requires(AllowsDuplicates || ForAll(items, item => !Contains(item)), CollectionMustAllowDuplicates);
 
 
             // The items are inserted into the list without replacing other items
@@ -990,7 +988,6 @@ namespace C6
 
             // Collection doesn't change if enumerator throws an exception
             EnsuresOnThrow<Exception>(this.IsSameSequenceAs(OldValue(ToArray())));
-
 
             return;
         }

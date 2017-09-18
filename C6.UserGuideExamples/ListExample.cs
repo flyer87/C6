@@ -20,9 +20,19 @@ namespace C6.UserGuideExamples
     {
         public static void Main()
         {
-            var hl = new HashedArrayList<int> { 1, 2, 3, 4, 5, 6, 6 };
-            hl.Shuffle(new Random(3));
+            var hl = new HashedArrayList<int> { 1, 2, 3, 4, 5, 6, 7 };
+            var v = hl.View(2, 5);
+            var a = new[] {3,5,7 };
+
+            hl.RemoveRange(a);
+
             Console.WriteLine(hl);
+            Console.WriteLine(v);
+            foreach (var kv in hl._itemIndex)
+            {
+                Console.WriteLine(kv);
+            }
+
           
 
 

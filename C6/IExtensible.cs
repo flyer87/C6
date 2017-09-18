@@ -288,7 +288,7 @@ namespace C6
 
             // Returns true if bag semantic, otherwise the opposite of whether the collection already contained the item
             // !!! Ensures(AllowsDuplicates ? Result<bool>() : OldValue(!this.Contains(item, EqualityComparer)));
-            //Ensures(AllowsDuplicates == Result<bool>());
+            //Ensures(AllowsDuplicates == Result<bool>());            
 
             return default(bool);
         }

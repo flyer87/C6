@@ -994,10 +994,8 @@ namespace C6
             // is Valid, not disposed
             //Requires(IsValid);
 
-            // Returns true if the collection contains the item
-            var res = Result<bool>();
-            Ensures( res == this.Contains(item, EqualityComparer));
-
+            // Returns true if the collection contains the item            
+            Ensures(Result<bool>() == this.Contains(item, EqualityComparer));
 
             return default(bool);
         }
