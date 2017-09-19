@@ -1,0 +1,45 @@
+TODO:		
+	- some Ensure, Require, ... are gray, so non-active because of Resharper
+	- 
+	
+creat your own nested instead of using other class from IDictionary
+=============
+- HashSet<T> itemIndex:
+	- !!class HashSet<T> : CollectionBase<T>, ICollection<T>
+
+Q:
+	indexOf(T item)
+
+- "maintains a hash table so that it can quickly find the position of a given item in the array list."
+- "does not allow duplicates"
+- C5.13.6 Implementation of hashed array lists
+- Constant time for: Find, IndexOf, Contains, ... (instead of iterating over the items)
+
+
+
+!- KeyValuePair - struct
+	- ???IEquatable
+	- restrcuture???
+	
+- What is int for in KeyValuePair<T, int> for? Is It real index in the _items?
+	- yes!
+	
+
+!- HashSet<KeyValuePair<T>> - UnitTests, Code Contracts
+	- class restructure???
+	- itemIndex.Find(), itemIndex.FindorAdd(), itemIndex.Remove(), itemIndex.UpdateOrAdd(),
+		itemIndex.Update(), itemIndex.Clear()
+		- I should re-write that class as well or not ?
+		
+- Allowsnull?
+	- now: NO
+
+- AllowsDuplicates
+	- NO!
+	
+- CountSpeed - EmptyCollection has CountSpeed = Speed.Constant?
+
+- DuplicatesByCounting:
+	- "true by convention for collections with set semantics."(C5)
+	- "An array list(array!,not hashed!) allows duplicates, so AllowsDuplicates is true, and stores duplicates explicitly, so DuplicatesByCounting is false."
+

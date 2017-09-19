@@ -232,7 +232,7 @@ namespace C6
             Requires(0 <= count, ArgumentMustBeNonNegative);
 
             // is Valid, not disposed
-            // Requires(IsValid);
+            Requires(IsValid);
 
             // Result is non-null
             Ensures(Result<IDirectedCollectionValue<T>>() != null);
@@ -269,7 +269,7 @@ namespace C6
             Requires(AllowsNull || item != null, ItemMustBeNonNull);
 
             // is Valid, not disposed
-            // Requires(IsValid);
+            Requires(IsValid);
 
             // Result is a valid index
             Ensures(Contains(item)
@@ -286,7 +286,7 @@ namespace C6
             Requires(AllowsNull || item != null, ItemMustBeNonNull);
 
             // is Valid, not disposed
-            // Requires(IsValid);
+            Requires(IsValid);
 
             // Result is a valid index
             Ensures(Contains(item)
@@ -306,7 +306,7 @@ namespace C6
         public T RemoveAt(int index)
         {
             // is Valid, not disposed
-            // Requires(IsValid);
+            Requires(IsValid);
 
             // Collection must be non-read-only
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
@@ -339,7 +339,7 @@ namespace C6
         public void RemoveIndexRange(int startIndex, int count)
         {
             // is Valid, not disposed
-            // Requires(IsValid);            
+            Requires(IsValid);
 
             // Collection must be non-read-only
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);

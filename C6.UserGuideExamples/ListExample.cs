@@ -12,6 +12,7 @@ using static C6.Contracts.ContractMessage;
 
 
 using SCG = System.Collections.Generic;
+using SC = System.Collections;
 
 
 namespace C6.UserGuideExamples
@@ -20,22 +21,15 @@ namespace C6.UserGuideExamples
     {
         public static void Main()
         {
-            var hl = new HashedArrayList<int> { 1, 2, 3, 4, 5, 6, 7 };
-            var v = hl.View(2, 5);
-            var a = new[] {3,5,7 };
-
-            hl.RemoveRange(a);
-
-            Console.WriteLine(hl);
+            var collection = new HashedArrayList<string> { "1", "2", "3", "4" };
+            var v = collection.View(1, 2);
             Console.WriteLine(v);
-            foreach (var kv in hl._itemIndex)
-            {
-                Console.WriteLine(kv);
-            }
-
-          
+            v.Dispose();
+            Console.WriteLine(v.AllowsNull);
 
 
+
+            
             // Act            
 
 

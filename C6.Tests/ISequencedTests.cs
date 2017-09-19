@@ -459,6 +459,8 @@ namespace C6.Tests
         [Test]
         public void SequencedEquals_EqualItemsButDifferentMultiplicity_False()
         {
+            Run.If(AllowsDuplicates);
+
             // Arrange
             var items = GetStrings(Random);
             var sequence = GetSequence(items);

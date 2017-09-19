@@ -165,7 +165,7 @@ namespace C6.Collections
 
         #region ICollectionValue
 
-        public bool IsValid { get; }
+        public bool IsValid { get; private set; }
 
         public int Count { get; protected set; } // to_base
 
@@ -371,8 +371,45 @@ namespace C6.Collections
 
         public bool RetainRange(SCG.IEnumerable<T> items)
         {
-            // View:
-            throw new NotImplementedException();
+            #region Code Contracts
+            //RequireValidity();
+            // If collection changes, the version is updated
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+
+            #endregion
+
+            if (IsEmpty)
+            {
+                return false;
+            }
+
+            if (items.IsEmpty())
+            {
+                // Optimize call, if no items should be retained
+                UpdateVersion();
+
+                T[] itemsRemoved;
+                // proper list
+                if (_underlying == null)
+                {
+                    itemsRemoved = _items;
+                    ClearPrivate();
+                }
+                else
+                {
+                    // views                
+                    itemsRemoved = new T[Count];
+                    Array.Copy(_items, Offset, itemsRemoved, 0, Count);
+                    RemoveIndexRange(0, Count);
+                }
+
+                RaiseForRemoveAllWhere(itemsRemoved);
+                return true;
+            }
+
+            // TODO: Replace ArrayList<T> with more efficient data structure like HashBag<T>
+            var itemsToRemove = new ArrayList<T>(items, EqualityComparer, AllowsNull);
+            return RemoveAllWhere(item => !itemsToRemove.Remove(item));
         }
 
         public ICollectionValue<T> UniqueItems() => new ItemSet(this);
@@ -770,6 +807,8 @@ namespace C6.Collections
 
         public virtual void InsertRange(int index, SCG.IEnumerable<T> items)
         {
+            // TODO: Use InsertPrivate()
+
             // TODO: Handle ICollectionValue<T> and ICollection<T>
             // TODO: Avoid creating an array? Requires a lot of extra code, since we need to properly handle items already added from a bad enumerable
             // A bad enumerator will throw an exception here      
@@ -781,6 +820,7 @@ namespace C6.Collections
             }
             var countToAdd = array.Length;
 
+            var inIndex = index; // no need; only for RaiseFor
             index += Offset;            
             EnsureCapacity(UnderlyingCount + countToAdd);
 
@@ -823,7 +863,7 @@ namespace C6.Collections
 
                 ReindexPrivate(index);
                 FixViewsAfterInsertPrivate(countAdded, index - countAdded); //View; index - countAdded == oldIndex
-                (_underlying ?? this).RaiseForAddRange(array); // View
+                (_underlying ?? this).RaiseForInsertRange(inIndex, array);
             }
             finally 
             {
@@ -834,6 +874,19 @@ namespace C6.Collections
             //throw new NotImplementedException();
         }
 
+        private void RaiseForInsertRange(int index, T[] array) // ??? the index of the view or the _items
+        {
+            if (ActiveEvents.HasFlag(Inserted | Added))
+            {
+                for (var i = 0; i < array.Length; i++)
+                {
+                    var item = array[i];
+                    OnItemInserted(item, index + i);
+                    OnItemsAdded(item, 1);
+                }
+            }
+            OnCollectionChanged();
+        }
         public virtual bool IsSorted(Comparison<T> comparison) // View:
         {
             #region Code Contract
@@ -1543,32 +1596,37 @@ namespace C6.Collections
 
         private void UpdateVersion() => _version++;
 
-        private static bool IsCompatibleObject(object value) => value is T; // || value == null && default(T) == null;
+        private static bool IsCompatibleObject(object value) => value is T || value == null && default(T) == null;
 
         private void Dispose(bool disposingUnderlying)
         {
-            //if (IsValid)
-            //{
-            //    if (_underlying != null) // view
-            //    {
-            //        IsValid = false;
-            //        if (!disposingUnderlying && _views != null) // the purpose of disposingUnderlying
-            //            _views.Remove(_myWeakReference);
-            //        _underlying = null;
-            //        _views = null; // shared ref. for _view! Does this set other views to null ??? No!
-            //        // only the current view's field (_view) starts to point to null.
-            //        _myWeakReference = null;
-            //    }
-            //    else // proper list
-            //    {
-            //        //isValid = false;
-            //        if (_views != null)
-            //            foreach (ArrayList<T> view in _views)
-            //                view.Dispose(true); // How can we assure that the nodes are deleted?
-            //        Clear();
+            if (!IsValid)
+            {
+                return;
+            }
 
-            //    }
-            //}
+            if (_underlying != null) // view calls Dispose
+            {
+                IsValid = false;
+                if (!disposingUnderlying && _views != null) // disposingUnderlying == true: comes from the else part 
+                    _views.Remove(_myWeakReference);
+                _underlying = null;
+                _views = null; // shared ref. for _view! Does this set other views to null ??? No!
+                // only the current view's field (_view) starts to point to null.
+                _myWeakReference = null;
+            }
+            else // proper list call
+            {
+                //isValid = false;
+                if (_views != null)
+                {
+                    foreach (var view in _views)
+                        view.Dispose(true); // How can we assure that the nodes are deleted?
+                    _views = null; // !!! ??? notes
+                }
+
+                Clear();
+            }
         }
 
         private void RaiseForAdd(T item)
@@ -1617,7 +1675,8 @@ namespace C6.Collections
                 OnItemsRemoved(oldItem, 1);
                 OnItemInserted(newItem, index);
                 OnItemsAdded(newItem, 1);
-            }
+                OnCollectionChanged();
+            }            
         }
 
         private void RaiseForRemovedAt(T item, int index)
@@ -1657,6 +1716,18 @@ namespace C6.Collections
             OnCollectionCleared(false, count, startIndex);
             OnCollectionChanged();
         }
+
+        //private void RaiseForIndexSetter(T oldItem, T newItem, int index)
+        //{
+        //    if (ActiveEvents != None)
+        //    {
+        //        OnItemRemovedAt(oldItem, index);
+        //        OnItemsRemoved(oldItem, 1);
+        //        OnItemInserted(newItem, index);
+        //        OnItemsAdded(newItem, 1);
+        //        OnCollectionChanged();
+        //    }
+        //}
 
         #region InvokingMethods
 

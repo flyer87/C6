@@ -1,0 +1,63 @@
+creat your own nested instead of using other class from IDictionary
+=============
+- HashSet<T> itemIndex:
+	- !!class HashSet<T> : CollectionBase<T>, ICollection<T>
+	
+Q:
+	indexOf(T item)
+
+- "maintains a hash table so that it can quickly find the position of a given item in the array list."
+- "does not allow duplicates"
+- C5.13.6 Implementation of hashed array lists
+- Constant time for: Find, IndexOf, Contains, ... (instead of iterating over the items)
+
+
+!- KeyValuePair - struct
+	- ???IEquatable
+	- restrcuture???
+	
+- What is int for in KeyValuePair<T, int> for? Is It real index in the _items?
+	- yes!
+	
+
+!- HashSet<KeyValuePair<T>> - UnitTests, Code Contracts
+	- class restructure???
+	- itemIndex.Find(), itemIndex.FindorAdd(), itemIndex.Remove(), itemIndex.UpdateOrAdd(),
+		itemIndex.Update(), itemIndex.Clear()
+		- I should re-write that class as well or not ?
+		
+- ?ListenableEvents - Why? Do we need?
+
+- ?FindorAddToHash - any other operations to support ???
+
+- Contains, Remove
+	- from SCG and ICollection<T> - I put virtual, since they have the same signature. Is it fine?
+		
+- Test:
+	- What is the properties in HALTests for? Cos when we create HAL, it already has the values
+	
+Tips:
+	Clear()
+		prop. list -> Clear(); 
+		view -> RemoveIndexRange(0, Count);
+	Add() -> Insert
+	Remove() -> RemoveAt
+=======================
+TODO:
+	- Use InsertPrivate() in InsertRange
+	- private void RaiseForInsertRange(int index, T[] array) // ??? the index of the view or the _items
+	- AddRange -> can we re-use InsertRange???
+	- Add Code contracts to:
+		private methods
+		additional postconditions: look at Mikkel's implementations.
+	- Properties: no Code Contracts for set {}
+	- Some methods are the same as in ArrayList: Dispose() and others. Re-use them?
+	- in Dispose(), else{} section, added: _views = null; Otherwise Clear(), calling 					FixViewsBeforeRemovePrivate() throws isValid should be true for the views. Is it fine?
+		Code to reproduce:
+		var collection = new HashedArrayList<string> { "1", "2", "3", "4" };
+		var v = collection.View(1, 2);
+		Console.WriteLine(v);
+		collection.Dispose();
+	- view after Dispose() can call: v.AllowsNull. But should we allow that?
+	Views:
+		- add not a view message

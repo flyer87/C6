@@ -694,6 +694,7 @@ namespace C6.Tests
         public void SCIListContains_AllowNullContainsNull_True()
         {
             Run.If(AllowsNull);
+
             // Arrange
             var items = GetStrings(Random).WithNull(Random);
             var collection = GetList(items, allowsNull: true);
@@ -708,6 +709,8 @@ namespace C6.Tests
         [Test]
         public void SCIListContains_AllowNullContainsNoNull_False()
         {
+            Run.If(AllowsNull); // new
+
             // Arrange
             var items = GetStrings(Random);
             var collection = GetList(items, allowsNull: true);

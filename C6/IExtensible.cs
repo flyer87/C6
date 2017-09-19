@@ -14,7 +14,6 @@ using static C6.Contracts.ContractMessage;
 using SC = System.Collections;
 using SCG = System.Collections.Generic;
 
-
 namespace C6
 {
     // This is mainly the intersection of the main stream generic collection interfaces and the priority queue interface, ICollection<T> and IPriorityQueue<T>.
@@ -213,6 +212,35 @@ namespace C6
             }
         }
 
+        public bool IsFixedSize
+        {
+            get
+            {
+                // No preconditions
+
+
+                // Read-only list has fixed size
+                Ensures(!IsReadOnly || Result<bool>());
+
+
+                return default(bool);
+            }
+        }
+
+        public bool IsReadOnly
+        {
+            get
+            {
+                // No preconditions
+
+
+                // No postconditions
+
+
+                return default(bool);
+            }
+        }
+
         public SCG.IEqualityComparer<T> EqualityComparer
         {
             get {
@@ -227,35 +255,11 @@ namespace C6
             }
         }
 
-        public bool IsFixedSize
-        {
-            get {
-                // No preconditions
-
-
-                // Read-only list has fixed size
-                Ensures(!IsReadOnly || Result<bool>());
-
-
-                return default(bool);
-            }
-        }
-
-        public bool IsReadOnly
-        {
-            get {
-                // No preconditions
-
-
-                // No postconditions
-
-
-                return default(bool);
-            }
-        }
-
         public bool Add(T item)
         {
+            // is Valid, not disposed
+            Requires(IsValid);
+
             // Collection must be non-read-only
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
 
@@ -264,9 +268,6 @@ namespace C6
 
             // Argument must be non-null if collection disallows null values
             Requires(AllowsNull || item != null, ItemMustBeNonNull);
-
-            // is Valid, not disposed
-            //Requires(IsValid);
 
             // The collection becomes non-empty
             Ensures(!IsEmpty);
@@ -295,6 +296,9 @@ namespace C6
 
         public bool AddRange(SCG.IEnumerable<T> items)
         {
+            // is Valid, not disposed
+            Requires(IsValid);
+
             // Collection must be non-read-only
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
 
@@ -306,10 +310,7 @@ namespace C6
 
             // All items must be non-null if collection disallows null values
             Requires(AllowsNull || ForAll(items, item => item != null), ItemsMustBeNonNull);
-
-            // is Valid, not disposed
-            //Requires(IsValid);
-
+            
             // The collection becomes non-empty, if items are non-empty
             Ensures(items.IsEmpty() || !IsEmpty);
 

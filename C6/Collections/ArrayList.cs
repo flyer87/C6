@@ -864,7 +864,7 @@ namespace C6.Collections
             {
                 // Optimize call, if no items should be retained
                 UpdateVersion();
-                var itemsRemoved = _items;
+                var itemsRemoved = _items; // for views ???
                 ClearPrivate();
                 RaiseForRemoveAllWhere(itemsRemoved);
                 return true;
@@ -1185,10 +1185,9 @@ namespace C6.Collections
                 {
                     //isValid = false;
                     if (_views != null)
-                        foreach (ArrayList<T> view in _views)
+                        foreach (var view in _views)
                             view.Dispose(true); // How can we assure that the nodes are deleted?
-                    Clear();
-                    
+                    Clear();                    
                 }
             }
         }
