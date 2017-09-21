@@ -50,7 +50,8 @@ namespace C6.Collections
 
         public abstract SCG.IEnumerator<T> GetEnumerator();
 
-        public virtual bool Show(StringBuilder stringBuilder, ref int rest, IFormatProvider formatProvider) => Showing.Show(this, stringBuilder, ref rest, formatProvider);
+        public virtual bool Show(StringBuilder stringBuilder, ref int rest, IFormatProvider formatProvider) => 
+            Showing.Show(this, stringBuilder, ref rest, formatProvider);
 
         public virtual T[] ToArray()
         {
@@ -61,7 +62,8 @@ namespace C6.Collections
 
         public override string ToString() => ToString(null, null);
 
-        public virtual string ToString(string format, IFormatProvider formatProvider) => Showing.ShowString(this, format, formatProvider);
+        public virtual string ToString(string format, IFormatProvider formatProvider) => 
+            Showing.ShowString(this, format, formatProvider);
 
         #endregion
 

@@ -1,0 +1,14 @@
+TODO:
+	Other virtual properties/ methods ? So far only IExtensible p,m's
+	
+	//!Check for Code contracts after implementation of IExtensible
+===========
+C5:
+	void InsertAll(int i, SCG.IEnumerable<T> items, bool insertion)
+	redundant: if (count > 0) {}
+	
+================
+Thesis notes:	
+	it was: private void raiseForInsertAll(Node node, int i, int added, bool insertion)
+	now: private void RaiseForAddRange(SCG.IEnumerable<T> items)
+            

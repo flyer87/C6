@@ -164,7 +164,7 @@ namespace C6
         }
 
         [Serializable]
-        private class EqualityComparer<T> : SCG.IEqualityComparer<T>
+        public class EqualityComparer<T> : SCG.IEqualityComparer<T> // !!!
         {
             private readonly Func<T, T, bool> _equals;
             private readonly Func<T, int> _getHashCode;

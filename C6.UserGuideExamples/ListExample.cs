@@ -21,11 +21,17 @@ namespace C6.UserGuideExamples
     {
         public static void Main()
         {
-            var collection = new HashedArrayList<string> { "1", "2", "3", "4" };
-            var v = collection.View(1, 2);
-            Console.WriteLine(v);
-            v.Dispose();
-            Console.WriteLine(v.AllowsNull);
+            var eq = new C6.ComparerFactory.EqualityComparer<string>(ReferenceEquals, 
+                SCG.EqualityComparer<string>.Default.GetHashCode);
+            var items = new[] { "1", "2", "3", "4", "5", "6", "7" };
+            var ll = new LinkedList<string>(items, eq, true);
+            //var nitems = new string[] { "3", null, "5" };
+            var nitems = items.Concat(items);
+            ll.AddRange(nitems);
+            Console.WriteLine(ll);
+            
+            
+
 
 
 

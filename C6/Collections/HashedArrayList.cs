@@ -196,7 +196,7 @@ namespace C6.Collections
 
         public bool IsReadOnly => false;
 
-        public virtual SCG.IEqualityComparer<T> EqualityComparer { get; } // ??? virtual
+        public virtual SCG.IEqualityComparer<T> EqualityComparer { get; } 
 
         #endregion
 
@@ -242,7 +242,7 @@ namespace C6.Collections
 
         #region ICollectionValue
 
-        public SCG.IEnumerator<T> GetEnumerator()
+        public SCG.IEnumerator<T> GetEnumerator() // overrides valuebase 
         {
             #region Code Contracts
 

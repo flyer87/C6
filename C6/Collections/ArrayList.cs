@@ -316,7 +316,7 @@ namespace C6.Collections
 
             InsertPrivate(Count, item);            
             (_underlying ?? this).RaiseForAdd(item); //RaiseForAdd(item); // we raise the event on the proper list, ya?!
-            InvalidateCollectionValuesPrivate();
+            // InvalidateCollectionValuesPrivate();
             return true;
         }
 
@@ -2172,7 +2172,7 @@ namespace C6.Collections
                 }
             }
 
-            public override bool IsEmpty => /*CheckVersion() &*/ List.IsEmpty;
+            public override bool IsEmpty => CheckVersion() & List.IsEmpty;
 
             #endregion
 
