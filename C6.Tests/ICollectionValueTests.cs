@@ -8,6 +8,7 @@ using System.Text;
 
 using C6.Collections;
 using C6.Tests.Contracts;
+using C6.Tests.Helpers;
 
 using NUnit.Framework;
 using NUnit.Framework.Internal;
@@ -25,6 +26,8 @@ namespace C6.Tests
     {
         #region Factories
 
+        protected abstract bool AllowsNull { get; }
+
         /// <summary>
         ///     Creates an empty collection value.
         /// </summary>
@@ -37,7 +40,7 @@ namespace C6.Tests
         /// <returns>
         ///     An empty collection value.
         /// </returns>
-        protected abstract ICollectionValue<T> GetEmptyCollectionValue<T>(bool allowsNull = false);
+        protected abstract ICollectionValue<T> GetEmptyCollectionValue<T>(bool allowsNull = false);        
 
         /// <summary>
         ///     Creates a collection value containing the items in the enumerable.
@@ -97,6 +100,8 @@ namespace C6.Tests
         [Test]
         public void AllowsNull_EmptyCollectionAllowsNull_True()
         {
+            Run.If(AllowsNull);
+
             // Arrange
             var collection = GetEmptyCollectionValue<string>(allowsNull: true);
 
@@ -123,6 +128,8 @@ namespace C6.Tests
         [Test]
         public void AllowsNull_AllowsNull_True()
         {
+            Run.If(AllowsNull);
+
             // Arrange
             var collection = GetCollectionValue(Enumerable.Empty<string>(), allowsNull: true);
 
@@ -241,6 +248,7 @@ namespace C6.Tests
 
             // Act & Assert
             Assert.That(() => collection.Choose(), Violates.PreconditionSaying(CollectionMustBeNonEmpty));
+            //Assert.That(() => collection.Choose(), Throws.TypeOf<PreconditionException>());            
         }
 
         [Test]

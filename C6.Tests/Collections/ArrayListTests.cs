@@ -396,6 +396,7 @@ namespace C6.Tests.Collections
     [TestFixture]
     public class ArrayListListTests : IListTests
     {
+        protected override bool AllowsNull => true;
         protected override bool AllowsDuplicates => true;
         protected override Speed ContainsSpeed => Speed.Linear;
         protected override bool DuplicatesByCounting => false;
@@ -405,13 +406,14 @@ namespace C6.Tests.Collections
         protected override EventTypes ListenableEvents => All;
 
         protected override IList<T> GetEmptyList<T>(SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false) => new ArrayList<T>(equalityComparer: equalityComparer, allowsNull: allowsNull);
-        protected override IList<T> GetList<T>(SCG.IEnumerable<T> enumerable, SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false) => new ArrayList<T>(enumerable, equalityComparer, allowsNull);
+        protected override IList<T> GetList<T>(SCG.IEnumerable<T> enumerable, SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false) => new ArrayList<T>(enumerable, equalityComparer, allowsNull);        
     }
 
 
     [TestFixture]
     public class ArrayListStackTests : IStackTests
     {
+        protected override bool AllowsNull => true;
         protected override bool IsReadOnly => false;
         protected override EventTypes ListenableEvents => All;
 

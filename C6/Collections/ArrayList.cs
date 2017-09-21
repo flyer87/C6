@@ -1,4 +1,4 @@
-﻿    // This file is part of the C6 Generic Collection Library for C# and CLI
+﻿// This file is part of the C6 Generic Collection Library for C# and CLI
 // See https://github.com/C6/C6/blob/master/LICENSE.md for licensing details.
 
 using System;
@@ -159,7 +159,7 @@ namespace C6.Collections
         }
 
         public ArrayList(int capacity = 0, SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false) 
-            : base(allowsNull)
+            : base(allowsNull)            
         {
             #region Code Contracts
 
@@ -284,20 +284,14 @@ namespace C6.Collections
                 
         public virtual int Offset => _offsetField;
 
-        public virtual bool IsValid { get; protected set; }
+        public virtual bool IsValid { get; protected set; } // ???
 
         /// <summary>
         /// Null if this list is not a view.
         /// </summary>
         /// <value>Underlying list for view.</value>
         /// ???????? move to Property region
-        public virtual IList<T> Underlying
-        {
-            get
-            {                
-                return _underlying;
-            }
-        }
+        public virtual IList<T> Underlying => _underlying;
         // View ==========
 
         #endregion
@@ -355,7 +349,6 @@ namespace C6.Collections
             // TODO: Avoid creating an array? Requires a lot of extra code, since we need to properly handle items already added from a bad enumerable
             // A bad enumerator will throw an exception here            
             var array = items.ToArray();
-
             if (array.IsEmpty())
             {
                 return false;
@@ -486,7 +479,7 @@ namespace C6.Collections
             //RequireValidity();
             #endregion
             var duplicates = new Duplicates(this, item);            
-            _collValues.Add(duplicates);            
+            _collValues.Add(duplicates); // ???        
 
             return duplicates;
         }
@@ -620,9 +613,9 @@ namespace C6.Collections
             (_underlying ?? this).RaiseForInsert(index, item);
         }
 
-        public virtual void InsertFirst(T item) => Insert(0, item);
+        public virtual void InsertFirst(T item) => Insert(0, item); // Offset ???
 
-        public virtual void InsertLast(T item) => Insert(Count, item);
+        public virtual void InsertLast(T item) => Insert(Count, item); // Offset ???
 
         public virtual void InsertRange(int index, SCG.IEnumerable<T> items)
         {
@@ -675,7 +668,7 @@ namespace C6.Collections
         // TODO: Defer execution
         public virtual ICollectionValue<KeyValuePair<T, int>> ItemMultiplicities()
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException(); // ???
         }
 
         public virtual int LastIndexOf(T item)
@@ -788,7 +781,7 @@ namespace C6.Collections
         // Explicitly check against null to avoid using the (slower) equality comparer
         public virtual bool RemoveDuplicates(T item) => item == null ? RemoveAllWhere(x => x == null) : RemoveAllWhere(x => Equals(item, x));
 
-        public virtual T RemoveFirst() => RemoveAt(0);
+        public virtual T RemoveFirst() => RemoveAt(0); // ??? View ofset, not 0
 
         public virtual void RemoveIndexRange(int startIndex, int count)
         {
@@ -871,7 +864,7 @@ namespace C6.Collections
             {
                 // Optimize call, if no items should be retained
                 UpdateVersion();
-                var itemsRemoved = _items;
+                var itemsRemoved = _items; // for views ???
                 ClearPrivate();
                 RaiseForRemoveAllWhere(itemsRemoved);
                 return true;
@@ -1089,14 +1082,14 @@ namespace C6.Collections
             return false;
         }
 
-        public virtual IList<T> View(int startIndex, int count)
+        public virtual IList<T> View(int index, int count)
         {            
             if (_views == null)
                 _views = new WeakViewList<ArrayList<T>>();
 
             ArrayList<T> view = (ArrayList<T>)MemberwiseClone();
             
-            view._offsetField = _offsetField + startIndex;
+            view._offsetField = _offsetField + index;
             view.Count = count;            
             
             view._underlying = _underlying ?? this;
@@ -1133,7 +1126,7 @@ namespace C6.Collections
             return View(index, 1);
         }
 
-        public IList<T> Slide(int offset)
+        public IList<T> Slide(int offset) // duplication ???;  => Slide(offset, Count); enough
         {
             TrySlide(offset, Count);
             return this;
@@ -1192,10 +1185,9 @@ namespace C6.Collections
                 {
                     //isValid = false;
                     if (_views != null)
-                        foreach (ArrayList<T> view in _views)
+                        foreach (var view in _views)
                             view.Dispose(true); // How can we assure that the nodes are deleted?
-                    Clear();
-                    
+                    Clear();                    
                 }
             }
         }
@@ -1268,7 +1260,7 @@ namespace C6.Collections
             remove
             {
                 _itemInserted -= value;
-                if (_itemInserted == null)
+                if (_itemInserted == null) // ??? Why only when _itemInserted == null
                 {
                     ActiveEvents &= ~Inserted;
                 }
@@ -2164,7 +2156,7 @@ namespace C6.Collections
             {
                 get
                 {
-                    //CheckVersion();
+                    CheckVersion();
                     
                     return List.Count;
                 }

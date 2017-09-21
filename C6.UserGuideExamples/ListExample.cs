@@ -4,8 +4,15 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Text;
 
 using C6.Collections;
+
+using static C6.Contracts.ContractMessage;
+
+
+using SCG = System.Collections.Generic;
+using SC = System.Collections;
 
 
 namespace C6.UserGuideExamples
@@ -14,7 +21,19 @@ namespace C6.UserGuideExamples
     {
         public static void Main()
         {
-            HashedArrayList<int> hal = new HashedArrayList<int>();
+            var collection = new HashedArrayList<string> { "1", "2", "3", "4" };
+            var v = collection.View(1, 2);
+            Console.WriteLine(v);
+            v.Dispose();
+            Console.WriteLine(v.AllowsNull);
+
+
+
+            
+            // Act            
+
+
+            return;
             // Construct list using collection initializer
             //var list = new ArrayList<int>() { 2, 3, 5, 5, 7, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33};
             var list = new ArrayList<int>() { 2, 3};
@@ -33,7 +52,7 @@ namespace C6.UserGuideExamples
             //var items = new ArrayList<int>() { 3, 13, 7, 17};
             //Console.WriteLine(ArrayList<int>.EmptyArray);           
 
-            return;
+            
             
             var dupl = list.FindDuplicates(5);
             Console.WriteLine(dupl);
@@ -141,5 +160,21 @@ namespace C6.UserGuideExamples
 
             return;
         }
+    }
+
+    public class CaseInsensitiveStringComparer : SCG.IEqualityComparer<string>, SCG.IComparer<string>
+    {
+        private CaseInsensitiveStringComparer() { }
+
+        public static CaseInsensitiveStringComparer Default => new CaseInsensitiveStringComparer();
+
+        public int GetHashCode(string item) => ToLower(item).GetHashCode();
+
+        public bool Equals(string x, string y) => ToLower(x).Equals(ToLower(y));
+
+        // ReSharper disable once StringCompareToIsCultureSpecific
+        public int Compare(string x, string y) => ToLower(x).CompareTo(ToLower(y));
+
+        private string ToLower(string item) => item?.ToLower() ?? string.Empty;
     }
 }

@@ -149,6 +149,8 @@ namespace C6.Tests
         [Test]
         public void Backwards_AllowsNull_Expected()
         {
+            Run.If(AllowsNull);
+
             // Arrange
             var items = GetStrings(Random).WithNull(Random);
             var collection = GetSequence(items, allowsNull: true);
@@ -261,6 +263,7 @@ namespace C6.Tests
         [Test]
         public void GetSequencedHashCode_RandomSequenceWithNull_GeneratedHashCode()
         {
+            Run.If(AllowsDuplicates);
             // Arrange
             var items = GetStrings(Random).WithNull(Random);
             var sequence = GetSequence(items, allowsNull: true);
@@ -456,6 +459,8 @@ namespace C6.Tests
         [Test]
         public void SequencedEquals_EqualItemsButDifferentMultiplicity_False()
         {
+            Run.If(AllowsDuplicates);
+
             // Arrange
             var items = GetStrings(Random);
             var sequence = GetSequence(items);

@@ -99,7 +99,7 @@ namespace C6
         {
             // No preconditions
             // is Valid, not disposed
-            //Requires(IsValid);
+            Requires(IsValid);
 
             // Result is equal to that of SequencedEqualityComparer
             Ensures(Result<int>() == this.GetSequencedHashCode(EqualityComparer));
@@ -112,7 +112,7 @@ namespace C6
         {
             // No preconditions
             // is Valid, not disposed
-            //Requires(IsValid);
+            Requires(IsValid);
 
 
             // Enumeration of the collections must yield equal items

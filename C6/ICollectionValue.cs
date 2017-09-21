@@ -139,7 +139,6 @@ namespace C6
                 return default(bool);
             }
         }
-
         public bool IsValid
         {
             get
@@ -152,7 +151,6 @@ namespace C6
                 return default(bool);
             }
         }
-
         public int Count
         {
             get {
@@ -163,7 +161,8 @@ namespace C6
                 Ensures(Result<int>() >= 0);
 
                 // Returns the same as the number of items in the enumerator
-                Ensures(Result<int>() == this.Count()); // ??? Why Enumerator's Count is used here
+                // Ensures(Result<int>() == Count); // ??? Why Enumerator's Count is used here
+                // Ensures(Result<int>() == this.Count());
 
 
                 return default(int);
@@ -199,13 +198,14 @@ namespace C6
                 return default(bool);
             }
         }        
+
         public T Choose()
         {
+            // is Valid, not disposed
+            Requires(IsValid);
+
             // Collection must be non-empty
             Requires(!IsEmpty, CollectionMustBeNonEmpty);
-
-            // is Valid, not disposed
-            // Requires(IsValid);
 
             // Result is non-null
             Ensures(AllowsNull || Result<T>() != null);
@@ -238,6 +238,7 @@ namespace C6
 
             return;
         }
+
         public T[] ToArray()
         {
             // No preconditions

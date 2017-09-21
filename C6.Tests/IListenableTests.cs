@@ -21,9 +21,9 @@ namespace C6.Tests
     {
         #region Fields
 
-        private readonly EventHandler _changed = (sender, args) => { };
+        private readonly EventHandler _changed = (sender, args) => { };        
         private readonly EventHandler<ClearedEventArgs> _cleared = (sender, args) => { };
-        private readonly EventHandler<ItemCountEventArgs<int>> _added = (sender, args) => { }, _removed = (sender, args) => { };
+        private readonly EventHandler<ItemCountEventArgs<int>> _added = (sender, args) => { }, _removed = (sender, args) => { }; // ??? What means {}
         private readonly EventHandler<ItemAtEventArgs<int>> _inserted = (sender, args) => { }, _removedAt = (sender, args) => { };
 
         #endregion
