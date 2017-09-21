@@ -1744,6 +1744,7 @@ namespace C6.Tests
         [Test]
         public void RemoveRange_RemoveOneOfEachDuplicate_AllButOneLeft()
         {
+            Run.If(AllowsDuplicates);
             // Arrange
             var items = GetStrings(Random);
             var repeatedItems = items.SelectMany(item => item.Repeat(Random.Next(2, 5))).ToArray();

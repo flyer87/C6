@@ -1,0 +1,2 @@
+- Dispose()
+	- // WeakViewList.start is not set to null -> the linked list is live!

@@ -227,6 +227,7 @@ namespace C6.Tests
         [Test]
         public void SCIListItemGet_RandomCollectionWithNull_Null()
         {
+            Run.If(AllowsNull);
             // Arrange
             var items = GetStrings(Random).WithNull(Random);
             var collection = GetList(items, allowsNull: true);
@@ -391,6 +392,7 @@ namespace C6.Tests
         [Test]
         public void SCIListItemSet_AllowsNull_Null()
         {
+            Run.If(AllowsNull);
             // Arrange
             var collection = GetStringList(Random, allowsNull: true);
             var index = GetIndex(collection, Random);
@@ -530,6 +532,7 @@ namespace C6.Tests
         [Test]
         public void SCIListAdd_AllowsNullAddNull_ReturnsTrue()
         {
+            Run.If(AllowsNull);
             // Arrange
             var collection = GetStringList(Random, allowsNull: true);
             var index = collection.Count;
@@ -690,6 +693,8 @@ namespace C6.Tests
         [Test]
         public void SCIListContains_AllowNullContainsNull_True()
         {
+            Run.If(AllowsNull);
+
             // Arrange
             var items = GetStrings(Random).WithNull(Random);
             var collection = GetList(items, allowsNull: true);
@@ -704,6 +709,8 @@ namespace C6.Tests
         [Test]
         public void SCIListContains_AllowNullContainsNoNull_False()
         {
+            Run.If(AllowsNull); // new
+
             // Arrange
             var items = GetStrings(Random);
             var collection = GetList(items, allowsNull: true);
@@ -861,6 +868,7 @@ namespace C6.Tests
         [Test]
         public void SCIListIndexOf_AllowsNull_PositiveIndex()
         {
+            Run.If(AllowsDuplicates);
             // Arrange
             var items = GetStrings(Random).WithNull(Random);
             var collection = GetList(items, allowsNull: true);
@@ -1091,6 +1099,7 @@ namespace C6.Tests
         [Test]
         public void SCIListInsert_AllowsNull_Null()
         {
+            Run.If(AllowsNull);
             // Arrange
             var collection = GetStringList(Random, allowsNull: true);
             var index = GetIndex(collection, Random, true);
@@ -1231,6 +1240,7 @@ namespace C6.Tests
         [Test]
         public void SCIListRemove_AllowsNull_RemovesNull()
         {
+            Run.If(AllowsNull);
             // Arrange
             var items = GetStrings(Random).WithNull(Random);
             var collection = GetList(items, allowsNull: true);
@@ -1473,6 +1483,7 @@ namespace C6.Tests
         [Test]
         public void SCIListRemoveAt_RandomCollectionWithNullRemoveNull_Null()
         {
+            Run.If(AllowsNull);
             // Arrange
             var items = GetStrings(Random).WithNull(Random);
             var collection = GetList(items, allowsNull: true);
@@ -1570,6 +1581,7 @@ namespace C6.Tests
         [Test]
         public void SCGIListIndexOf_AllowsNull_PositiveIndex()
         {
+            Run.If(AllowsDuplicates);
             // Arrange
             var items = GetStrings(Random).WithNull(Random);
             var collection = GetList(items, allowsNull: true);
@@ -1777,6 +1789,7 @@ namespace C6.Tests
         [Test]
         public void SCGIListRemoveAt_RandomCollectionWithNullRemoveNull_Null()
         {
+            Run.If(AllowsNull);
             // Arrange
             var items = GetStrings(Random).WithNull(Random);
             var collection = GetList(items, allowsNull: true);
@@ -1905,6 +1918,7 @@ namespace C6.Tests
         [Test]
         public void First_RandomCollectionStartingWithNull_Null()
         {
+            Run.If(AllowsNull);
             // Arrange
             var items = new string[] { null }.Concat(GetStrings(Random));
             var collection = GetList(items, allowsNull: true);
@@ -1962,6 +1976,7 @@ namespace C6.Tests
         [Test]
         public void Last_RandomCollectionStartingWithNull_Null()
         {
+            Run.If(AllowsNull);
             // Arrange
             var items = GetStrings(Random).Append(null);
             var collection = GetList(items, allowsNull: true);
@@ -2070,6 +2085,7 @@ namespace C6.Tests
         [Test]
         public void ItemSet_AllowsNull_Null()
         {
+            Run.If(AllowsNull);
             // Arrange
             var collection = GetStringList(Random, allowsNull: true);
             var index = GetIndex(collection, Random);
@@ -2287,6 +2303,7 @@ namespace C6.Tests
         [Test]
         public void Insert_AllowsNull_Null()
         {
+            Run.If(AllowsNull);
             // Arrange
             var collection = GetStringList(Random, allowsNull: true);
             var index = GetIndex(collection, Random, true);
@@ -2457,6 +2474,7 @@ namespace C6.Tests
         [Test]
         public void InsertFirst_AllowsNull_Null()
         {
+            Run.If(AllowsNull);
             // Arrange
             var collection = GetStringList(Random, allowsNull: true);
             var array = collection.ToArray().InsertItem(0, null);
@@ -2591,6 +2609,7 @@ namespace C6.Tests
         [Test]
         public void InsertLast_AllowsNull_Null()
         {
+            Run.If(AllowsNull);
             // Arrange
             var collection = GetStringList(Random, allowsNull: true);
             var array = collection.Append(null).ToArray();
@@ -2816,6 +2835,7 @@ namespace C6.Tests
         [Test]
         public void InsertRange_AllowsNull_InsertedRangeWithNull()
         {
+            Run.If(AllowsNull);
             // Arrange
             var collection = GetStringList(Random, allowsNull: true);
             var index = GetIndex(collection, Random, true);
@@ -3544,6 +3564,7 @@ namespace C6.Tests
         [Test]
         public void RemoveFirst_RandomCollectionWithNullRemoveNull_Null()
         {
+            Run.If(AllowsNull);
             // Arrange
             var collection = GetStringList(Random, allowsNull: true);
             collection[0] = null;
@@ -3649,6 +3670,7 @@ namespace C6.Tests
         [Test]
         public void RemoveLast_RandomCollectionWithNullRemoveNull_Null()
         {
+            Run.If(AllowsNull);
             // Arrange
             var collection = GetStringList(Random, allowsNull: true);
             collection[collection.Count - 1] = null;
@@ -3780,6 +3802,8 @@ namespace C6.Tests
         [Test]
         public void Reverse_RandomCollectionWithNull_Reversed()
         {
+            Run.If(AllowsNull);
+
             // Arrange
             var items = GetStrings(Random).WithNull(Random);
             var collection = GetList(items, allowsNull: true);

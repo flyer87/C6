@@ -956,7 +956,6 @@ namespace C6
         {
             // No additional preconditions allowed
 
-
             // The collection will contain the item added
             Ensures(Contains(item));
 
@@ -976,7 +975,7 @@ namespace C6
             Requires(!IsFixedSize, CollectionMustBeNonFixedSize);
 
             // is Valid, not disposed
-            //Requires(IsValid);
+            Requires(IsValid);
 
             // The collection becomes empty
             Ensures(IsEmpty);
@@ -992,12 +991,10 @@ namespace C6
             Requires(AllowsNull || item != null, ItemMustBeNonNull);
 
             // is Valid, not disposed
-            //Requires(IsValid);
+            Requires(IsValid);
 
-            // Returns true if the collection contains the item
-            var res = Result<bool>();
-            Ensures( res == this.Contains(item, EqualityComparer));
-
+            // Returns true if the collection contains the item            
+            Ensures(Result<bool>() == this.Contains(item, EqualityComparer));
 
             return default(bool);
         }
@@ -1011,7 +1008,7 @@ namespace C6
             Requires(AllowsNull || ForAll(items, item => item != null), ItemsMustBeNonNull);
 
             // is Valid, not disposed
-            //Requires(IsValid);
+            Requires(IsValid);
 
             // The collection contains the same items as items, with a multiplicity equal or greater
             Ensures(Result<bool>() == items.GroupBy(key => key, element => element, EqualityComparer).All(group => CountDuplicates(group.Key) >= group.Count()));
@@ -1041,7 +1038,7 @@ namespace C6
             Requires(AllowsNull || item != null, ItemMustBeNonNull);
 
             // is Valid, not disposed
-            // Requires(IsValid);
+            Requires(IsValid);
 
             // Result equals the number of items equal to item using the collection's equality comparer
             Ensures(Result<int>() == this.CountDuplicates(item, EqualityComparer));
@@ -1064,7 +1061,7 @@ namespace C6
             Requires(AllowsNull || item != null, ItemMustBeNonNull);
 
             // is Valid, not disposed
-            // Requires(IsValid);
+            Requires(IsValid);
 
             // Result is equal to Contains
             Ensures(Result<bool>() == Contains(item));
@@ -1085,7 +1082,7 @@ namespace C6
             Requires(AllowsNull || item != null, ItemMustBeNonNull);
 
             // is Valid, not disposed
-            // Requires(IsValid);
+            Requires(IsValid);
 
             // Result is non-null
             Ensures(Result<ICollectionValue<T>>() != null);
@@ -1127,7 +1124,7 @@ namespace C6
             Requires(AllowsNull || item != null, ItemMustBeNonNull);
 
             // is Valid, not disposed
-            // Requires(IsValid);
+            Requires(IsValid);
 
             // The collection contains the item
             Ensures(Contains(item));
@@ -1155,7 +1152,7 @@ namespace C6
         {
             // No preconditions            
             // is Valid, not disposed
-            // Requires(IsValid);
+            Requires(IsValid);
 
             // Result is equal to that of UnsequencedEqualityComparer
             Ensures(Result<int>() == this.GetUnsequencedHashCode(EqualityComparer));
@@ -1168,7 +1165,7 @@ namespace C6
         {
             // No preconditions
             // is Valid, not disposed
-            // Requires(IsValid);
+            Requires(IsValid);
 
 
             // TODO: Ensure that the result contains the right items
@@ -1193,7 +1190,7 @@ namespace C6
             Requires(AllowsNull || item != null, ItemMustBeNonNull);
 
             // is Valid, not disposed
-            //Requires(IsValid);
+            Requires(IsValid);
 
             // Returns true if the collection contained the item
             Ensures(Result<bool>() == OldValue(Contains(item)));
@@ -1226,7 +1223,7 @@ namespace C6
             Requires(AllowsNull || item != null, ItemMustBeNonNull);
 
             // is Valid, not disposed
-            //Requires(IsValid);
+            Requires(IsValid);
 
             // Returns true if the collection contained the item
             Ensures(Result<bool>() == OldValue(Contains(item)));
@@ -1269,7 +1266,7 @@ namespace C6
             Requires(AllowsNull || item != null, ItemMustBeNonNull);
 
             // is Valid, not disposed
-            //Requires(IsValid);
+            Requires(IsValid);
 
             // Returns true if the collection contained the item
             Ensures(Result<bool>() == OldValue(Contains(item)));
@@ -1296,7 +1293,7 @@ namespace C6
         public bool RemoveRange(SCG.IEnumerable<T> items)
         {
             // is Valid, not disposed
-            //Requires(IsValid);
+            Requires(IsValid);
 
             // Collection must be non-read-only
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
@@ -1309,8 +1306,6 @@ namespace C6
 
             // All items must be non-null if collection disallows null values
             Requires(AllowsNull || ForAll(items, item => item != null), ItemsMustBeNonNull);
-
-
 
 
             // TODO: Write ensures
@@ -1352,7 +1347,7 @@ namespace C6
             Requires(AllowsNull || ForAll(items, item => item != null), ItemsMustBeNonNull);
 
             // is Valid, not disposed
-            //Requires(IsValid);
+            Requires(IsValid);
 
             // The collection is at most as big as the enumerable
             Ensures(Count <= (AllowsDuplicates ? items.Count() : items.Distinct(EqualityComparer).Count()));
@@ -1388,7 +1383,7 @@ namespace C6
         {
             // No preconditions
             // is Valid, not disposed
-            //Requires(IsValid);
+            Requires(IsValid);
 
 
             // Result is non-null
@@ -1422,7 +1417,7 @@ namespace C6
         {
             // No preconditions
             // is Valid, not disposed
-            //Requires(IsValid);
+            Requires(IsValid);
 
 
             // If the collections must contain a different number of (distinct) items, then they must be non-equal
@@ -1450,7 +1445,7 @@ namespace C6
             Requires(AllowsNull || item != null, ItemMustBeNonNull);
 
             // is Valid, not disposed
-            //Requires(IsValid);
+            Requires(IsValid);
 
             // Result is equal to whether the collection already contained the item
             Ensures(Result<bool>() == OldValue(Contains(item)));
@@ -1526,7 +1521,7 @@ namespace C6
             Requires(AllowsNull || item != null, ItemMustBeNonNull);
 
             // is Valid, not disposed
-            //Requires(IsValid);
+            Requires(IsValid);
 
             // The collection contains the item
             Ensures(Contains(item));
@@ -1557,6 +1552,8 @@ namespace C6
             // Argument must be non-null if collection disallows null values
             Requires(AllowsNull || item != null, ItemMustBeNonNull);
 
+            // is Valid
+            Requires(IsValid);
 
             // The collection contains the item
             Ensures(Contains(item));

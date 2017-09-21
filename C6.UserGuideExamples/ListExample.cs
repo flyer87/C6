@@ -6,17 +6,13 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 
-
-
 using C6.Collections;
-
-
-
 
 using static C6.Contracts.ContractMessage;
 
 
 using SCG = System.Collections.Generic;
+using SC = System.Collections;
 
 
 namespace C6.UserGuideExamples
@@ -25,14 +21,15 @@ namespace C6.UserGuideExamples
     {
         public static void Main()
         {
-            var collection = new HashedArrayList<int> { 1,2,3,4 };
-            var d = collection.FindDuplicates(1).GetEnumerator();
-            d.MoveNext();
-            collection.Add(5);
-            d.MoveNext();
+            var collection = new HashedArrayList<string> { "1", "2", "3", "4" };
+            var v = collection.View(1, 2);
+            Console.WriteLine(v);
+            v.Dispose();
+            Console.WriteLine(v.AllowsNull);
 
-                        
 
+
+            
             // Act            
 
 
