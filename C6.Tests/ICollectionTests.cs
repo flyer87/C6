@@ -858,10 +858,12 @@ namespace C6.Tests
         [Test]
         public void FindDuplicates_AlterDuringResultEnumeration_ThrowsInvalidOperationException()
         {
+            Run.If(AllowsDuplicates);
+
             // Arrange
             var item = GetLowercaseString(Random);
             var count = GetCount(Random);
-            var items = GetUppercaseStrings(Random); //.WithRepeatedItem(() => item, count, Random);
+            var items = GetUppercaseStrings(Random).WithRepeatedItem(() => item, count, Random);
             var collection = GetCollection(items);
 
             Run.If(AllowsDuplicates);

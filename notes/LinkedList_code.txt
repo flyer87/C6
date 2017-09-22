@@ -1,7 +1,22 @@
 TODO:
-	Other virtual properties/ methods ? So far only IExtensible p,m's
+	Add "virtual" to other properties/ methods ? So far only IExtensible p,m's
 	
-	//!Check for Code contracts after implementation of IExtensible
+	//!Check for Code contracts after implementation of IExtensible	
+	- public bool UnsequencedEquals(ICollection<T> otherCollection)        
+		Peter's is different
+	
+		
+	RemoveWhere		
+		RemoveRange
+			RemoveDuplicates
+		RetainRange
+		
+	- private sealed class ItemSet : CollectionValueBase<T>, ICollectionValue<T> // ??? CollectionValues base
+	- ADD: ObjectInvariants
+	- FindOrAdd_FindItemDuringEnumeration_ThrowsNothing()
+		throws Code Contratcs error if:
+		 in Find(ref T item)
+			propusna item = node.item;
 ===========
 C5:
 	void InsertAll(int i, SCG.IEnumerable<T> items, bool insertion)

@@ -17,7 +17,7 @@ namespace C6.Tests.Collections
 
 
     [TestFixture]
-    public class LinkedListListTests : IExtensibleTests
+    public class LinkedListListTests : ICollectionTests
     {
         protected override bool AllowsNull => true;
         protected override EventTypes ListenableEvents => All;
@@ -26,11 +26,18 @@ namespace C6.Tests.Collections
         protected override bool DuplicatesByCounting => false;
         protected override bool IsFixedSize => false;
         protected override bool IsReadOnly => false;
+        protected override Speed ContainsSpeed => Linear;
 
-        protected override IExtensible<T> GetEmptyExtensible<T>(IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
+        protected override ICollection<T> GetEmptyCollection<T>(IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
             => new LinkedList<T>(equalityComparer, allowsNull);
 
-        protected override IExtensible<T> GetExtensible<T>(IEnumerable<T> enumerable, IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
+        protected override ICollection<T> GetCollection<T>(IEnumerable<T> enumerable, IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
             => new LinkedList<T>(enumerable, equalityComparer, allowsNull);
+
+        //protected override IExtensible<T> GetEmptyExtensible<T>(IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
+        //    => new LinkedList<T>(equalityComparer, allowsNull);
+
+        //protected override IExtensible<T> GetExtensible<T>(IEnumerable<T> enumerable, IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
+        //    => new LinkedList<T>(enumerable, equalityComparer, allowsNull);
     }
 }

@@ -178,7 +178,7 @@ namespace C6.Collections
         public T Choose() => _items[0]; //to_base: virtual // Count - 1
 
         #endregion
-
+        
         #region IListenable
 
         public virtual EventTypes ActiveEvents { get; private set; }

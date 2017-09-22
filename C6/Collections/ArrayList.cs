@@ -436,7 +436,7 @@ namespace C6.Collections
 
             return this.Any(item => itemsToContain.Remove(item) && itemsToContain.IsEmpty);
         }
-
+        
         public override void CopyTo(T[] array, int arrayIndex)
         {
             #region Code Contract
@@ -966,7 +966,7 @@ namespace C6.Collections
             RequireValidity();
             return ToString(null, null);
         }
-
+        
         /// <summary>
         ///     Sets the capacity to the actual number of items in the <see cref="ArrayList{T}"/>, if that number is less than a
         ///     threshold value.
@@ -2202,7 +2202,7 @@ namespace C6.Collections
                 if (_list != null)
                 {
                     var enumerator = _list.GetEnumerator();
-                    while (/*CheckVersion() &*/ enumerator.MoveNext())
+                    while (CheckVersion() & enumerator.MoveNext())                    
                     {
                         yield return enumerator.Current;
                     }

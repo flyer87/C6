@@ -41,6 +41,7 @@ Tips:
 		prop. list -> Clear(); 
 		view -> RemoveIndexRange(0, Count);
 	Add() -> InsertPrivate
+		AddRange -> InsertRange
 	Remove() -> RemoveAt
 =======================
 TODO:
@@ -61,8 +62,9 @@ TODO:
 	- view after Dispose() can call: v.AllowsNull. But should we allow that?
 	Views:
 		- add not a view message
-	- AddRange(items) {
-		...
-		RaiseForAddRange(items) //Are all items actually added?
-	}
-		
+		- AddRange(items) {
+			...
+			RaiseForAddRange(items) //Are all items actually added?
+		}
+	- ADD: ObjectInvariants
+		incl: the nested types in all classes
