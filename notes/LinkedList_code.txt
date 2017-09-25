@@ -17,6 +17,8 @@ TODO:
 		throws Code Contratcs error if:
 		 in Find(ref T item)
 			propusna item = node.item;
+	- Array.Copy() how does it work? Using enumerator or ?
+	- What is diff. between IList and IList<T>
 ===========
 C5:
 	void InsertAll(int i, SCG.IEnumerable<T> items, bool insertion)
@@ -26,4 +28,6 @@ C5:
 Thesis notes:	
 	it was: private void raiseForInsertAll(Node node, int i, int added, bool insertion)
 	now: private void RaiseForAddRange(SCG.IEnumerable<T> items)
+	- get -> getNode
+	find() and dnif - were combined with usage of Eumeration direction as paramter
             

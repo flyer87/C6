@@ -900,9 +900,9 @@ namespace C6.Collections
 
         public virtual bool SequencedEquals(ISequenced<T> otherCollection)
         {
-            #region Code Contract
-            RequireValidity();
-            #endregion
+            //#region Code Contract
+            //RequireValidity();
+            //#endregion
             return this.SequencedEquals(otherCollection, EqualityComparer);
         }
 
@@ -2492,6 +2492,7 @@ namespace C6.Collections
 
                 _base = list;
                 _version = list._version;
+
                 _sign = (int)direction;
                 _startIndex = startIndex;
                 _count = count;
@@ -2554,7 +2555,7 @@ namespace C6.Collections
             public override void CopyTo(T[] array, int arrayIndex)
             {
                 CheckVersion();
-                if (_direction.IsForward())
+                if (_direction.IsForward()) // depending on _direction choose the most efficient one
                 {
                     // Copy array directly
                     Array.Copy(_base._items, _base.Offset + _startIndex, array, arrayIndex, _count); // Offset!!

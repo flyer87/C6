@@ -35,7 +35,6 @@ namespace C6.Collections
 
         public virtual bool IsEmpty => Count == 0;
       
-
         #endregion
 
         #region Methods

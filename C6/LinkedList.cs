@@ -21,7 +21,7 @@ using SCG = System.Collections.Generic;
 
 namespace C6
 {
-    public class LinkedList<T> : ICollection<T>
+    public class LinkedList<T> : IIndexed<T>
     {
         #region Fields
 
@@ -108,6 +108,15 @@ namespace C6
 
         public Speed ContainsSpeed => Linear;
 
+        #endregion
+
+        #region IDirectedCollectionValues
+        public virtual EnumerationDirection Direction => EnumerationDirection.Forwards;
+        #endregion
+
+        #region IIndexed
+
+        public Speed IndexingSpeed => Linear;
         #endregion
 
         #region IList
@@ -223,7 +232,7 @@ namespace C6
             return this.Any(item => itemsToContain.Remove(item) && itemsToContain.IsEmpty);
         }
 
-        public int CountDuplicates(T item)
+        public int CountDuplicates(T item) 
         {            
             return item == null ? this.Count(x => x == null) : this.Count(x => Equals(x, item));
         }
@@ -232,7 +241,7 @@ namespace C6
         {
             var node = _starSentinel.Next;
             var index = 0;
-            if (!FindNodePrivate(item, ref node, ref index))
+            if (!FindNodePrivate(item, ref node, ref index, EnumerationDirection.Forwards))
             {
                 return false;
             }
@@ -283,7 +292,7 @@ namespace C6
             var node = _starSentinel.Next;
             removedItem = default(T);
 
-            if (!FindNodePrivate(item, ref node, ref index))
+            if (!FindNodePrivate(item, ref node, ref index, EnumerationDirection.Forwards))
                 return false;
 
             removedItem = RemoveAtPrivate(node, index);
@@ -322,7 +331,7 @@ namespace C6
         {
             var node = _starSentinel.Next;
             var index = 0;            
-            if (!FindNodePrivate(item, ref node, ref index))
+            if (!FindNodePrivate(item, ref node, ref index, EnumerationDirection.Forwards))
             {
                 oldItem = default(T);
                 return false;
@@ -353,8 +362,98 @@ namespace C6
         {
             var node = _starSentinel.Next;
             var index = 0;
-            FindNodePrivate(item, ref node, ref index); 
+            FindNodePrivate(item, ref node, ref index, EnumerationDirection.Forwards); 
             return index;
+        }
+
+        #endregion
+
+        #region ISequenced
+        public virtual int GetSequencedHashCode()
+        {
+            if (_sequencedHashCode != _version)
+            {
+                _sequencedHashCodeVersion = _version;
+                _sequencedHashCode = this.GetSequencedHashCode(EqualityComparer);
+            }
+
+            return _sequencedHashCode;
+        }
+
+        public virtual bool SequencedEquals(ISequenced<T> otherCollection)
+        {
+            return this.SequencedEquals(otherCollection, EqualityComparer);
+        }
+
+        #endregion
+
+        #region IDirectedCollectionValue
+
+        public IDirectedCollectionValue<T> Backwards()
+        {
+            return new Range(this, Count - 1, Count, EnumerationDirection.Backwards);
+        }
+
+        #endregion
+
+        #region IIndexed
+
+        public IDirectedCollectionValue<T> GetIndexRange(int startIndex, int count)
+            => new Range(this, startIndex, count, EnumerationDirection.Forwards);
+
+        public T this[int index]
+        {
+            get { return GetNodeAtPrivate(index).item; }
+            set {
+                var node = GetNodeAtPrivate(index);
+                try
+                {
+                    node.item = (T)value;
+                }
+                catch (InvalidCastException)
+                {
+                    throw new ArgumentException($"The value \"{value}\" is not of type \"{typeof(T)}\" and cannot be used in this generic collection.{Environment.NewLine}Parameter name: {nameof(value)}");
+                }
+            }
+        }
+
+        public int LastIndexOf(T item)
+        {
+            #region Code Contracts
+
+            // TODO: Add contract to IList<T>.LastIndexOf            
+            Ensures(Contains(item)
+                ? 0 <= Result<int>() && Result<int>() < Count
+                : ~Result<int>() == Count);
+
+            // Item at index is the first equal to item
+            // !@ Ensures(Result<int>() < 0 || !this.Skip(Result<int>() + 1).Contains(item, EqualityComparer) && EqualityComparer.Equals(item, this.ElementAt(Result<int>())));
+
+            #endregion
+            var node = _endSentinel;
+            var index = Count - 1;
+            FindNodePrivate(item, ref node, ref index, EnumerationDirection.Backwards);
+            return index;
+        }
+
+        public T RemoveAt(int index)
+        {
+            #region Code Contracts
+            
+            // If collection changes, the version is updated
+            //var old = OldValue(this.ToArray());            
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+            #endregion
+
+            var node = GetNodeAtPrivate(index);
+            var item = RemoveAtPrivate(node, index);
+            (_underlying ?? this).RaiseForRemoveAt(item, index);
+            return item;
+        }
+
+        public void RemoveIndexRange(int startIndex, int count)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
@@ -362,7 +461,6 @@ namespace C6
         #region IList
 
         public virtual T First => _starSentinel.Next.item;
-
 
         #endregion
 
@@ -534,7 +632,7 @@ namespace C6
             UpdaVersion();
 
             Node cursor;
-            var succ = index == Count ? _endSentinel : GetNode(index);
+            var succ = index == Count ? _endSentinel : GetNodeAtPrivate(index);
             var pred = cursor = succ.Prev;
 
             var count = 0;
@@ -590,7 +688,7 @@ namespace C6
             throw new InvalidOperationException(CollectionWasModified);
         }
 
-        private Node GetNode(int index)
+        private Node GetNodeAtPrivate(int index)
         {
             #region Code Contracts                        
 
@@ -621,17 +719,28 @@ namespace C6
             }
         }
 
-        private bool FindNodePrivate(T item, ref Node node, ref int index) // FIFO style
-        {                        
-            while (node != _endSentinel)
+        private bool FindNodePrivate(T item, ref Node node, ref int index, EnumerationDirection direction) // FIFO style
+        {
+            var endNode = direction.IsForward() ? _endSentinel : _starSentinel;
+            while (node != endNode)
             {
-                if (Equals(item, node.item))
+                if (item == null)
                 {
-                    return true;
+                    if (node.item == null)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (Equals(item, node.item))
+                    {
+                        return true;
+                    }
                 }
 
-                index++;
-                node = node.Next;
+                index = direction.IsForward() ? index++ : index--;
+                node = direction.IsForward() ? node.Next : node.Prev;
             }
 
             index = ~Count;
@@ -710,6 +819,13 @@ namespace C6
             OnCollectionChanged();
         }
 
+        private void RaiseForRemoveAt(T item, int index)
+        {
+            OnItemRemovedAt(item, index);
+            OnItemsRemoved(item, 1);
+            OnCollectionChanged();
+        }
+
         #region Invoking methods
 
         private void OnCollectionChanged()
@@ -722,10 +838,12 @@ namespace C6
             =>
                 _itemsAdded?.Invoke(this, new ItemCountEventArgs<T>(item, count));
 
-
         private void OnItemsRemoved(T item, int count)
             => _itemsRemoved?.Invoke(this, new ItemCountEventArgs<T>(item, count));
 
+        private void OnItemRemovedAt(T item, int index)
+            => _itemRemovedAt?.Invoke(this, new ItemAtEventArgs<T>(item, index));
+        
         #endregion
 
         #endregion
@@ -1016,6 +1134,7 @@ namespace C6
             private readonly LinkedList<T> _base;
             private readonly int _version, _startIndex, _count, _sign;
             private readonly EnumerationDirection _direction;
+            private Node _startNode, _endNode;
 
             #endregion
 
@@ -1067,11 +1186,13 @@ namespace C6
                 #endregion
 
                 _base = list;
-                _version = list._version;
-                _sign = (int)direction;
+                _version = list._underlying?._version ?? list._version;
+
                 _startIndex = startIndex;
                 _count = count;
+                _sign = (int)direction;                                
                 _direction = direction;
+                _startNode = list.GetNodeAtPrivate(startIndex);
             }
 
             #endregion
@@ -1123,50 +1244,46 @@ namespace C6
             {
                 CheckVersion();
                 // Select the highest index in the range
-                //var index = _direction.IsForward() ? _startIndex + _count - 1 : _startIndex;
-                var node = _direction.IsForward() ? _base._starSentinel.Next : _base._endSentinel.Prev;
-                return node.item;
+                //--var index = _direction.IsForward() ? _startIndex + _count - 1 : _startIndex;
+                return _startNode.item;                
             }
 
             public override void CopyTo(T[] array, int arrayIndex)
             {
                 CheckVersion();
-                if (_direction.IsForward())
-                {
-                    // Copy array directly
-                    //Array.Copy(_base._items, _base.Offset + _startIndex, array, arrayIndex, _count); // Offset!!
-                    throw new NotImplementedException();
-                }
-                else
-                {
-                    // Use enumerator instead of copying and then reversing
-                    base.CopyTo(array, arrayIndex);
-                }
+                
+                base.CopyTo(array, arrayIndex); // ??? works? In base.CopyTo() we have this. What is "this" - 
+                // the current(class) one, the parrent or the underlying ??
+                // longer version on C6.ArrayList
             }
 
-            public override bool Equals(object obj) => CheckVersion() & base.Equals(obj);
+            public override bool Equals(object obj) => CheckVersion() & base.Equals(obj); // base. ???
 
             public override SCG.IEnumerator<T> GetEnumerator()
             {
-                throw new NotImplementedException();
+                var count = Count;
+                var cursor = _startNode;
 
-                //var items = _base._items;
-                //for (var i = 0; i < Count; i++)
-                //{
-                //    yield return items[_base.Offset + _startIndex + _sign * i];
-                //}
+                CheckVersion();
+                yield return cursor.item;
+                while (--count > 0)
+                {
+                    CheckVersion();
+                    cursor = _direction.IsForward() ? cursor.Next : cursor.Prev;
+                    yield return cursor.item;
+                }
             }
 
             public override int GetHashCode()
             {
                 CheckVersion();
-                return base.GetHashCode();
+                return base.GetHashCode(); // ??? calls again Object.GetHashCode(); base.
             }
 
-            public override T[] ToArray()// ??? only this.ToArray(). Reimplement?
+            public override T[] ToArray()// ??? test it
             {
                 CheckVersion();
-                return base.ToArray();
+                return base.ToArray(); // ??? base
             }
 
             #endregion
@@ -1269,7 +1386,7 @@ namespace C6
                 }
             }
 
-            public override bool IsEmpty => CheckVersion() & List.IsEmpty;
+            public override bool IsEmpty => CheckVersion() & List.IsEmpty;            
 
             #endregion
 
@@ -1355,5 +1472,8 @@ namespace C6
         }
 
         #endregion
+
+
+
     }
 }
