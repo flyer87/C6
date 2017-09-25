@@ -17,7 +17,7 @@ namespace C6.Tests.Collections
 
 
     [TestFixture]
-    public class LinkedListListTests : ICollectionTests
+    public class LinkedListListTests : IIndexedTests
     {
         protected override bool AllowsNull => true;
         protected override EventTypes ListenableEvents => All;
@@ -27,17 +27,19 @@ namespace C6.Tests.Collections
         protected override bool IsFixedSize => false;
         protected override bool IsReadOnly => false;
         protected override Speed ContainsSpeed => Linear;
+        protected override Speed IndexingSpeed => Linear;
 
-        protected override ICollection<T> GetEmptyCollection<T>(IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
-            => new LinkedList<T>(equalityComparer, allowsNull);
-
-        protected override ICollection<T> GetCollection<T>(IEnumerable<T> enumerable, IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
-            => new LinkedList<T>(enumerable, equalityComparer, allowsNull);
-
-        //protected override IExtensible<T> GetEmptyExtensible<T>(IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
+        //protected override ICollection<T> GetEmptyCollection<T>(IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
         //    => new LinkedList<T>(equalityComparer, allowsNull);
 
-        //protected override IExtensible<T> GetExtensible<T>(IEnumerable<T> enumerable, IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
+        //protected override ICollection<T> GetCollection<T>(IEnumerable<T> enumerable, IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
         //    => new LinkedList<T>(enumerable, equalityComparer, allowsNull);
+
+        protected override IIndexed<T> GetEmptyIndexed<T>(IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
+            => new LinkedList<T>(equalityComparer, allowsNull);
+
+        protected override IIndexed<T> GetIndexed<T>(IEnumerable<T> enumerable, IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
+            => new LinkedList<T>(enumerable, equalityComparer, allowsNull);
+
     }
 }

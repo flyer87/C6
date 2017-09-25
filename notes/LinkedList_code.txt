@@ -23,6 +23,9 @@ TODO:
 C5:
 	void InsertAll(int i, SCG.IEnumerable<T> items, bool insertion)
 	redundant: if (count > 0) {}
+=========
+Tests:
+	- ExpectedDirectedCollectionValue. Why no we need a class ???
 	
 ================
 Thesis notes:	

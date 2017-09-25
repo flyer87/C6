@@ -356,18 +356,6 @@ namespace C6
                 
         #endregion
 
-        #region IIndexed
-
-        public virtual int IndexOf(T item)
-        {
-            var node = _starSentinel.Next;
-            var index = 0;
-            FindNodePrivate(item, ref node, ref index, EnumerationDirection.Forwards); 
-            return index;
-        }
-
-        #endregion
-
         #region ISequenced
         public virtual int GetSequencedHashCode()
         {
@@ -417,6 +405,14 @@ namespace C6
             }
         }
 
+        public virtual int IndexOf(T item)
+        {
+            var node = _starSentinel.Next;
+            var index = 0;
+            FindNodePrivate(item, ref node, ref index, EnumerationDirection.Forwards);
+            return index;
+        }
+
         public int LastIndexOf(T item)
         {
             #region Code Contracts
@@ -430,7 +426,7 @@ namespace C6
             // !@ Ensures(Result<int>() < 0 || !this.Skip(Result<int>() + 1).Contains(item, EqualityComparer) && EqualityComparer.Equals(item, this.ElementAt(Result<int>())));
 
             #endregion
-            var node = _endSentinel;
+            var node = _endSentinel.Prev;
             var index = Count - 1;
             FindNodePrivate(item, ref node, ref index, EnumerationDirection.Backwards);
             return index;
@@ -739,7 +735,7 @@ namespace C6
                     }
                 }
 
-                index = direction.IsForward() ? index++ : index--;
+                index = direction.IsForward() ? index + 1 : index - 1;
                 node = direction.IsForward() ? node.Next : node.Prev;
             }
 
@@ -1134,7 +1130,7 @@ namespace C6
             private readonly LinkedList<T> _base;
             private readonly int _version, _startIndex, _count, _sign;
             private readonly EnumerationDirection _direction;
-            private Node _startNode, _endNode;
+            private Node _startNode;
 
             #endregion
 
@@ -1192,7 +1188,8 @@ namespace C6
                 _count = count;
                 _sign = (int)direction;                                
                 _direction = direction;
-                _startNode = list.GetNodeAtPrivate(startIndex);
+                if (count > 0)               
+                    _startNode = list.GetNodeAtPrivate(startIndex);
             }
 
             #endregion
@@ -1263,6 +1260,10 @@ namespace C6
             {
                 var count = Count;
                 var cursor = _startNode;
+                if (cursor == null)
+                {
+                    yield break;                    
+                }
 
                 CheckVersion();
                 yield return cursor.item;

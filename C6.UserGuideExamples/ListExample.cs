@@ -26,20 +26,12 @@ namespace C6.UserGuideExamples
             //    SCG.EqualityComparer<string>.Default.GetHashCode);
 
             var eq = CaseInsensitiveStringComparer.Default;
-            var items = new[] { "1", "Ab", "2", "3", "4", "5", "6", "7", "6" };
+            var items = new[] { "1", "Ab", null, "3", "4", "5", "6", "7", null };
+            
             var ll = new LinkedList<string>(items, eq, allowsNull: true);
-
-
-            var ir = ll.GetIndexRange(0, 5);
-            Console.WriteLine(ir);
-
-            Console.WriteLine(ll[1]);
-
-            Console.WriteLine(ll.LastIndexOf("6"));
-
-            Console.WriteLine(ll.RemoveAt(1));
-
-
+            var b = ll.IndexOf(null);
+            Console.WriteLine(b);
+             
 
 
 
