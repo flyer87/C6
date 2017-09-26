@@ -17,11 +17,12 @@ using static C6.Speed;
 
 using SC = System.Collections;
 using SCG = System.Collections.Generic;
+//using static EnumerationDirection;
 
 
 namespace C6
 {
-    public class LinkedList<T> : IIndexed<T>
+    public class LinkedList<T> : IList<T>
     {
         #region Fields
 
@@ -121,8 +122,14 @@ namespace C6
 
         #region IList
 
-        public LinkedList<T> Underlying => _underlying; // ??? do it IList<T>
+        public int Offset { get; private set; }
 
+        public IList<T> Underlying => _underlying; // ??? do it IList<T>
+
+        public virtual T First => _starSentinel.Next.item;
+
+        public T Last => _endSentinel.Prev.item;
+        
         #endregion
 
         private int UnderlyingCount => (Underlying ?? this).Count;
@@ -342,7 +349,7 @@ namespace C6
             oldItem = node.item;
             node.item = item;
 
-            (_underlying ?? this).RiaseForUpdate(item, oldItem);
+            (_underlying ?? this).RaiseForUpdate(item, oldItem);
             return true;
         }
 
@@ -456,7 +463,168 @@ namespace C6
 
         #region IList
 
-        public virtual T First => _starSentinel.Next.item;
+        public virtual void InsertFirst(T item)
+        {
+            InsertPrivate(0, _starSentinel.Next, item);
+            (_underlying ?? this).RaiseForInsert(Offset + 0, item);
+        }
+
+        public virtual void InsertLast(T item)
+        {
+            InsertPrivate(Count, _endSentinel, item);
+            (_underlying ?? this).RaiseForInsert(Offset + Count - 1, item);
+        }
+
+        public virtual void Insert(int index, T item)
+        {
+            InsertPrivate(index, index == Count ? _endSentinel : GetNodeAtPrivate(index), item);
+            (_underlying ?? this).RaiseForInsert(Offset + index, item);
+        }
+
+        public virtual void InsertRange(int index, SCG.IEnumerable<T> items)
+        {
+            InsertRangePrivate(index, items); // ??? C5.LinkedList has last bool parameter
+            (_underlying ?? this).RaiseForInsertRange(Offset + index, items);
+        }
+
+        public virtual bool IsSorted(Comparison<T> comparison)
+        {
+            if (Count <= 1)
+            {
+                return true;
+            }
+
+            var prevNode = _starSentinel.Next;
+            var node = prevNode.Next;
+
+            while (node != _endSentinel)
+            {
+                if (comparison(prevNode.item, node.item) > 0)
+                {
+                    return false;
+                }
+
+                prevNode = prevNode.Next;
+                node = node.Next;
+            }
+
+            return true;
+        }
+
+        public bool IsSorted(SCG.IComparer<T> comparer)
+            => IsSorted((comparer ?? SCG.Comparer<T>.Default).Compare);
+
+        public virtual bool IsSorted()
+            => IsSorted(SCG.Comparer<T>.Default.Compare);
+
+        public virtual string Print()
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual T RemoveFirst() => RemoveAt(0);
+
+        public virtual T RemoveLast()  => RemoveAt(Count - 1);
+
+        public virtual void Reverse()
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void Shuffle(Random random)
+        {
+            // View: disposeOverlappingViews(false);
+
+            // add to ArrayList) & shuffle
+            var list =  new ArrayList<T>(this);            
+            list.Shuffle(random);
+
+            // put them back to the llist
+            var index = 0;
+            var cursor = _starSentinel.Next;
+            while (cursor != _endSentinel)
+            {
+                cursor.item = list[index++];
+                cursor = cursor.Next;
+            }
+
+            (_underlying ?? this).RaiseForShuffle();
+        }
+
+        public virtual void Shuffle() => Shuffle(new Random());
+
+        public virtual IList<T> Slide(int offset) => Slide(offset, Count);
+
+        public virtual IList<T> Slide(int offset, int count)
+        {
+            TrySlide(offset, count);
+            return this;
+        }
+
+        public virtual bool TrySlide(int offset, int count)
+        {
+            if (Offset + offset < 0 || Offset + offset + count > UnderlyingCount)
+            {
+                return false;
+            }
+
+            var oldOffset = Offset;
+            GetPairPrivate(offset - 1, offset + count, out _starSentinel, out _endSentinel,
+                new[] { -oldOffset - 1, -1, Count, UnderlyingCount - oldOffset },
+                new[] { _underlying._starSentinel, _starSentinel, _endSentinel, _underlying._endSentinel });
+
+            Count = count;
+            Offset += offset;
+            return true;
+        }
+
+        public virtual bool TrySlide(int offset) => TrySlide(offset, Count);
+
+        public virtual void Sort(SCG.IComparer<T> comparer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void Sort()
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void Sort(Comparison<T> comparison)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual IList<T> View(int index, int count)
+        {
+            if (_views == null)  _views = new WeakViewList<LinkedList<T>>();            
+
+            var view = (LinkedList<T>) MemberwiseClone();
+            view._underlying = _underlying ?? this;
+            view.Offset = Offset + index;
+            view.Count = count;
+
+            GetPairPrivate(index - 1, index + count, out view._starSentinel, out view._endSentinel,
+                new [] { -1, Count }, new Node[] { _starSentinel, _endSentinel });
+
+            //TODO: for the purpose of Dispose, we need to retain a ref to the node
+            view._myWeakReference = _views.Add(view);
+            return view;
+        }
+
+        public virtual IList<T> ViewOf(T item)
+        {
+            var node = _starSentinel.Next;
+            var index = 0;
+            return !FindNodePrivate(item, ref node, ref index, EnumerationDirection.Forwards) ? null : View(index, 1);
+        }
+
+        public virtual IList<T> LastViewOf(T item)
+        {
+            var node = _endSentinel.Prev;
+            var index = Count - 1;
+            return !FindNodePrivate(item, ref node, ref index, EnumerationDirection.Backwards) ? null : View(index, 1);
+        }
 
         #endregion
 
@@ -556,7 +724,7 @@ namespace C6
 
         #endregion
 
-        #region Explicit implemntations
+        #region Explicit implementations
 
         SC.IEnumerator SC.IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -572,9 +740,106 @@ namespace C6
             }
         }
 
-        #region ICollection
+        #region ICollection<T>
 
         void SCG.ICollection<T>.Add(T item) => Add(item);
+
+        #endregion
+
+        #region System.Collections.ICollection Members
+
+        bool SC.ICollection.IsSynchronized => false;
+
+        object SC.ICollection.SyncRoot 
+            => ((SC.ICollection) _underlying)?.SyncRoot ?? _starSentinel;
+
+        void System.Collections.ICollection.CopyTo(Array array, int index)
+        {
+            #region Code Contracts
+
+            Requires(index >= 0, ArgumentMustBeWithinBounds);
+            Requires(index + Count < array.Length, ArgumentMustBeWithinBounds);
+
+            #endregion
+
+            foreach (var item in this)
+            {
+                array.SetValue(item, index++);
+            }
+        }
+        #endregion
+
+        #region System.Collections.IList Members
+        int SC.IList.Add(object value)
+        {
+            try
+            {
+                return Add((T)value) ? Count - 1 : -1;
+            }
+            catch (InvalidCastException)
+            {
+                throw new ArgumentException($"The value \"{value}\" is not of type \"{typeof(T)}\" and cannot be used in this generic collection.{Environment.NewLine}Parameter name: {nameof(value)}");
+            }
+        }
+
+        bool SC.IList.Contains(object value) => IsCompatibleObject(value) && Contains((T) value);
+
+        int SC.IList.IndexOf(object value) => IsCompatibleObject(value) ? Math.Max(-1, IndexOf((T)value)) : -1;        
+
+        void SC.IList.Insert(int index, object value)
+        {
+            try
+            {
+                Insert(index, (T)value);
+            }
+            catch (InvalidCastException)
+            {
+                throw new ArgumentException($"The value \"{value}\" is not of type \"{typeof(T)}\" and cannot be used in this generic collection.{Environment.NewLine}Parameter name: {nameof(value)}");
+            }
+        }
+
+        object SC.IList.this[int index]
+        {
+            get { return this[index]; }
+            set {
+                try
+                {
+                    this[index] = (T) value;
+                }
+                catch (InvalidCastException)
+                {
+                    throw new ArgumentException($"The value \"{value}\" is not of type \"{typeof(T)}\" and cannot be used in this generic collection.{Environment.NewLine}Parameter name: {nameof(value)}");
+                }
+            }
+        }
+
+        void SC.IList.Remove(object value)
+        {
+            if (IsCompatibleObject(value))
+            {
+                Remove((T)value);
+            }
+        }
+
+        void SC.IList.RemoveAt(int index) => RemoveAt(index);
+
+        #endregion
+
+        #region System.Collections.Generic.IList<T> Members
+
+        // Explicit implementation is needed, since C6.IList<T>.IndexOf(T) breaks SCG.IList<T>.IndexOf(T)'s precondition: Result<T>() >= -1
+        int SCG.IList<T>.IndexOf(T item) => Math.Max(-1, IndexOf(item));
+
+        void SCG.IList<T>.RemoveAt(int index) => RemoveAt(index);
+
+        #endregion
+
+        #region IDisposable
+
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }        
 
         #endregion
 
@@ -583,6 +848,67 @@ namespace C6
         #region Private Methods
 
         [Pure]
+
+        private void GetPairPrivate(int p1, int p2, out Node n1, out Node n2, int[] positions, Node[] nodes)
+        {
+            int nearest1, nearest2;
+            int delta1 = Dist(p1, out nearest1, positions), d1 = delta1 < 0 ? -delta1 : delta1;
+            int delta2 = Dist(p2, out nearest2, positions), d2 = delta2 < 0 ? -delta2 : delta2;
+
+            if (d1 < d2)
+            {
+                n1 = GetNodePrivate(p1, positions, nodes);
+                n2 = GetNodePrivate(p2, new [] { positions[nearest2], p1 }, new [] { nodes[nearest2], n1 });
+            }
+            else
+            {
+                n2 = GetNodePrivate(p2, positions, nodes);
+                n1 = GetNodePrivate(p1, new [] { positions[nearest1], p2 }, new [] { nodes[nearest1], n2 });
+            }
+        }
+
+        private Node GetNodePrivate(int pos, int[] positions, Node[] nodes) // Get a node; make the search shorter
+        {
+            int nearest;
+            var delta = Dist(pos, out nearest, positions); // Get the delta and nearest. Start searching from nearest!
+            var node = nodes[nearest];
+            if (delta > 0)
+                for (var i = 0; i < delta; i++)
+                    node = node.Prev;
+            else
+                for (var i = 0; i > delta; i--)
+                    node = node.Next;
+            return node;
+        }
+
+
+        private int Dist(int pos, out int nearest, int[] positions)
+        {
+            nearest = -1;
+            int bestdist = int.MaxValue;
+            int signeddist = bestdist;
+            for (int i = 0; i < positions.Length; i++)
+            {
+                int thisdist = positions[i] - pos;
+                if (thisdist >= 0 && thisdist < bestdist)
+                {
+                    nearest = i;
+                    bestdist = thisdist;
+                    signeddist = thisdist;
+                }
+
+                if (thisdist < 0 && -thisdist < bestdist)
+                {
+                    nearest = i;
+                    bestdist = -thisdist;
+                    signeddist = thisdist;
+                }
+            }
+            return signeddist;
+        }
+
+        private bool IsCompatibleObject(object value) => value is T || value == null && default(T) == null;
+
         private bool Equals(T x, T y) => EqualityComparer.Equals(x, y);
 
         private void InsertPrivate(int index, Node succ, T item)
@@ -590,7 +916,7 @@ namespace C6
             #region Code Contracts
 
             // Argument must be within bounds
-            Requires(0 <= index, ArgumentMustBeWithinBounds);
+            Requires(index >= 0, ArgumentMustBeWithinBounds);
             Requires(index <= Count, ArgumentMustBeWithinBounds);
 
             // Argument must be non-null if collection disallows null values
@@ -652,7 +978,7 @@ namespace C6
 
             if (count > 0) // no need! We have array.IsEmpty() check in the public methods ???
             {
-                //fixViewsAfterInsert(succ, pred, count, offset + i);                
+                //View: fixViewsAfterInsert(succ, pred, count, offset + i);                
             }
         }
 
@@ -758,8 +1084,28 @@ namespace C6
             return node.item;
         }
 
+        private void RaiseForCollectionChanged()
+        {
+            if (!ActiveEvents.HasFlag(None))
+                return;
+            
+            OnCollectionChanged();
+        }
 
+        private void RaiseForShuffle() => OnCollectionChanged();
 
+        private void RaiseForInsertRange(int index, SCG.IEnumerable<T> items) // ??? T[] on C6.ArrayList
+        {
+            if (!ActiveEvents.HasFlag(Inserted | Added))
+                return;
+
+            foreach (var item in items)
+            {
+                OnItemInserted(item, index++);
+                OnItemsAdded(item, 1);
+            }
+            OnCollectionChanged();
+        }
 
         private void RaiseForAdd(T item)
         {
@@ -805,7 +1151,7 @@ namespace C6
             OnCollectionChanged();
         }
 
-        private void RiaseForUpdate(T item, T oldItem)
+        private void RaiseForUpdate(T item, T oldItem)
         {
             Requires(Equals(item, oldItem));
             // ActiveEvents check ???
@@ -822,6 +1168,18 @@ namespace C6
             OnCollectionChanged();
         }
 
+        private void RaiseForInsert(int index, T item)
+        {
+            if (!ActiveEvents.HasFlag(Inserted))
+            {
+                return;
+            }
+
+            OnItemInserted(item, index);
+            OnItemsAdded(item, 1);
+            OnCollectionChanged();
+        }
+
         #region Invoking methods
 
         private void OnCollectionChanged()
@@ -831,15 +1189,17 @@ namespace C6
             => _collectionCleared?.Invoke(this, new ClearedEventArgs(true, count, start));
 
         private void OnItemsAdded(T item, int count)
-            =>
-                _itemsAdded?.Invoke(this, new ItemCountEventArgs<T>(item, count));
+            => _itemsAdded?.Invoke(this, new ItemCountEventArgs<T>(item, count));
 
         private void OnItemsRemoved(T item, int count)
             => _itemsRemoved?.Invoke(this, new ItemCountEventArgs<T>(item, count));
 
         private void OnItemRemovedAt(T item, int index)
             => _itemRemovedAt?.Invoke(this, new ItemAtEventArgs<T>(item, index));
-        
+
+        private void OnItemInserted(T item, int index)
+            => _itemInserted?.Invoke(this, new ItemAtEventArgs<T>(item, index));
+
         #endregion
 
         #endregion
@@ -1473,8 +1833,6 @@ namespace C6
         }
 
         #endregion
-
-
 
     }
 }

@@ -781,7 +781,7 @@ namespace C6.Collections
         // Explicitly check against null to avoid using the (slower) equality comparer
         public virtual bool RemoveDuplicates(T item) => item == null ? RemoveAllWhere(x => x == null) : RemoveAllWhere(x => Equals(item, x));
 
-        public virtual T RemoveFirst() => RemoveAt(0); // ??? View ofset, not 0
+        public virtual T RemoveFirst() => RemoveAt(0); 
 
         public virtual void RemoveIndexRange(int startIndex, int count)
         {
@@ -1164,7 +1164,7 @@ namespace C6.Collections
 
         public virtual void Dispose()
         {
-            Dispose(false);
+            //View: Dispose(false);
         }
 
         private void Dispose(bool disposingUnderlying)
@@ -2022,7 +2022,7 @@ namespace C6.Collections
                 for (var i = 0; i < array.Length; i++)
                 {
                     var item = array[i];
-                    OnItemInserted(item, index + i);
+                    OnItemInserted(item, index + i); // View: ???
                     OnItemsAdded(item, 1);
                 }
             }

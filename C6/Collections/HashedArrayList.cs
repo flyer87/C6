@@ -1034,7 +1034,7 @@ namespace C6.Collections
             if (_views == null)
                 _views = new WeakViewList<HashedArrayList<T>>();
 
-            HashedArrayList<T> view = (HashedArrayList<T>) MemberwiseClone();
+            var view = (HashedArrayList<T>) MemberwiseClone();
 
             view.Offset += index;
             view.Count = count;
