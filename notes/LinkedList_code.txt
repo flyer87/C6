@@ -1,3 +1,11 @@
+CHECK FOR VERSIONUPDATE() IN LinkedList
+	which methods?
+AL - (_under ?? this).RaiseFor - included or not?
+	indexes
+	
+Code COntracts with Ensure()
+
+
 TODO:
 	Add "virtual" to other properties/ methods ? So far only IExtensible p,m's
 	
@@ -30,6 +38,10 @@ TODO:
 		- index or Offset + index
 		P.S. I also have in ArrayList
 	- remove Print() from IList
+	- Slide returns the same view after sliding. Do we need it to return "this"
+	chaining; xs.
+	Effective Java, Bloch, second edition!!!
+		changing + side effect ?!
 ======
 View:
 	View changes in the methods:
@@ -53,6 +65,14 @@ Thesis notes:
 	- raiseFor: index mismatches
 	- redundant else's in C5.LinkedList
 		public virtual bool IsSorted(SCG.IComparer<T> c)
-	- public virtual bool IsSorted(Comparison<T> comparison) - new method, not exisitn in C5. Is it in C6's documentaion?	
-		
+	- public virtual bool IsSorted(Comparison<T> comparison) - new method, not exisitn in C5. Is it in C6's documentaion?
+	- Properties' getters can't throw an exception, BUT we throw. Reflect on it.	
+	- private void RaiseForIndexSetter(T oldItem, T newItem, int index)
+	 was: 
+		raiseItemsRemoved(item, 1);
+		raiseItemRemovedAt(item, index);
+	 now: 
+		OnItemRemovedAt(oldItem, index);
+		OnItemsRemoved(oldItem, 1);
+
             

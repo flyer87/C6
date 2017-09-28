@@ -651,6 +651,11 @@ namespace C6.Collections
             RequireValidity();
             #endregion
 
+            if (Count <= 1)
+            {
+                return true;
+            }
+
             // TODO: Can we check that comparison doesn't alter the collection?
             for (var i = _offsetField + 1; i < Count + _offsetField; i++)
             {

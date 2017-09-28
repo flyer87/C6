@@ -186,7 +186,7 @@ namespace C6
             #region Code Contracts
 
             // If collection changes, the version is updated
-            // !@ Ensures(this.IsSameSequenceAs(OldValue((_underlying ?? this).ToArray())) || _version != OldValue(_version));           
+            Ensures(this.IsSameSequenceAs(OldValue((_underlying ?? this).ToArray())) || _version != OldValue(_version));           
 
             #endregion
 
@@ -199,7 +199,7 @@ namespace C6
             }
 
             InsertRangePrivate(Count, array);
-            RaiseForAddRange(array);
+            (_underlying ?? this).RaiseForAddRange(array);
             return true;
         }
 
@@ -209,6 +209,11 @@ namespace C6
 
         public virtual void Clear()
         {
+            #region Code Contracts            
+            // If collection changes, the version is updated
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+            #endregion
+
             if (IsEmpty)
             {
                 return;
@@ -295,6 +300,12 @@ namespace C6
 
         public virtual bool Remove(T item, out T removedItem)
         {
+            #region Code Contracts            
+            // If collection changes, the version is updated
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+
+            #endregion
+
             var index = 0;
             var node = _starSentinel.Next;
             removedItem = default(T);
@@ -336,6 +347,13 @@ namespace C6
 
         public bool Update(T item, out T oldItem)
         {
+            #region Code Contracts            
+            // If collection changes, the version is updated
+            // !@ 
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+
+            #endregion
+
             var node = _starSentinel.Next;
             var index = 0;            
             if (!FindNodePrivate(item, ref node, ref index, EnumerationDirection.Forwards))
@@ -366,7 +384,7 @@ namespace C6
         #region ISequenced
         public virtual int GetSequencedHashCode()
         {
-            if (_sequencedHashCode != _version)
+            if (_sequencedHashCodeVersion != _version)
             {
                 _sequencedHashCodeVersion = _version;
                 _sequencedHashCode = this.GetSequencedHashCode(EqualityComparer);
@@ -400,20 +418,36 @@ namespace C6
         {
             get { return GetNodeAtPrivate(index).item; }
             set {
+                #region Code Contracts
+                // The version is updated
+                Ensures(_version != OldValue(_version));
+                #endregion
+
+                UpdaVersion();
+
                 var node = GetNodeAtPrivate(index);
-                try
-                {
-                    node.item = (T)value;
-                }
-                catch (InvalidCastException)
-                {
-                    throw new ArgumentException($"The value \"{value}\" is not of type \"{typeof(T)}\" and cannot be used in this generic collection.{Environment.NewLine}Parameter name: {nameof(value)}");
-                }
+                var oldItem = node.item;
+                node.item = value;
+
+                (_underlying ?? this).RaiseForIndexSetter(oldItem, value, Offset + index);
             }
         }
-
+       
         public virtual int IndexOf(T item)
         {
+            #region Code Contracts                        
+
+            // TODO: Add contract to IList<T>.IndexOf
+            // Result is a valid index
+            Ensures(Contains(item)
+                ? 0 <= Result<int>() && Result<int>() < Count
+                : ~Result<int>() == Count);
+
+            // Item at index is the first equal to item                        
+            Ensures(Result<int>() < 0 || !this.Take(Result<int>()).Contains(item, EqualityComparer) && EqualityComparer.Equals(item, this.ElementAt(Result<int>())));
+
+            #endregion
+
             var node = _starSentinel.Next;
             var index = 0;
             FindNodePrivate(item, ref node, ref index, EnumerationDirection.Forwards);
@@ -463,26 +497,51 @@ namespace C6
 
         #region IList
 
-        public virtual void InsertFirst(T item)
-        {
-            InsertPrivate(0, _starSentinel.Next, item);
-            (_underlying ?? this).RaiseForInsert(Offset + 0, item);
-        }
+        public virtual void InsertFirst(T item) => Insert(0, item);
+        //{
+        //    InsertPrivate(0, _starSentinel.Next, item);
+        //    (_underlying ?? this).RaiseForInsert(Offset + 0, item);
+        //}
 
-        public virtual void InsertLast(T item)
-        {
-            InsertPrivate(Count, _endSentinel, item);
-            (_underlying ?? this).RaiseForInsert(Offset + Count - 1, item);
-        }
+        public virtual void InsertLast(T item) => Insert(Count, item);
+        //{
+        //    InsertPrivate(Count, _endSentinel, item);
+        //    (_underlying ?? this).RaiseForInsert(Offset + Count - 1, item);
+        //}
 
         public virtual void Insert(int index, T item)
         {
+            #region Code Contracts
+
+            // If collection changes, the version is updated
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+
+            #endregion
+
             InsertPrivate(index, index == Count ? _endSentinel : GetNodeAtPrivate(index), item);
             (_underlying ?? this).RaiseForInsert(Offset + index, item);
         }
 
         public virtual void InsertRange(int index, SCG.IEnumerable<T> items)
         {
+            #region Code Contracts                       
+
+            // If collection changes, the version is updated
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+
+            #endregion
+
+            // TODO: Handle ICollectionValue<T> and ICollection<T>
+
+            // TODO: Avoid creating an array? Requires a lot of extra code, since we need to properly handle items already added from a bad enumerable
+            // A bad enumerator will throw an exception here
+            var array = items.ToArray();
+
+            if (array.IsEmpty())
+            {
+                return;
+            }
+
             InsertRangePrivate(index, items); // ??? C5.LinkedList has last bool parameter
             (_underlying ?? this).RaiseForInsertRange(Offset + index, items);
         }
@@ -528,11 +587,21 @@ namespace C6
 
         public virtual void Reverse()
         {
+            #region Code Contracts            
+            // If collection changes, the version is updated
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+            #endregion
+
             throw new NotImplementedException();
         }
 
         public virtual void Shuffle(Random random)
         {
+            #region Code Contracts            
+            // If collection changes, the version is updated
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+            #endregion
+
             // View: disposeOverlappingViews(false);
 
             // add to ArrayList) & shuffle
@@ -592,6 +661,11 @@ namespace C6
 
         public virtual void Sort(Comparison<T> comparison)
         {
+            #region Code Contracts            
+            // If collection changes, the version is updated
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+            #endregion
+
             throw new NotImplementedException();
         }
 
@@ -753,18 +827,25 @@ namespace C6
         object SC.ICollection.SyncRoot 
             => ((SC.ICollection) _underlying)?.SyncRoot ?? _starSentinel;
 
-        void System.Collections.ICollection.CopyTo(Array array, int index)
+        void SC.ICollection.CopyTo(Array array, int index)
         {
             #region Code Contracts
 
             Requires(index >= 0, ArgumentMustBeWithinBounds);
-            Requires(index + Count < array.Length, ArgumentMustBeWithinBounds);
+            Requires(index + Count <= array.Length, ArgumentMustBeWithinBounds);
 
             #endregion
 
-            foreach (var item in this)
+            try // why try ???
             {
-                array.SetValue(item, index++);
+                foreach (var item in this)
+                {
+                    array.SetValue(item, index++);
+                }
+            }
+            catch(InvalidCastException) //catch (ArrayTypeMismatchException) ???
+            {
+                throw new ArgumentException("Target array type is not compatible with the type of items in the collection.");
             }
         }
         #endregion
@@ -1084,14 +1165,20 @@ namespace C6
             return node.item;
         }
 
-        private void RaiseForCollectionChanged()
+        private void RaiseForIndexSetter(T oldItem, T newItem, int index)
         {
-            if (!ActiveEvents.HasFlag(None))
+            if (ActiveEvents == None)
+            {
                 return;
-            
+            }
+
+            OnItemRemovedAt(oldItem, index);
+            OnItemsRemoved(oldItem, 1);
+            OnItemInserted(newItem, index);
+            OnItemsAdded(newItem, 1);
             OnCollectionChanged();
         }
-
+        
         private void RaiseForShuffle() => OnCollectionChanged();
 
         private void RaiseForInsertRange(int index, SCG.IEnumerable<T> items) // ??? T[] on C6.ArrayList
@@ -1833,6 +1920,5 @@ namespace C6
         }
 
         #endregion
-
     }
 }
