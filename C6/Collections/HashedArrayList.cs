@@ -873,20 +873,7 @@ namespace C6.Collections
 
             //throw new NotImplementedException();
         }
-
-        private void RaiseForInsertRange(int index, T[] array) // ??? the index of the view or the _items
-        {
-            if (ActiveEvents.HasFlag(Inserted | Added))
-            {
-                for (var i = 0; i < array.Length; i++)
-                {
-                    var item = array[i];
-                    OnItemInserted(item, index + i);
-                    OnItemsAdded(item, 1);
-                }
-            }
-            OnCollectionChanged();
-        }
+        
         public virtual bool IsSorted(Comparison<T> comparison) // View:
         {
             #region Code Contract
@@ -909,12 +896,7 @@ namespace C6.Collections
 
         public virtual bool IsSorted(SCG.IComparer<T> comparer) => IsSorted((comparer ?? SCG.Comparer<T>.Default).Compare);
 
-        public virtual bool IsSorted() => IsSorted(SCG.Comparer<T>.Default);
-
-        public virtual string Print()
-        {
-            throw new NotImplementedException();
-        }
+        public virtual bool IsSorted() => IsSorted(SCG.Comparer<T>.Default);        
 
         public virtual T RemoveFirst() => RemoveAt(Offset); //View:
 
@@ -1627,6 +1609,20 @@ namespace C6.Collections
 
                 Clear();
             }
+        }
+
+        private void RaiseForInsertRange(int index, T[] array) // ??? the index of the view or the _items
+        {
+            if (ActiveEvents.HasFlag(Inserted | Added))
+            {
+                for (var i = 0; i < array.Length; i++)
+                {
+                    var item = array[i];
+                    OnItemInserted(item, index + i);
+                    OnItemsAdded(item, 1);
+                }
+            }
+            OnCollectionChanged();
         }
 
         private void RaiseForAdd(T item)

@@ -11,10 +11,6 @@ Q:
 - C5.13.6 Implementation of hashed array lists
 - Constant time for: Find, IndexOf, Contains, ... (instead of iterating over the items)
 
-
-!- KeyValuePair - struct
-	- ???IEquatable
-	- restrcuture???
 	
 - What is int for in KeyValuePair<T, int> for? Is It real index in the _items?
 	- yes!
