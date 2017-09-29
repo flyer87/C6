@@ -182,7 +182,7 @@ namespace C6.Collections
 
         #endregion
 
-        #region Properties
+        #region Properties        
 
         public virtual EventTypes ActiveEvents { get; private set; }
 
@@ -296,6 +296,7 @@ namespace C6.Collections
 
         #endregion
 
+        private int UnderlyingCount => (Underlying ?? this).Count;
         #region Public Methods
 
         public override T[] ToArray()
@@ -806,7 +807,7 @@ namespace C6.Collections
 
             // Only update version if item is actually removed
             UpdateVersion();
-            // new
+            // newa
             startIndex += _offsetField;
             FixViewsBeforeRemovePrivate(startIndex, count);
             var underlyingCount = (_underlying ?? this).Count;
@@ -1852,7 +1853,7 @@ namespace C6.Collections
             Ensures(Result<bool>() || this.IsSameSequenceAs(OldValue(ToArray())));
             #endregion
 
-            //TODO: updatecheck() ???
+            // updatecheck() ???
 
             if (IsEmpty)
             {
@@ -1861,8 +1862,8 @@ namespace C6.Collections
 
             var shouldRememberItems = ActiveEvents.HasFlag(Removed); // ??? 
             IExtensible<T> itemsRemoved = null;
-            int cntRemoved = 0;
-            ViewHandler viewHandler = new ViewHandler(this); 
+            var cntRemoved = 0;
+            var viewHandler = new ViewHandler(this); 
 
             // TODO: Use bulk moves - consider using predicate(item) ^ something
             var j = _offsetField;
@@ -1887,7 +1888,7 @@ namespace C6.Collections
                         _items[j] = item;
                     }
                     j++;
-                    viewHandler.skipEndpoints(cntRemoved, i+1); // not effective
+                    viewHandler.skipEndpoints(cntRemoved, i+1); // not effective ???
                 }
             }
 
@@ -1897,25 +1898,24 @@ namespace C6.Collections
                 Assert(itemsRemoved == null);
                 return false;
             }
-            var underlyingCount = (_underlying ?? this).Count;
-            viewHandler.updateViewSizesAndCounts(cntRemoved, underlyingCount);
+            
+            viewHandler.updateViewSizesAndCounts(cntRemoved, UnderlyingCount);
 
-            Array.Copy(_items, _offsetField + Count, _items, j, underlyingCount - _offsetField - Count);            
+            Array.Copy(_items, _offsetField + Count, _items, j, UnderlyingCount - _offsetField - Count);            
             Count -= cntRemoved;
             if (_underlying != null)
             {
                 _underlying.Count -= cntRemoved;
             }
 
-            // Only update version if items are actually removed
-            UpdateVersion();
+            
+            UpdateVersion(); // Only update version if items are actually removed
 
-            // Clean up
-            underlyingCount = (_underlying ?? this).Count;
-            Array.Clear(_items, underlyingCount, cntRemoved); // underlyingCount != j !!!
+            // Clean up            
+            Array.Clear(_items, UnderlyingCount, cntRemoved); // underlyingCount != j !!!
             //Count = j;
 
-            RaiseForRemoveAllWhere(itemsRemoved);
+            (_underlying ?? this).RaiseForRemoveAllWhere(itemsRemoved);
 
             return true;
         }

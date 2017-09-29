@@ -400,7 +400,7 @@ namespace C6.Collections
                     // views                
                     itemsRemoved = new T[Count];
                     Array.Copy(_items, Offset, itemsRemoved, 0, Count);
-                    RemoveIndexRange(0, Count);
+                    (_underlying ?? this).RemoveIndexRange(0, Count);
                 }
 
                 RaiseForRemoveAllWhere(itemsRemoved);
@@ -487,7 +487,7 @@ namespace C6.Collections
             return Remove(item, out removedItem);
         }
 
-        public bool Remove(T item, out T removedItem)
+        public virtual bool Remove(T item, out T removedItem)
         {
             #region Code Contracts            
 
@@ -508,9 +508,9 @@ namespace C6.Collections
             return true;
         }
 
-        public virtual bool RemoveDuplicates(T item) => Remove(item);
+        public virtual bool RemoveDuplicates(T item) => item == null ? RemoveAllWhere(x => x == null) : RemoveAllWhere(x => Equals(item, x));
 
-        public bool RemoveRange(SCG.IEnumerable<T> items)
+        public virtual bool RemoveRange(SCG.IEnumerable<T> items)
         {
             #region Code Contracts            
 
@@ -1283,7 +1283,7 @@ namespace C6.Collections
                     }
                     _itemIndex[item] = j;
                     j++; // next "free" place 
-                    viewHandler.skipEndpoints(cntRemoved, i + 1); // not effective
+                    viewHandler.skipEndpoints(cntRemoved, i + 1); // TODO: not effective
                 }
             }
 

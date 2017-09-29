@@ -25,12 +25,12 @@ namespace C6.UserGuideExamples
             //var eq = new C6.ComparerFactory.EqualityComparer<string>(ReferenceEquals,
             //    SCG.EqualityComparer<string>.Default.GetHashCode);
 
-            var eq = CaseInsensitiveStringComparer.Default;
+            //var eq = CaseInsensitiveStringComparer.Default;
             var items = new[] { "1", "Ab", null, "3", "4", "5", "6", "7", null };
-            var ll = new LinkedList<string>(items, eq, allowsNull: true);
+            var ll = new LinkedList<string>(items, null, allowsNull: true);
 
-            var a = Enumerable.Empty<string>();
-            ll.InsertRange(0, a);
+            ll.RetainRange(items);
+            Console.WriteLine(ll);
           
 
 

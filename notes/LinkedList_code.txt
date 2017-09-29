@@ -1,9 +1,7 @@
 CHECK FOR VERSIONUPDATE() IN LinkedList
 	which methods?
-AL - (_under ?? this).RaiseFor - included or not?
+ArrL - (_under ?? this).RaiseFor - included or not?
 	indexes
-	
-Code COntracts with Ensure()
 
 
 TODO:
@@ -12,12 +10,8 @@ TODO:
 	//!Check for Code contracts after implementation of IExtensible	
 	- public bool UnsequencedEquals(ICollection<T> otherCollection)        
 		Peter's is different
-	
-		
-	RemoveWhere		
-		RemoveRange
-			RemoveDuplicates
-		RetainRange
+	- private bool RemoveAllWhere(Func<T, bool> predicate)
+		- updateCheck == CheckVersion
 		
 	- private sealed class ItemSet : CollectionValueBase<T>, ICollectionValue<T> // ??? CollectionValues base
 	- ADD: ObjectInvariants
@@ -42,6 +36,10 @@ TODO:
 	chaining; xs.
 	Effective Java, Bloch, second edition!!!
 		changing + side effect ?!
+	- RemoveIndexRange's Code Contracts in IIndexed
+		Add Requires(IsEmpty, CollectionMustBeNonReadOnly); or what ???
+	- RemoweAllWhere looks ugly
+		- what about //updatecheck();?
 ======
 View:
 	View changes in the methods:
@@ -55,12 +53,18 @@ C5:
 =========
 Tests:
 	- ExpectedDirectedCollectionValue. Why no we need a class ???
-	
+====================	
+Complex methods:
+	private static Node mergeRuns(Node run1, Node run2, SCG.IComparer<T> c) // ???
+		- SCG.IComparer<T> c or 
+	private MutualViewPosition viewPosition(LinkedList<T> otherView)
+		IList instead of LinkedList
+
 ================
 Thesis notes:	
 	it was: private void raiseForInsertAll(Node node, int i, int added, bool insertion)
 	now: private void RaiseForAddRange(SCG.IEnumerable<T> items)
-	- get -> getNode
+	- get -> getNodeAtPrivate
 	find() and dnif - were combined with usage of Eumeration direction as paramter
 	- raiseFor: index mismatches
 	- redundant else's in C5.LinkedList
@@ -74,5 +78,13 @@ Thesis notes:
 	 now: 
 		OnItemRemovedAt(oldItem, index);
 		OnItemsRemoved(oldItem, 1);
+	- C5's private methods was renamed
+		- Capital letter; ...Private suffix; var instead of a specific type.
+	- Reverse
+		- PositionComparer: fields became private; expression-bobies added
+		- CircularQueue -> Queue; a new instance
+		- Sorting.IntroSort<Position>(positions, 0, positions.Length, PositionComparer.Default)
+			-> Array.Sort(positions, PositionComparer.Default);
+		
 
-            
+          
