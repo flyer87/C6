@@ -437,7 +437,7 @@
     <Compile Include="EnumerationDirectionExtension.cs" />
     <Compile Include="EventTypes.cs" />
     <Compile Include="IMyInterface.cs" />
-    <Compile Include="LinkedList.cs" />
+    <Compile Include="Collections\LinkedList.cs" />
     <Compile Include="Speed.cs" />
     <Compile Include="ClearedEventArgs.cs" />
     <Compile Include="ItemCountEventArgs.cs" />
