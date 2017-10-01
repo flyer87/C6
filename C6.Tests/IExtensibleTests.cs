@@ -360,6 +360,7 @@ namespace C6.Tests
         public void AddRange_AllowNullAddNull_True()
         {     
             Run.If(AllowsNull);       
+
             // Arrange
             var items = GetStrings(Random);
             var collection = GetExtensible(items, ReferenceEqualityComparer, allowsNull: true);
@@ -433,28 +434,28 @@ namespace C6.Tests
         public void AddRange_AddDuplicates_ExpectedItems()
         {
             // Arrange
-            var items = GetStrings(Random);
+            var items = GetStrings(Random);//.Take(5);
             var collection = GetExtensible(items, ReferenceEqualityComparer);
             var expectedItems = AllowsDuplicates ? items.Concat(items) : items;
 
             // Act
-            var addRange = collection.AddRange(items);
+            var randeIsAdded = collection.AddRange(items);
 
             // Assert
-            Assert.That(addRange, Is.EqualTo(AllowsDuplicates));
+            Assert.That(randeIsAdded, Is.EqualTo(AllowsDuplicates));
             Assert.That(collection, Is.EquivalentTo(expectedItems));
         }
 
         [Test]
         public void AddRange_AddItemsWithDuplicates_RaisesExpectedEvents()
         {
+            Run.If(AllowsDuplicates);
             // Arrange
             var collection = GetStringExtensible(Random, ReferenceEqualityComparer);
             var item1 = Random.GetString();
             var item2 = Random.GetString();
             var item3 = Random.GetString();
-            //var items = new[] { item1, item2, item1, item3 };
-            var items = new[] { item1, item2, item3 };
+            var items = new[] { item1, item2, item1, item3 };            
             var expectedEvents = AllowsDuplicates
                 ? new[] {
                     Added(item1, 1, collection),

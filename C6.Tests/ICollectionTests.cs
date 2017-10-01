@@ -858,10 +858,12 @@ namespace C6.Tests
         [Test]
         public void FindDuplicates_AlterDuringResultEnumeration_ThrowsInvalidOperationException()
         {
+            Run.If(AllowsDuplicates);
+
             // Arrange
             var item = GetLowercaseString(Random);
             var count = GetCount(Random);
-            var items = GetUppercaseStrings(Random); //.WithRepeatedItem(() => item, count, Random);
+            var items = GetUppercaseStrings(Random).WithRepeatedItem(() => item, count, Random);
             var collection = GetCollection(items);
 
             Run.If(AllowsDuplicates);
@@ -2661,8 +2663,8 @@ namespace C6.Tests
             // Arrange
             var items = new[] { 4, 54, 56, 8 };
             var collection = GetCollection(items, TenEqualityComparer.Default);
-            //var count = DuplicatesByCounting ? 2 : 1;
-            var count = AllowsDuplicates ? 2 : 1;
+            var count = DuplicatesByCounting ? 2 : 1;
+            //var count = AllowsDuplicates ? 2 : 1; ??? one of these
             var item = 53;
             var expectedEvents = new[] {
                 Removed(54, count, collection),
@@ -3034,8 +3036,7 @@ namespace C6.Tests
             var items = GetUppercaseStrings(Random);
             var collection = GetCollection(items, CaseInsensitiveStringComparer.Default);
             var oldItem = items.Choose(Random);
-            //var item = oldItem.ToLower();
-            var item = oldItem.ToString();
+            var item = oldItem.ToLower();            
             var expectedEvents = new[] {
                 Removed(oldItem, 1, collection),
                 Added(item, 1, collection),
@@ -3052,8 +3053,8 @@ namespace C6.Tests
             // Arrange
             var items = new[] { 4, 54, 56, 8 };
             var collection = GetCollection(items, TenEqualityComparer.Default);
-            //var count = DuplicatesByCounting ? 2 : 1;
-            var count = AllowsDuplicates ? 2 : 1;
+            var count = DuplicatesByCounting ? 2 : 1;
+            //var count = AllowsDuplicates ? 2 : 1;
             var item = 53;
             var expectedEvents = new[] {
                 Removed(54, count, collection),
@@ -3273,8 +3274,8 @@ namespace C6.Tests
             // Arrange
             var items = new[] { 4, 54, 56, 8 };
             var collection = GetCollection(items, TenEqualityComparer.Default);
-            //var count = DuplicatesByCounting ? 2 : 1;
-            var count = AllowsDuplicates ? 2 : 1;
+            var count = DuplicatesByCounting ? 2 : 1;
+            //var count = AllowsDuplicates ? 2 : 1;
             var item = 53;
             int oldItem;
             var expectedEvents = new[] {

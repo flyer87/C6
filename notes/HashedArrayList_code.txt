@@ -11,10 +11,6 @@ Q:
 - C5.13.6 Implementation of hashed array lists
 - Constant time for: Find, IndexOf, Contains, ... (instead of iterating over the items)
 
-
-!- KeyValuePair - struct
-	- ???IEquatable
-	- restrcuture???
 	
 - What is int for in KeyValuePair<T, int> for? Is It real index in the _items?
 	- yes!
@@ -40,7 +36,8 @@ Tips:
 	Clear()
 		prop. list -> Clear(); 
 		view -> RemoveIndexRange(0, Count);
-	Add() -> Insert
+	Add() -> InsertPrivate
+		AddRange -> InsertRange
 	Remove() -> RemoveAt
 =======================
 TODO:
@@ -61,3 +58,9 @@ TODO:
 	- view after Dispose() can call: v.AllowsNull. But should we allow that?
 	Views:
 		- add not a view message
+		- AddRange(items) {
+			...
+			RaiseForAddRange(items) //Are all items actually added?
+		}
+	- ADD: ObjectInvariants
+		incl: the nested types in all classes

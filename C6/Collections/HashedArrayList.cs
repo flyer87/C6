@@ -178,7 +178,7 @@ namespace C6.Collections
         public T Choose() => _items[0]; //to_base: virtual // Count - 1
 
         #endregion
-
+        
         #region IListenable
 
         public virtual EventTypes ActiveEvents { get; private set; }
@@ -196,7 +196,7 @@ namespace C6.Collections
 
         public bool IsReadOnly => false;
 
-        public virtual SCG.IEqualityComparer<T> EqualityComparer { get; } // ??? virtual
+        public virtual SCG.IEqualityComparer<T> EqualityComparer { get; } 
 
         #endregion
 
@@ -242,7 +242,7 @@ namespace C6.Collections
 
         #region ICollectionValue
 
-        public SCG.IEnumerator<T> GetEnumerator()
+        public SCG.IEnumerator<T> GetEnumerator() // overrides valuebase 
         {
             #region Code Contracts
 
@@ -400,7 +400,7 @@ namespace C6.Collections
                     // views                
                     itemsRemoved = new T[Count];
                     Array.Copy(_items, Offset, itemsRemoved, 0, Count);
-                    RemoveIndexRange(0, Count);
+                    (_underlying ?? this).RemoveIndexRange(0, Count);
                 }
 
                 RaiseForRemoveAllWhere(itemsRemoved);
@@ -487,7 +487,7 @@ namespace C6.Collections
             return Remove(item, out removedItem);
         }
 
-        public bool Remove(T item, out T removedItem)
+        public virtual bool Remove(T item, out T removedItem)
         {
             #region Code Contracts            
 
@@ -508,9 +508,9 @@ namespace C6.Collections
             return true;
         }
 
-        public virtual bool RemoveDuplicates(T item) => Remove(item);
+        public virtual bool RemoveDuplicates(T item) => item == null ? RemoveAllWhere(x => x == null) : RemoveAllWhere(x => Equals(item, x));
 
-        public bool RemoveRange(SCG.IEnumerable<T> items)
+        public virtual bool RemoveRange(SCG.IEnumerable<T> items)
         {
             #region Code Contracts            
 
@@ -873,20 +873,7 @@ namespace C6.Collections
 
             //throw new NotImplementedException();
         }
-
-        private void RaiseForInsertRange(int index, T[] array) // ??? the index of the view or the _items
-        {
-            if (ActiveEvents.HasFlag(Inserted | Added))
-            {
-                for (var i = 0; i < array.Length; i++)
-                {
-                    var item = array[i];
-                    OnItemInserted(item, index + i);
-                    OnItemsAdded(item, 1);
-                }
-            }
-            OnCollectionChanged();
-        }
+        
         public virtual bool IsSorted(Comparison<T> comparison) // View:
         {
             #region Code Contract
@@ -909,12 +896,7 @@ namespace C6.Collections
 
         public virtual bool IsSorted(SCG.IComparer<T> comparer) => IsSorted((comparer ?? SCG.Comparer<T>.Default).Compare);
 
-        public virtual bool IsSorted() => IsSorted(SCG.Comparer<T>.Default);
-
-        public virtual string Print()
-        {
-            throw new NotImplementedException();
-        }
+        public virtual bool IsSorted() => IsSorted(SCG.Comparer<T>.Default);        
 
         public virtual T RemoveFirst() => RemoveAt(Offset); //View:
 
@@ -1034,7 +1016,7 @@ namespace C6.Collections
             if (_views == null)
                 _views = new WeakViewList<HashedArrayList<T>>();
 
-            HashedArrayList<T> view = (HashedArrayList<T>) MemberwiseClone();
+            var view = (HashedArrayList<T>) MemberwiseClone();
 
             view.Offset += index;
             view.Count = count;
@@ -1283,7 +1265,7 @@ namespace C6.Collections
                     }
                     _itemIndex[item] = j;
                     j++; // next "free" place 
-                    viewHandler.skipEndpoints(cntRemoved, i + 1); // not effective
+                    viewHandler.skipEndpoints(cntRemoved, i + 1); // TODO: not effective
                 }
             }
 
@@ -1627,6 +1609,20 @@ namespace C6.Collections
 
                 Clear();
             }
+        }
+
+        private void RaiseForInsertRange(int index, T[] array) // ??? the index of the view or the _items
+        {
+            if (ActiveEvents.HasFlag(Inserted | Added))
+            {
+                for (var i = 0; i < array.Length; i++)
+                {
+                    var item = array[i];
+                    OnItemInserted(item, index + i);
+                    OnItemsAdded(item, 1);
+                }
+            }
+            OnCollectionChanged();
         }
 
         private void RaiseForAdd(T item)

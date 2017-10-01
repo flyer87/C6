@@ -83,9 +83,7 @@ namespace C6
         ///     The last item in the list.
         /// </value>
         [Pure]
-        T Last { get; }
-
-        string Print();
+        T Last { get; }        
 
         /// <summary>
         ///     Gets or sets the item at the specified index.

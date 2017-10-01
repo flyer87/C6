@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Text;
 
 using C6.Collections;
+using C6.Contracts;
 
 using static C6.Contracts.ContractMessage;
 
@@ -21,15 +22,20 @@ namespace C6.UserGuideExamples
     {
         public static void Main()
         {
-            var collection = new HashedArrayList<string> { "1", "2", "3", "4" };
-            var v = collection.View(1, 2);
-            Console.WriteLine(v);
-            v.Dispose();
-            Console.WriteLine(v.AllowsNull);
+            //var eq = new C6.ComparerFactory.EqualityComparer<string>(ReferenceEquals,
+            //    SCG.EqualityComparer<string>.Default.GetHashCode);
+
+            //var eq = CaseInsensitiveStringComparer.Default;
+            var items = new[] { "1", "Ab", null, "3", "4", "5", "6", "7", null };
+            var ll = new LinkedList<string>(items, null, allowsNull: true);
+
+            ll.RetainRange(items);
+            Console.WriteLine(ll);
+          
 
 
 
-            
+
             // Act            
 
 

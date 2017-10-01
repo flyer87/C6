@@ -1,0 +1,30 @@
+ - itemsAdded -> itemAdded
+ - countItems(items), where SCG.IEnumerable<T> items -> just items.ToArray();
+ - C6.Properties - Contract Reference Assembly: Build, ohterwise it doesn't see the user define messages.
+	
+TESTS:
+ - CountDuplicates_RandomCollectionWithCountEqualItems_Count()
+	Run.If(AllowsDuplicates);
+	
+- public void ContainsRange_LargerRangeThanCollectionWithDuplicateItem_False()
+        {
+            Run.If(AllowsDuplicates); (!!!) Added
+            // Arrange
+            var collection = GetStringCollection(Random);
+            var items = collection.Append(collection.Choose()).ShuffledCopy(Random);
+         }
+		 
+- protected override bool AllowsNull { get; } in ICollectionTests
+===========
+- properties:
+	- don't throw exceptions, p.age 139, 5.2 Property design
+	but IList.Last; First - they have preconditions; and only they
+	- backing fields; bypass additional code contracts checks; For example; Count, List.First, List.Last
+	-private properteies (https://stackoverflow.com/questions/3310186/are-there-any-reasons-to-use-private-properties-in-c)
+	
+===================
+COde contracts:
+	- Requires(AllowsDuplicates || ForAll(items, item => !Contains(item)), CollectionMustAllowDuplicates);
+	- DuplicatesByCounting Code COntracts was wrong. Now:
+		Ensures(AllowsDuplicates || Result<bool>());
+		Ensures(!AllowsDuplicates || !Result<bool>());	

@@ -182,7 +182,7 @@ namespace C6.Collections
 
         #endregion
 
-        #region Properties
+        #region Properties        
 
         public virtual EventTypes ActiveEvents { get; private set; }
 
@@ -296,6 +296,7 @@ namespace C6.Collections
 
         #endregion
 
+        private int UnderlyingCount => (Underlying ?? this).Count;
         #region Public Methods
 
         public override T[] ToArray()
@@ -316,7 +317,7 @@ namespace C6.Collections
 
             InsertPrivate(Count, item);            
             (_underlying ?? this).RaiseForAdd(item); //RaiseForAdd(item); // we raise the event on the proper list, ya?!
-            InvalidateCollectionValuesPrivate();
+            // InvalidateCollectionValuesPrivate();
             return true;
         }
 
@@ -436,7 +437,7 @@ namespace C6.Collections
 
             return this.Any(item => itemsToContain.Remove(item) && itemsToContain.IsEmpty);
         }
-
+        
         public override void CopyTo(T[] array, int arrayIndex)
         {
             #region Code Contract
@@ -651,6 +652,11 @@ namespace C6.Collections
             RequireValidity();
             #endregion
 
+            if (Count <= 1)
+            {
+                return true;
+            }
+
             // TODO: Can we check that comparison doesn't alter the collection?
             for (var i = _offsetField + 1; i < Count + _offsetField; i++)
             {
@@ -781,7 +787,7 @@ namespace C6.Collections
         // Explicitly check against null to avoid using the (slower) equality comparer
         public virtual bool RemoveDuplicates(T item) => item == null ? RemoveAllWhere(x => x == null) : RemoveAllWhere(x => Equals(item, x));
 
-        public virtual T RemoveFirst() => RemoveAt(0); // ??? View ofset, not 0
+        public virtual T RemoveFirst() => RemoveAt(0); 
 
         public virtual void RemoveIndexRange(int startIndex, int count)
         {
@@ -801,7 +807,7 @@ namespace C6.Collections
 
             // Only update version if item is actually removed
             UpdateVersion();
-            // new
+            // newa
             startIndex += _offsetField;
             FixViewsBeforeRemovePrivate(startIndex, count);
             var underlyingCount = (_underlying ?? this).Count;
@@ -900,9 +906,9 @@ namespace C6.Collections
 
         public virtual bool SequencedEquals(ISequenced<T> otherCollection)
         {
-            #region Code Contract
-            RequireValidity();
-            #endregion
+            //#region Code Contract
+            //RequireValidity();
+            //#endregion
             return this.SequencedEquals(otherCollection, EqualityComparer);
         }
 
@@ -966,7 +972,7 @@ namespace C6.Collections
             RequireValidity();
             return ToString(null, null);
         }
-
+        
         /// <summary>
         ///     Sets the capacity to the actual number of items in the <see cref="ArrayList{T}"/>, if that number is less than a
         ///     threshold value.
@@ -1164,7 +1170,7 @@ namespace C6.Collections
 
         public virtual void Dispose()
         {
-            Dispose(false);
+            //View: Dispose(false);
         }
 
         private void Dispose(bool disposingUnderlying)
@@ -1847,7 +1853,7 @@ namespace C6.Collections
             Ensures(Result<bool>() || this.IsSameSequenceAs(OldValue(ToArray())));
             #endregion
 
-            //TODO: updatecheck() ???
+            // updatecheck() ???
 
             if (IsEmpty)
             {
@@ -1856,8 +1862,8 @@ namespace C6.Collections
 
             var shouldRememberItems = ActiveEvents.HasFlag(Removed); // ??? 
             IExtensible<T> itemsRemoved = null;
-            int cntRemoved = 0;
-            ViewHandler viewHandler = new ViewHandler(this); 
+            var cntRemoved = 0;
+            var viewHandler = new ViewHandler(this); 
 
             // TODO: Use bulk moves - consider using predicate(item) ^ something
             var j = _offsetField;
@@ -1882,7 +1888,7 @@ namespace C6.Collections
                         _items[j] = item;
                     }
                     j++;
-                    viewHandler.skipEndpoints(cntRemoved, i+1); // not effective
+                    viewHandler.skipEndpoints(cntRemoved, i+1); // not effective ???
                 }
             }
 
@@ -1892,25 +1898,24 @@ namespace C6.Collections
                 Assert(itemsRemoved == null);
                 return false;
             }
-            var underlyingCount = (_underlying ?? this).Count;
-            viewHandler.updateViewSizesAndCounts(cntRemoved, underlyingCount);
+            
+            viewHandler.updateViewSizesAndCounts(cntRemoved, UnderlyingCount);
 
-            Array.Copy(_items, _offsetField + Count, _items, j, underlyingCount - _offsetField - Count);            
+            Array.Copy(_items, _offsetField + Count, _items, j, UnderlyingCount - _offsetField - Count);            
             Count -= cntRemoved;
             if (_underlying != null)
             {
                 _underlying.Count -= cntRemoved;
             }
 
-            // Only update version if items are actually removed
-            UpdateVersion();
+            
+            UpdateVersion(); // Only update version if items are actually removed
 
-            // Clean up
-            underlyingCount = (_underlying ?? this).Count;
-            Array.Clear(_items, underlyingCount, cntRemoved); // underlyingCount != j !!!
+            // Clean up            
+            Array.Clear(_items, UnderlyingCount, cntRemoved); // underlyingCount != j !!!
             //Count = j;
 
-            RaiseForRemoveAllWhere(itemsRemoved);
+            (_underlying ?? this).RaiseForRemoveAllWhere(itemsRemoved);
 
             return true;
         }
@@ -2022,7 +2027,7 @@ namespace C6.Collections
                 for (var i = 0; i < array.Length; i++)
                 {
                     var item = array[i];
-                    OnItemInserted(item, index + i);
+                    OnItemInserted(item, index + i); // View: ???
                     OnItemsAdded(item, 1);
                 }
             }
@@ -2172,7 +2177,7 @@ namespace C6.Collections
                 }
             }
 
-            public override bool IsEmpty => /*CheckVersion() &*/ List.IsEmpty;
+            public override bool IsEmpty => CheckVersion() & List.IsEmpty;
 
             #endregion
 
@@ -2202,7 +2207,7 @@ namespace C6.Collections
                 if (_list != null)
                 {
                     var enumerator = _list.GetEnumerator();
-                    while (/*CheckVersion() &*/ enumerator.MoveNext())
+                    while (CheckVersion() & enumerator.MoveNext())                    
                     {
                         yield return enumerator.Current;
                     }
@@ -2492,6 +2497,7 @@ namespace C6.Collections
 
                 _base = list;
                 _version = list._version;
+
                 _sign = (int)direction;
                 _startIndex = startIndex;
                 _count = count;
@@ -2554,7 +2560,7 @@ namespace C6.Collections
             public override void CopyTo(T[] array, int arrayIndex)
             {
                 CheckVersion();
-                if (_direction.IsForward())
+                if (_direction.IsForward()) // depending on _direction choose the most efficient one
                 {
                     // Copy array directly
                     Array.Copy(_base._items, _base.Offset + _startIndex, array, arrayIndex, _count); // Offset!!
