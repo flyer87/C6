@@ -5,6 +5,7 @@ ArrL - (_under ?? this).RaiseFor - included or not?
 
 
 TODO:	
+	- Invalidate views
 	//!Check for Code contracts after implementation of IExtensible	
 	- public bool UnsequencedEquals(ICollection<T> otherCollection)        
 		Peter's is different

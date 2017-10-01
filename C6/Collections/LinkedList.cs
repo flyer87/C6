@@ -1909,7 +1909,7 @@ namespace C6
         #region Nested types
 
         /// <summary>
-        /// Something ???
+        /// Node ???
         /// </summary>
         /// <typeparam name="V"></typeparam>
         private sealed class Node // Why not Node<T> ??

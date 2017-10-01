@@ -62,7 +62,7 @@ namespace C6.Collections
         private int UnderlyingCount => (Underlying ?? this).Count;
 
         #endregion Fields
-
+        
         #region Constructors
 
         public HashedArrayList()
