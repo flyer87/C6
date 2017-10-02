@@ -303,6 +303,7 @@ namespace C6.Collections
 
             #endregion
 
+            // TODO: insert range ???
             // TODO: Handle ICollectionValue<T> and ICollection<T>
             var array = items.ToArray();
             if (array.IsEmpty())
@@ -1374,19 +1375,19 @@ namespace C6.Collections
 
         private void FixViewsAfterInsertPrivate(int added, int realInsertionIndex)
         {
-            if (_views != null)
-                foreach (HashedArrayList<T> view in _views)
-                {
-                    if (view != this)
-                    {
-                        // in the middle
-                        if (view.Offset < realInsertionIndex && realInsertionIndex < view.Offset + view.Count)
-                            view.Count += added;
-                        // before the beginning
-                        if (view.Offset > realInsertionIndex || (view.Offset == realInsertionIndex && view.Count > 0))
-                            view.Offset += added;
-                    }
-                }
+            if (_views == null) return;
+
+            foreach (var view in _views)
+            {
+                if (view == this) continue;
+                
+                // in the middle
+                if (view.Offset < realInsertionIndex && realInsertionIndex < view.Offset + view.Count)
+                    view.Count += added;
+                // before the beginning
+                if (view.Offset > realInsertionIndex || (view.Offset == realInsertionIndex && view.Count > 0))
+                    view.Offset += added;
+            }
         }
 
         private void FixViewsBeforeSingleRemovePrivate(int realRemovalIndex)

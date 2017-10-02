@@ -231,7 +231,7 @@ namespace C6.Tests
             // Arrange
             var items = GetUppercaseStrings(Random);
             var collection = GetExtensible(items, CaseInsensitiveStringComparer.Default); // , CaseInsensitiveStringComparer.Default
-            var duplicateItem = items.Choose(Random).ToLower();//.ToLower();
+            var duplicateItem = items.Choose(Random).ToLower();
 
             // Act
             var result = collection.Add(duplicateItem);

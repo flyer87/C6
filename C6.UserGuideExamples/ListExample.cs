@@ -26,11 +26,11 @@ namespace C6.UserGuideExamples
             //    SCG.EqualityComparer<string>.Default.GetHashCode);
 
             //var eq = CaseInsensitiveStringComparer.Default;
-            var items = new[] { "1", "Ab", null, "3", "4", "5", "6", "7", null };
-            var ll = new LinkedList<string>(items, null, allowsNull: true);
+            var items = new[] { "1", "Ab", "3", "4", "5", "6", "7" };
+            var ll = new HashedLinkedList<string>(items, null);
 
-            ll.RetainRange(items);
-            Console.WriteLine(ll);
+            Console.WriteLine(ll.Add("1dfs"));
+            
           
 
 

@@ -16,7 +16,6 @@ using static C6.Speed;
 
 using SC = System.Collections;
 using SCG = System.Collections.Generic;
-//using static EnumerationDirection;
 
 
 namespace C6

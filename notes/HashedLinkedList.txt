@@ -1,4 +1,12 @@
-
+- invariants in C5
+- RaiseForAddRange(array) - not correct
+	- some of array items can't bo added, since they're already there. Should raise only for the added ones.
 
 ===========
 Thesis notes:
+	- void C5.AddNode() => bool C6.AddNode()
+	- object initializer used in:
+		private  void SplitTagGroupPrivate(TagGroup taggroup) {
+			...
+			var newtaggroup = new TagGroup { ... }
+		}

@@ -131,8 +131,7 @@ namespace C6.Collections
             // ReSharper restore InvocationIsSkipped
 
             #endregion
-
-            IsValid = true;
+            
             EqualityComparer = equalityComparer ?? SCG.EqualityComparer<T>.Default;
 
             var collectionValue = items as ICollectionValue<T>;
@@ -174,8 +173,7 @@ namespace C6.Collections
             // ReSharper restore InvocationIsSkipped
 
             #endregion
-
-            IsValid = true;
+            
             Capacity = capacity;
             EqualityComparer = equalityComparer ?? SCG.EqualityComparer<T>.Default;
         }
@@ -356,6 +354,7 @@ namespace C6.Collections
             }
 
             InsertRangePrivate(Count, array);
+
             (_underlying ?? this).RaiseForAddRange(array);
             return true;
         }
@@ -440,9 +439,6 @@ namespace C6.Collections
         
         public override void CopyTo(T[] array, int arrayIndex)
         {
-            #region Code Contract
-            RequireValidity();
-            #endregion
             Array.Copy(_items, _offsetField, array, arrayIndex, Count);
         }
 
