@@ -281,7 +281,7 @@ namespace C6
 
         public virtual ICollectionValue<T> FindDuplicates(T item) => new Duplicates(this, item);
 
-        public virtual bool FindOrAdd(ref T item) => Find(ref item) ? true : !Add(item);
+        public virtual bool FindOrAdd(ref T item) => Find(ref item) || !Add(item);
 
         // TODO: Update hash code when items are added, if the hash code version is not equal to -1
         public virtual int GetUnsequencedHashCode()
@@ -421,7 +421,7 @@ namespace C6
             return UpdateOrAdd(item, out olditem);
         }
                
-        public virtual bool UpdateOrAdd(T item, out T oldItem) => Update(item, out oldItem) ? true : !Add(item);
+        public virtual bool UpdateOrAdd(T item, out T oldItem) => Update(item, out oldItem) || !Add(item);
                 
         #endregion
 
@@ -1656,6 +1656,7 @@ namespace C6
             UpdateVersion();
 
             FixViewsBeforeRemovePrivate(0, Count, _startSentinel.Next, _endSentinel.Prev);
+
             _startSentinel.Next = _endSentinel; //_startSentinel.Prev = null;
             _endSentinel.Prev = _startSentinel; //_endSentinel.Next = null;
 

@@ -1,7 +1,20 @@
+updateversion
+IndexOf
+void SCG.ICollection<T>.Clear() and other methods
+Code Contracts in the beginnig
+=========
 - invariants in C5
 - RaiseForAddRange(array) - not correct
 	- some of array items can't bo added, since they're already there. Should raise only for the added ones.
-
+-     if (_underlying == null) or  if (_underlying == null) {
+			return true; 				return true;
+								   }
+- insideview or Isinsideview
+- methods with SCG.IEnumerable<T> items (ContainsRange, ...) some check in the beginnig of the method ?
+- Improve GetUnsequencedHashCode() ???
+- public static bool UnsequencedEquals<T>(this ICollection<T> first, ICollection<T> second, SCG.IEqualityComparer<T> equalityComparer = null)
+	- Why ICollection, but no IEnumerable?
+- isValid in privae classes like ItemSet, Duplicates, ...
 ===========
 Thesis notes:
 	- void C5.AddNode() => bool C6.AddNode()
@@ -10,3 +23,11 @@ Thesis notes:
 			...
 			var newtaggroup = new TagGroup { ... }
 		}
+		
+	- private methods renamed:
+		- contains => containsItem
+	- LINQ for ContainsRange()
+	- public static bool UnsequencedEquals<T>(this ICollection<T> first, ICollection<T> second, SCG.IEqualityComparer<T> equalityComparer = null)
+		updated; C5 re-used. BUT DO WE NEED it?
+		C6.4.3.6 Sequenced and Unsequenced Equality
+			4.1.1 Order-Indifferent Equality

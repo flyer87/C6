@@ -505,7 +505,7 @@ namespace C6.Collections
             }
 
             removedItem = RemoveAtPrivate(index);
-            RaiseForRemove(removedItem);
+            (_underlying ?? this).RaiseForRemove(removedItem);
             return true;
         }
 
@@ -549,13 +549,15 @@ namespace C6.Collections
             // TODO: Private method
             // TODO: ???Replace ArrayList<T> with more efficient data structure like HashBag<T>
             //var itemsToContain = new ArrayList<T>(items, EqualityComparer);
-            bool containsRange = true;
-            foreach (var item in items)
-            {
-                containsRange = containsRange && _itemIndex.ContainsKey(item); // ??? &= 
-            }
+            //bool containsRange = true;
+            //foreach (var item in items)
+            //{
+            //    containsRange = containsRange && _itemIndex.ContainsKey(item); // ??? &= 
+            //}
+            
+            //return containsRange;
 
-            return containsRange;
+            return items.All(item => _itemIndex.ContainsKey(item));
         }
 
         public virtual void Clear()
@@ -589,9 +591,9 @@ namespace C6.Collections
 
         public virtual bool Contains(T item) => IndexOf(item) >= 0;
 
-        public int CountDuplicates(T item) => IndexOf(item) >= 0 ? 1 : 0;
+        public virtual int CountDuplicates(T item) => IndexOf(item) >= 0 ? 1 : 0;
 
-        public bool Find(ref T item)
+        public virtual bool Find(ref T item)
         {
             #region Code Contracts          
 
@@ -603,7 +605,7 @@ namespace C6.Collections
                 return false;
             }
 
-            item = _items[index]; // View: offset
+            item = _items[Offset + index]; // View: offset ???
             return true;
         }
 
@@ -621,7 +623,7 @@ namespace C6.Collections
             return duplicates;
         }
 
-        public bool FindOrAdd(ref T item)
+        public virtual bool FindOrAdd(ref T item)
         {
             #region Code Contracts          
 
@@ -638,12 +640,13 @@ namespace C6.Collections
 
         public int GetUnsequencedHashCode()
         {
-            if (_unsequencedHashCodeVersion != _version)
+            if (_unsequencedHashCodeVersion == _version)
             {
-                _unsequencedHashCodeVersion = _version;
-                _unsequencedHashCode = this.GetUnsequencedHashCode(EqualityComparer);
+                return _unsequencedHashCode;
             }
 
+            _unsequencedHashCodeVersion = _version;
+            _unsequencedHashCode = this.GetUnsequencedHashCode(EqualityComparer);
             return _unsequencedHashCode;
         }
 
@@ -2005,7 +2008,6 @@ namespace C6.Collections
 
             #endregion
         }
-
 
         [Serializable]
         [DebuggerTypeProxy(typeof(CollectionValueDebugView<>))]
