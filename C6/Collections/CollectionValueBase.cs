@@ -18,7 +18,7 @@ namespace C6.Collections
         protected CollectionValueBase(bool allowsNull = false)
         {
             AllowsNull = allowsNull;
-            IsValid = true;  // view new                                                      
+                     
         }
 
         #endregion
@@ -27,7 +27,8 @@ namespace C6.Collections
 
         public virtual bool AllowsNull { get; }
 
-        public virtual bool IsValid { get; protected internal set; } // is it CollectionValue property or ArrayView prop ???
+        public virtual bool IsValid { get; protected internal set; } = true;  // ??? protected internal because of: ArrayList: private void InvalidateCollectionValuesPrivate()
+        // is it CollectionValue property or ArrayView prop ???
 
         public virtual int Count { get; protected set; }
 

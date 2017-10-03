@@ -282,7 +282,7 @@ namespace C6.Collections
                 
         public virtual int Offset => _offsetField;
 
-        public virtual bool IsValid { get; protected set; } // ???
+        //public virtual bool IsValid { get; protected set; } // ???
 
         /// <summary>
         /// Null if this list is not a view.

@@ -29,7 +29,7 @@ namespace C6.UserGuideExamples
             var items = new[] { "1", "Ab", "3", "4", "5", "6", "7" };
             var ll = new HashedLinkedList<string>(items, null);
 
-            Console.WriteLine(ll.Add("1dfs"));
+            Console.WriteLine(ll.Add("ab"));
             
           
 

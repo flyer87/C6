@@ -26,7 +26,7 @@ namespace C6.Collections
 
         private HashedLinkedList<T> _underlying; // null for proper list
         private WeakViewList<HashedLinkedList<T>> _views; 
-        private WeakViewList<HashedArrayList<T>>.Node _myWeakView; // null for proper list
+        private WeakViewList<HashedLinkedList<T>>.Node _myWeakView; // null for proper list
 
         private int _version, _sequencedHashCodeVersion = -1, _unsequencedHashCodeVersion = -1;
         private int _sequencedHashCode, _unsequencedHashCode;
@@ -349,6 +349,8 @@ namespace C6.Collections
 
         private void InsertNodeBeforePrivate(bool updateViews, Node succ, Node node) // ??? updateViews
         {
+            UpdateVersion();
+
             node.Next = succ;
             node.Prev = succ.Prev; // ??? why skipped in C5
             succ.Prev.Next = node;
