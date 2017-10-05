@@ -1680,7 +1680,7 @@ namespace C6
             throw new InvalidOperationException(CollectionWasModified);
         }
 
-        private Node GetNodeAtPrivate(int index)
+        Node GetNodeAtPrivate(int index)
         {
             #region Code Contracts                        
 

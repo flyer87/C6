@@ -15,11 +15,9 @@ using static C6.Speed;
 using SCG = System.Collections.Generic;
 using SC = System.Collections;
 
-
-
 namespace C6.Collections
 {
-    public class HashedLinkedList<T> : ICollection<T>
+    public class HashedLinkedList<T> : IIndexed<T>
     {
         #region Fields
 
@@ -117,6 +115,18 @@ namespace C6.Collections
         #region ICollection
 
         public Speed ContainsSpeed { get; }
+
+        #endregion
+
+        #region IDirectedCollectionValue
+
+        public virtual EnumerationDirection Direction => EnumerationDirection.Forwards;
+
+        #endregion
+
+        #region IIndexed
+
+        public virtual Speed IndexingSpeed => Linear;
 
         #endregion
 
@@ -320,7 +330,7 @@ namespace C6.Collections
             }
 
             removedItem = node.item;            
-            RemoveAtPrivate(node, index); // remove from linked list
+            RemoveNodePrivate(node, index); // remove from linked list
 
             (_underlying ?? this).RaiseForRemove(removedItem, 1);
             return true;
@@ -389,6 +399,33 @@ namespace C6.Collections
         public virtual bool UpdateOrAdd(T item) => Update(item) || !Add(item);
 
         public virtual bool UpdateOrAdd(T item, out T oldItem) => Update(item, out oldItem) || !Add(item);
+
+        #endregion
+
+        #region IDirectedCollectionValue
+
+        public virtual IDirectedCollectionValue<T> Backwards()
+            => new Range(this, Count - 1, Count, EnumerationDirection.Backwards);
+    
+        #endregion
+
+        #region ISequenced
+
+        public virtual int GetSequencedHashCode()
+        {
+            if (_sequencedHashCodeVersion == _version)
+            {
+                return _sequencedHashCode;
+            }
+
+            _sequencedHashCodeVersion = _version;
+            _sequencedHashCode = this.GetSequencedHashCode(EqualityComparer);
+            return _sequencedHashCode;
+        }
+
+        public virtual bool SequencedEquals(ISequenced<T> otherCollection)        
+            => this.SequencedEquals(otherCollection, EqualityComparer);
+        
 
         #endregion
 
@@ -581,23 +618,42 @@ namespace C6.Collections
         #endregion
 
         #region Private methods
-
-        [Pure]
-        private bool Equals(T x, T y) => EqualityComparer.Equals(x, y);
-
-        private void RaiseForUpdate(T item, T oldItem)
+       
+        private Node GetNodeAtPrivate(int index)
         {
-            if (ActiveEvents == None)
-            {
-                return;
-            }
+            #region Code Contracts                        
 
-            OnItemsRemoved(oldItem, 1);
-            OnItemsAdded(item, 1);
-            OnCollectionChanged();
+            // ReSharper disable InvocationIsSkipped
+            Requires(0 <= index, ArgumentMustBeWithinBounds);
+            Requires(index < Count, ArgumentMustBeWithinBounds);
+            // ReSharper enable InvocationIsSkipped
+
+            #endregion
+
+            if (index < Count / 2)
+            {
+                // Closer to front
+                var node = _startSentinel;
+                for (var i = 0; i <= index; i++)
+                    node = node.Next;
+
+                return node;
+            }
+            else
+            {
+                // Closer to end
+                var node = _endSentinel;
+                for (var i = Count; i > index; i--)
+                    node = node.Prev;
+
+                return node;
+            }
         }
 
-        private T RemoveAtPrivate(Node node, int index)
+        [Pure]
+        private bool Equals(T x, T y) => EqualityComparer.Equals(x, y);       
+
+        private T RemoveNodePrivate(Node node, int index)
         {
             UpdateVersion();
 
@@ -641,7 +697,6 @@ namespace C6.Collections
                 return true;
             return _startSentinel.Precedes(node) && node.Precedes(_endSentinel);
         }
-
 
         private void ClearPrivate()
         {
@@ -736,6 +791,31 @@ namespace C6.Collections
             throw new InvalidOperationException(CollectionWasModified);
         }
 
+        private void RaiseForIndexSetter(T oldItem, T item, int index)
+        {
+            if (ActiveEvents == None)
+            {
+                return;
+            }
+
+            OnItemsRemoved(oldItem, index);
+            OnItemRemovedAt(oldItem, index);
+            OnItemsAdded(item, 1);
+            OnItemInserted(item, index);
+            OnCollectionChanged();
+        }
+
+        private void RaiseForUpdate(T item, T oldItem)
+        {
+            if (ActiveEvents == None)
+            {
+                return;
+            }
+
+            OnItemsRemoved(oldItem, 1);
+            OnItemsAdded(item, 1);
+            OnCollectionChanged();
+        }
 
         private void RaiseForRemove(T item, int count)
         {
@@ -784,6 +864,12 @@ namespace C6.Collections
         }
 
         #region Invoking methods
+
+        private void OnItemInserted(T item, int index)
+            => _itemInserted?.Invoke(this, new ItemAtEventArgs<T>(item, index));
+
+        private void OnItemRemovedAt(T item, int index)
+            => _itemRemovedAt?.Invoke(this, new ItemAtEventArgs<T>(item, index));
 
         private void OnItemsRemoved(T item, int count)
             => _itemsRemoved?.Invoke(this, new ItemCountEventArgs<T>(item, count));
@@ -1612,9 +1698,278 @@ namespace C6.Collections
             #endregion
         }
 
+        [Serializable]
+        [DebuggerTypeProxy(typeof(CollectionValueDebugView<>))]
+        [DebuggerDisplay("{DebuggerDisplay}")]
+        private sealed class Range : CollectionValueBase<T>, IDirectedCollectionValue<T>
+        {
+            #region Fields
+
+            private readonly HashedLinkedList<T> _base;
+            private readonly int _version, _startIndex, _count, _sign;
+            private readonly EnumerationDirection _direction;
+            private readonly Node _startNode;
+
+            #endregion
+
+            #region Constructors
+
+            /// <summary>
+            ///     Initializes a new instance of the <see cref="Range"/> class that starts at the specified index and spans the next
+            ///     <paramref name="count"/> items in the specified direction.
+            /// </summary>
+            /// <param name="list">
+            ///     The underlying <see cref="HashedLinkedList{T}"/>.
+            /// </param>
+            /// <param name="startIndex">
+            ///     The zero-based <see cref="HashedLinkedList{T}"/> index at which the range starts.
+            /// </param>
+            /// <param name="count">
+            ///     The number of items in the range.
+            /// </param>
+            /// <param name="direction">
+            ///     The direction of the range.
+            /// </param>
+            public Range(HashedLinkedList<T> list, int startIndex, int count, EnumerationDirection direction)
+            {
+                #region Code Contracts
+
+                // Argument must be non-null
+                Requires(list != null, ArgumentMustBeNonNull);
+
+                // Argument must be within bounds
+                Requires(-1 <= startIndex, ArgumentMustBeWithinBounds);
+                Requires(startIndex < list.Count || startIndex == 0 && count == 0, ArgumentMustBeWithinBounds);
+
+                // Argument must be within bounds
+                Requires(0 <= count, ArgumentMustBeWithinBounds);
+                Requires(direction.IsForward() ? startIndex + count <= list.Count : count <= startIndex + 1, ArgumentMustBeWithinBounds);
+
+                // Argument must be valid enum constant
+                Requires(Enum.IsDefined(typeof(EnumerationDirection), direction), EnumMustBeDefined);
+
+
+                Ensures(_base != null);
+                Ensures(_version == _base._version);
+                Ensures(_sign == (direction.IsForward() ? 1 : -1));
+                Ensures(-1 <= _startIndex);
+                Ensures(_startIndex < _base.Count || _startIndex == 0 && _base.Count == 0);
+                Ensures(-1 <= _startIndex + _sign * _count);
+                Ensures(_startIndex + _sign * _count <= _base.Count);
+
+                #endregion
+
+                // HashedLinkedList<T> list, int startIndex, int count, EnumerationDirection direction
+
+                _base = list;
+                _version = list._version;
+                _sign = (int) direction;
+                _startIndex = startIndex;
+                _count = count;
+                _direction = direction;
+                if (count > 0)
+                {
+                    _startNode = list.GetNodeAtPrivate(startIndex);
+                }                
+            }
+
+            #endregion
+
+            #region Properties
+
+            public override bool AllowsNull => CheckVersion() & _base.AllowsNull;
+
+            public override int Count
+            {
+                get
+                {
+                    CheckVersion();
+                    return _count;
+                }
+            }
+
+            public override Speed CountSpeed
+            {
+                get
+                {
+                    CheckVersion();
+                    return Constant;
+                }
+            }
+
+            public EnumerationDirection Direction
+            {
+                get
+                {
+                    CheckVersion();
+                    return _direction;
+                }
+            }
+
+            #endregion
+
+            #region Public Methods
+
+            public IDirectedCollectionValue<T> Backwards()
+            {
+                CheckVersion();
+                var startIndex = _startIndex + (_count - 1) * _sign;
+                var direction = Direction.Opposite();
+                return new Range(_base, startIndex, _count, direction);
+            }
+
+            public override T Choose()
+            {
+                CheckVersion();
+                // Select the highest index in the range
+                return _startNode.item;
+            }
+
+            public override void CopyTo(T[] array, int arrayIndex)
+            {
+                CheckVersion();
+
+                // Use enumerator instead of copying and then reversing
+                base.CopyTo(array, arrayIndex); // ??? for backwards. Would it work? Yes, it is the enum, who decides the dir.
+            }
+
+            public override bool Equals(object obj) => CheckVersion() & base.Equals(obj);
+
+            public override SCG.IEnumerator<T> GetEnumerator()
+            {
+                if (Count <= 0)
+                {
+                    yield break;                   
+                }
+
+                var cursor = _startNode;
+                for (var i = 0; i < Count; i++)
+                {
+                    CheckVersion();
+                    yield return cursor.item;
+                    cursor = _direction.IsForward() ? cursor.Next : cursor.Prev;
+                }
+            }
+
+            public override int GetHashCode()
+            {
+                CheckVersion();
+                return base.GetHashCode();
+            }
+
+            public override T[] ToArray()
+            {
+                CheckVersion();
+                return base.ToArray();
+            }
+
+            #endregion
+
+            #region Private Members
+
+            private string DebuggerDisplay => _version == _base._version ? ToString() : "Expired collection value; original collection was modified since range was created.";
+
+            private bool CheckVersion() => _base.CheckVersion(_version);
+
+            #endregion
+        }
 
         #endregion
 
+        public virtual IDirectedCollectionValue<T> GetIndexRange(int startIndex, int count)
+            => new Range(this, startIndex, count, EnumerationDirection.Forwards);
+
+        public virtual T this[int index]
+        {
+            get { return GetNodeAtPrivate(index).item; }
+            set {
+                var node = GetNodeAtPrivate(index);
+
+                var oldItem = node.item;
+                if (Equals(oldItem, value))
+                {
+                    node.item = value;
+                    _itemNode[value] = node;
+                }
+                else
+                {
+                    node.item = value;
+                    _itemNode[value] = node;
+                    _itemNode.Remove(oldItem);
+                }
+
+                (_underlying ?? this).RaiseForIndexSetter(oldItem, value, index);
+            }
+        }
+
+        public virtual int LastIndexOf(T item) => IndexOf(item);
+
+        public virtual T RemoveAt(int index)
+        {
+            var node = GetNodeAtPrivate(index);
+            _itemNode.Remove(node.item);
+            var item = RemoveNodePrivate(node, index);
+
+            (_underlying ?? this).RaiseForRemoveAt(item, Offset + index);
+            return item;
+        }
+
+        private void RaiseForRemoveAt(T item, int index)
+        {
+            if (ActiveEvents == None)
+            {
+                return;
+            }
+
+            OnItemRemovedAt(item, index);
+            OnItemsRemoved(item, 1);       
+            OnCollectionChanged();     
+        }
+
+        public virtual void RemoveIndexRange(int startIndex, int count)
+        {
+            if (count == 0 || IsEmpty)
+            {
+                return;
+            }
+
+            var oldCount = Count;
+            // Version with view: View(startIndex, count).Clear();
+            
+            // Version with NO view:
+            var startNode = GetNodeAtPrivate(startIndex);
+            var endNode = GetNodeAtPrivate(startIndex + count - 1);
+
+            // clean the _itemNode
+            var cursor = startNode;
+            for (var i = 0; i < count; i++)
+            {
+                _itemNode.Remove(cursor.item);
+                cursor = cursor.Next;
+            }
+
+            // clean the list
+            startNode.Prev.Next = endNode.Next;
+            endNode.Next.Prev = startNode.Prev;
+
+            Count -= count;
+            if (_underlying != null)
+            {
+                _underlying.Count -= count;
+            }
+
+            (_underlying ?? this).RaiseForRemoveIndexRange(Offset, oldCount);
+        }
+
+        private void RaiseForRemoveIndexRange(int start, int count)
+        {
+            if (ActiveEvents == None)
+            {
+                return;
+            }
+
+            OnCollectionCleared(false, count, start);
+            OnCollectionChanged();
+        }
     }
 }
-

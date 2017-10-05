@@ -2258,21 +2258,6 @@ namespace C6.Collections
             #endregion
         }
 
-        /*
-            ActiveEvents 
-            All 		
-            Apply 		
-            Choose - ok		
-            CopyTo - ok 
-            Count - ok		
-            CountSpeed - ok
-            Exists 		
-            Filter 		
-            Find 
-            IsEmpty - ok
-            ListenableEvents 
-            ToArray - ok         
-        */
         // TODO: Introduce base class?
         [Serializable]
         [DebuggerTypeProxy(typeof(CollectionValueDebugView<>))]

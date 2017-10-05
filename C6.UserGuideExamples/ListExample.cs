@@ -26,14 +26,13 @@ namespace C6.UserGuideExamples
             //    SCG.EqualityComparer<string>.Default.GetHashCode);
 
             var ec = CaseInsensitiveStringComparer.Default;
-            //var items = new[] { "1", "Ab", "3", "4", "5", "6", "7" };
-            //var items = new string[0];            
-            var items = new[] { "1" };
+            var items = new[] { "1", "Ab", "3", "4", "5", "6", "7" };            
             var collection = new HashedLinkedList<string>(items, ec);
 
-            var item = items[0];
-            var findDuplicates = collection.FindDuplicates(null);
-            Console.WriteLine(findDuplicates.AllowsNull);
+            var item = items[3];
+            var rem = collection.RemoveAt(0);
+            Console.WriteLine(rem);
+
             
 
 

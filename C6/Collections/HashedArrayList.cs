@@ -208,7 +208,7 @@ namespace C6.Collections
 
         #region ISequenced
 
-        public EnumerationDirection Direction => EnumerationDirection.Forwards;
+        public virtual EnumerationDirection Direction => EnumerationDirection.Forwards;
 
         #endregion
 
@@ -654,7 +654,8 @@ namespace C6.Collections
 
         #region ISequenced
 
-        public IDirectedCollectionValue<T> Backwards() => new Range(this, Count - 1, Count, EnumerationDirection.Backwards);
+        public virtual IDirectedCollectionValue<T> Backwards() 
+            => new Range(this, Count - 1, Count, EnumerationDirection.Backwards);
 
         public int GetSequencedHashCode()
         {
@@ -669,12 +670,6 @@ namespace C6.Collections
 
         public bool SequencedEquals(ISequenced<T> otherCollection)
         {
-            #region Code Contract
-
-            //RequireValidity();
-
-            #endregion
-
             return this.SequencedEquals(otherCollection, EqualityComparer);
         }
 
@@ -684,7 +679,7 @@ namespace C6.Collections
 
         public T this[int index]
         {
-            get { return _items[index]; } // View: offset +
+            get { return _items[Offset + index]; } // View: offset +
             set {
                 #region Code Contracst
 
@@ -707,6 +702,7 @@ namespace C6.Collections
                 {
                     // ???
                     _items[index] = value;
+                    _itemIndex.Remove(oldItem);
                     _itemIndex[value] = index;
                 }
                 // Allready there: Exception; C5 throws, but why ???
@@ -740,7 +736,7 @@ namespace C6.Collections
             #endregion
 
             var item = RemoveAtPrivate(index);
-            (_underlying ?? this).RaiseForRemovedAt(item, index); // View:
+            (_underlying ?? this).RaiseForRemovedAt(item, Offset + index); // View:
             return item;
         }
 
@@ -756,9 +752,11 @@ namespace C6.Collections
 
             UpdateVersion();
 
-            startIndex += Offset;
-            // fix views
+            startIndex += Offset;            
             FixViewsBeforeRemovePrivate(startIndex, count);
+
+            // ??? Alternative: View(start, count).Clear();
+
             // clean _itemIndex
             for (int i = startIndex, end = Offset + count; i < end ; i++)
             {
@@ -770,15 +768,17 @@ namespace C6.Collections
             {
                 Array.Copy(_items, startIndex + count, _items, startIndex, UnderlyingCount - startIndex - count);
             }
-                                    
-            //clear
+                                                
             Count -= count;
             if (_underlying != null)
             {
                 _underlying.Count -= count;
             }
+            
+            //clear
             Array.Clear(_items, UnderlyingCount, count);
             ReindexPrivate(startIndex);
+
             (_underlying ?? this).RaiseForRemoveIndexRange(startIndex, count);
         }
 
@@ -2174,7 +2174,7 @@ namespace C6.Collections
 
             private readonly HashedArrayList<T> _base;
             private readonly int _version, _startIndex, _count, _sign;
-            private readonly EnumerationDirection _direction;
+            private readonly EnumerationDirection _direction;            
 
             #endregion
 
@@ -2280,7 +2280,7 @@ namespace C6.Collections
                 CheckVersion();
                 // Select the highest index in the range
                 var index = _direction.IsForward() ? _startIndex + _count - 1 : _startIndex;
-                return _base._items[index];
+                return _base._items[index]; // ??? Offset
             }
 
             public override void CopyTo(T[] array, int arrayIndex)
