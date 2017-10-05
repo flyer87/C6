@@ -1935,7 +1935,7 @@ namespace C6.Collections
                 }
             }
 
-            public override bool IsEmpty => /*CheckVersion() &*/ List.IsEmpty;
+            public override bool IsEmpty => CheckVersion() & List.IsEmpty;
 
             #endregion
 

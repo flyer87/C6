@@ -1,6 +1,6 @@
-updateversion
-IndexOf
-void SCG.ICollection<T>.Clear() and other methods
+//updateversion
+//IndexOf
+//void SCG.ICollection<T>.Clear() and other methods
 Code Contracts in the beginnig
 =========
 - invariants in C5
@@ -15,6 +15,7 @@ Code Contracts in the beginnig
 - public static bool UnsequencedEquals<T>(this ICollection<T> first, ICollection<T> second, SCG.IEqualityComparer<T> equalityComparer = null)
 	- Why ICollection, but no IEnumerable?
 - isValid in privae classes like ItemSet, Duplicates, ...
+- rename FindNodePrivate to FindNodeAndIndex ???
 ===========
 Thesis notes:
 	- void C5.AddNode() => bool C6.AddNode()

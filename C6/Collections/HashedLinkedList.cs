@@ -75,7 +75,7 @@ namespace C6.Collections
 
         #region Properties
 
-        private int UnderlyingCount => (_underlying ?? this).Count;
+        private int UnderlyingCount => (_underlying ?? this).Count;        
 
         public int Taggroups // ??? private 
         {
@@ -175,10 +175,6 @@ namespace C6.Collections
             (_underlying ?? this).RaiseForAdd(item);
             return true;
         }
-
-
-
-
 
         public virtual bool AddRange(SCG.IEnumerable<T> items)
         {
@@ -311,7 +307,7 @@ namespace C6.Collections
             #endregion
 
             removedItem = default(T);
-            if (Count <= 0)
+            if (Count <= 0) // ??? maybe remove it
             {
                 return false;
             }
@@ -332,6 +328,9 @@ namespace C6.Collections
         
         public virtual bool Remove(T item)
         {
+            #region Code Contracts
+            #endregion
+
             T removedItem;
             return Remove(item, out removedItem);
         }
@@ -368,6 +367,9 @@ namespace C6.Collections
 
         public virtual bool Update(T item, out T oldItem)
         {
+            #region Code Contracts            
+            #endregion
+
             Node node;            
             if (!ContainsItemPrivate(item, out node))
             {
@@ -394,7 +396,51 @@ namespace C6.Collections
 
         public virtual int IndexOf(T item)
         {
-            throw new NotImplementedException();
+            // is it in the dictionary
+            if (!_itemNode.ContainsKey(item))
+            {
+                return ~Count;
+            }
+
+            var node = _itemNode[item];
+            if (!IsInsideViewPrivate(node))
+            {
+                return ~Count;
+            }
+
+            node = _startSentinel.Next;
+            var index = 0;
+            // find it in the list
+            FindNodeAndIndexPrivate(item, ref node, ref index, EnumerationDirection.Forwards);
+            return index;
+        }
+
+        private bool FindNodeAndIndexPrivate(T item, ref Node node, ref int index, EnumerationDirection direction) // FIFO style ???
+        {
+            var endNode = direction.IsForward() ? _endSentinel : _startSentinel;
+            while (node != endNode)
+            {
+                if (item == null)
+                {
+                    if (node.item == null)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (Equals(item, node.item))
+                    {
+                        return true;
+                    }
+                }
+
+                index = direction.IsForward() ? index + 1 : index - 1;
+                node = direction.IsForward() ? node.Next : node.Prev;
+            }
+
+            index = ~Count;
+            return false;
         }
 
         #endregion
@@ -532,24 +578,12 @@ namespace C6.Collections
 
         void SCG.ICollection<T>.Add(T item) => Add(item);
 
-        void SCG.ICollection<T>.Clear()
-        {
-            throw new NotImplementedException();
-        }
-
-        bool SCG.ICollection<T>.Contains(T item)
-        {
-            throw new NotImplementedException();
-        }
-
-        bool SCG.ICollection<T>.Remove(T item)
-        {
-            throw new NotImplementedException();
-        }
-
         #endregion
 
         #region Private methods
+
+        [Pure]
+        private bool Equals(T x, T y) => EqualityComparer.Equals(x, y);
 
         private void RaiseForUpdate(T item, T oldItem)
         {
@@ -565,6 +599,8 @@ namespace C6.Collections
 
         private T RemoveAtPrivate(Node node, int index)
         {
+            UpdateVersion();
+
             //View: fixViewsBeforeSingleRemove(node, Offset + index);
             node.Prev.Next = node.Next;
             node.Next.Prev = node.Prev;
@@ -598,7 +634,6 @@ namespace C6.Collections
 
         private bool ContainsItemPrivate(T item, out Node node)   // ??? remove: out Node node                 
             => _itemNode.TryGetValue(item, out node) && IsInsideViewPrivate(node);
-
 
         private bool IsInsideViewPrivate(Node node)
         {
@@ -1531,13 +1566,11 @@ namespace C6.Collections
 
             public override SCG.IEnumerator<T> GetEnumerator()
             {
-                #region Code contracts
-
-                Requires(IsValid);
-
-                #endregion
-
-                CheckVersion();                
+                CheckVersion();
+                if (List.IsEmpty)
+                {
+                    yield break;                    
+                }
                 yield return List.Choose();                
             }
 
@@ -1563,18 +1596,16 @@ namespace C6.Collections
 
             private ICollectionValue<T> List
             {
-                get
-                {
+                get {
                     if (_list != null)
                     {
                         return _list;
                     }
-
-                    var item = default(T);
-                    _base.Find(ref item);
-                    return item == null ?
-                        new HashedLinkedList<T>() :
-                        new HashedLinkedList<T> { item };
+                    
+                    var item = _item;                    
+                    return _base.Find(ref item)
+                        ? new HashedLinkedList<T>(new[] { item }, _base.EqualityComparer)
+                        : new HashedLinkedList<T>(_base.EqualityComparer);
                 }
             }
 
