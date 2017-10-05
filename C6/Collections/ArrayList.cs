@@ -940,6 +940,7 @@ namespace C6.Collections
         public virtual void Sort(SCG.IComparer<T> comparer)
         {
             #region Code Contracts
+
             RequireValidity();
             // If collection changes, the version is updated            
             Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
@@ -1167,32 +1168,7 @@ namespace C6.Collections
         public virtual void Dispose()
         {
             //View: Dispose(false);
-        }
-
-        private void Dispose(bool disposingUnderlying)
-        {
-            if (IsValid)
-            {
-                if (_underlying != null) // view
-                {
-                    IsValid = false;
-                    if (!disposingUnderlying && _views != null) // the purpose of disposingUnderlying
-                        _views.Remove(_myWeakReference);
-                    _underlying = null;
-                    _views = null; // shared ref. for _view! Does this set other views to null ??? No!
-                                   // only the current view's field (_view) starts to point to null.
-                    _myWeakReference = null;
-                }
-                else // proper list
-                {
-                    //isValid = false;
-                    if (_views != null)
-                        foreach (var view in _views)
-                            view.Dispose(true); // How can we assure that the nodes are deleted?
-                    Clear();                    
-                }
-            }
-        }
+        }        
 
         public string Print()
         {
@@ -1376,7 +1352,7 @@ namespace C6.Collections
 
         int SC.IList.IndexOf(object value) => IsCompatibleObject(value) ? Math.Max(-1, IndexOf((T)value)) : -1;
 
-        // Explicit implementation is needed, since C6.IList<T>.IndexOf(T) breaks SCG.IList<T>.IndexOf(T)'s precondition: Result<T>() >= -1
+        // Explicit implemDentation is needed, since C6.IList<T>.IndexOf(T) breaks SCG.IList<T>.IndexOf(T)'s precondition: Result<T>() >= -1
         int SCG.IList<T>.IndexOf(T item) => Math.Max(-1, IndexOf(item));
 
         void SC.IList.Insert(int index, object value)
@@ -1406,6 +1382,34 @@ namespace C6.Collections
         #endregion
 
         #region Private Members
+
+        private void Dispose(bool disposingUnderlying)
+        {
+            if (!IsValid)
+            {
+                return;
+            }
+
+            if (_underlying != null) // view
+            {
+                IsValid = false;
+                if (!disposingUnderlying && _views != null) // the purpose of disposingUnderlying
+                    _views.Remove(_myWeakReference);
+                _underlying = null;
+                _views = null; // shared ref. for _view! Does this set other views to null ??? No!
+                // only the current view's field (_view) starts to point to null.
+                _myWeakReference = null;
+            }
+            else // proper list
+            {
+                //isValid = false;
+                if (_views != null)
+                    foreach (var view in _views)
+                        view.Dispose(true); // How can we assure that the nodes are deleted?
+                Clear();
+            }
+        }
+
         private bool RequireValidity()
         {
             Requires(IsValid, ListOrViewMustBeValid);

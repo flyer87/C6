@@ -17,7 +17,7 @@ using SC = System.Collections;
 
 namespace C6.Collections
 {
-    public class HashedLinkedList<T> : IIndexed<T>
+    public class HashedLinkedList<T> : IList<T>
     {
         #region Fields
 
@@ -132,9 +132,11 @@ namespace C6.Collections
 
         #region IList
 
-        public virtual HashedLinkedList<T> Underlying => _underlying; // Do it IList<T> ???
+        public virtual IList<T> Underlying => _underlying; 
 
         public virtual int Offset { get; private set; }
+
+        public T Last => _endSentinel.Prev.item;
 
         #endregion
 
@@ -554,7 +556,13 @@ namespace C6.Collections
             }
 
             (_underlying ?? this).RaiseForRemoveIndexRange(Offset, oldCount);
-        }        
+        }
+
+        #endregion
+
+        #region IDisposable
+
+        public virtual void Dispose() => DisposePrivate(false);
 
         #endregion
 
@@ -562,6 +570,10 @@ namespace C6.Collections
 
         public virtual T First => _startSentinel.Next.item;
 
+        public virtual void Insert(int index, T item)
+        {
+            throw new NotImplementedException();
+        }
 
         #endregion
 
@@ -691,9 +703,164 @@ namespace C6.Collections
 
         void SCG.ICollection<T>.Add(T item) => Add(item);
 
+        void SC.ICollection.CopyTo(Array array, int index)
+        {
+            #region Code Contracts
+
+            Requires(index >= 0, ArgumentMustBeWithinBounds);
+            Requires(index + Count <= array.Length, ArgumentMustBeWithinBounds);
+
+            #endregion
+
+            try // why try ???
+            {
+                foreach (var item in this)
+                {
+                    array.SetValue(item, index++);
+                }
+            }
+            catch (InvalidCastException) //catch (ArrayTypeMismatchException) ??? ArrayTypeMismatchException not correct or 
+            {
+                throw new ArgumentException("Target array type is not compatible with the type of items in the collection.");
+            }
+        }
+
+        bool SC.ICollection.IsSynchronized => false;
+
+        object SC.ICollection.SyncRoot => new object();
+
+        #region IList
+
+        int SC.IList.Add(object value)
+        {
+            try
+            {
+                return Add((T)value) ? Count - 1 : -1;
+            }
+            catch (InvalidCastException)
+            {
+                throw new ArgumentException($"The value \"{value}\" is not of type \"{typeof(T)}\" and cannot be used in this generic collection.{Environment.NewLine}Parameter name: {nameof(value)}");
+            }
+        }
+
+        bool SC.IList.Contains(object value) => IsCompatibleObject(value) && Contains((T)value);
+
+        int SC.IList.IndexOf(object value) => IsCompatibleObject(value) ? Math.Max(IndexOf((T)value), -1) : -1;
+
+        void SC.IList.Insert(int index, object value)
+        {
+            try
+            {
+                Insert(index, (T)value);
+            }
+            catch (InvalidCastException)
+            {
+                throw new ArgumentException($"The value \"{value}\" is not of type \"{typeof(T)}\" and cannot be used in this generic collection.{Environment.NewLine}Parameter name: {nameof(value)}");
+            }
+        }
+
+        // Explicit implementation is needed, since C6.IList<T>.IndexOf(T) breaks SCG.IList<T>.IndexOf(T)'s precondition: Result<T>() >= -1
+        int SCG.IList<T>.IndexOf(T item) => Math.Max(-1, IndexOf(item));
+
+        object SC.IList.this[int index]
+        {
+            get { return this[index]; }
+            set
+            {
+                try
+                {
+                    this[index] = (T)value;
+                }
+                catch (InvalidCastException)
+                {
+                    throw new ArgumentException($"The value \"{value}\" is not of type \"{typeof(T)}\" and cannot be used in this generic collection.{Environment.NewLine}Parameter name: {nameof(value)}");
+                }
+            }
+        }
+
+        void SC.IList.Remove(object value)
+        {
+            if (IsCompatibleObject(value))
+            {
+                Remove((T)value);
+            }
+        }
+
+        void SC.IList.RemoveAt(int index) => RemoveAt(index);
+
+        void SCG.IList<T>.RemoveAt(int index) => RemoveAt(index);
+
+        #endregion
+
         #endregion
 
         #region Private methods
+        
+        private void InsertRangePrivate(int i, SCG.IEnumerable<T> items)
+        {
+            Node node;
+            var count = 0;
+            var succ = i == Count ? _endSentinel : GetNodeAtPrivate(i);
+            var pred = node = succ.Prev;
+            TagGroup taggroup = null;
+            int taglimit = 0, thetag = 0;
+            taggroup = GetTagGroup(node, succ, out thetag, out taglimit);
+
+            try
+            {
+                foreach (var item in items)
+                {
+                    var tmp = new Node(item, node, null);
+
+                    if (_itemNode.ContainsKey(item)) // ??? contains, but should we update the found key [with curr. item]
+                    {
+                        continue;
+                    }
+
+                    _itemNode[item] = tmp;
+
+                    tmp.tag = thetag < taglimit ? ++thetag : thetag;
+                    tmp.taggroup = taggroup;
+                    node.Next = tmp;
+                    count++;
+                    node = tmp;
+                }
+            }
+            finally
+            {
+                if (count != 0)
+                {
+                    UpdateVersion();
+
+                    taggroup.Count += count;
+                    if (taggroup != pred.taggroup)
+                        taggroup.First = pred.Next;
+
+                    if (taggroup != succ.taggroup)
+                        taggroup.Last = node;
+
+                    succ.Prev = node;
+                    node.Next = succ;
+                    if (node.tag == node.Prev.tag)
+                        SplitTagGroupPrivate(taggroup);
+
+                    Count += count;
+                    if (_underlying != null)
+                        _underlying.Count += count;
+
+                    //View: fixViewsAfterInsert(succ, pred, count, 0);
+                    // maybe no ??? raiseForInsertAll(pred, i, count, insertion); it is moved up !
+                }
+            }
+
+        }
+
+        private void DisposePrivate(bool b)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static bool IsCompatibleObject(object value) => value is T || value == null && default(T) == null;
 
         private bool FindNodeAndIndexPrivate(T item, ref Node node, ref int index, EnumerationDirection direction) // FIFO style ???
         {
@@ -895,7 +1062,108 @@ namespace C6.Collections
             throw new InvalidOperationException(CollectionWasModified);
         }
 
+        private static Node MergeRuns(Node run1, Node run2, SCG.IComparer<T> comparer)
+        {
+            //P: assert run1 != null && run2 != null;
+            Node prev;
+            bool prev1;	//P: is prev from run1?
 
+            if (comparer.Compare(run1.item, run2.item) <= 0)
+            {
+                prev = run1;
+                prev1 = true;
+                run1 = run1.Next;
+            }
+            else
+            {
+                prev = run2;
+                prev1 = false;
+                run2 = run2.Next;
+            }
+
+            Node start = prev;
+
+            //P: assert start != null;
+            start.Prev = null;
+            while (run1 != null && run2 != null)
+            {
+                if (prev1)
+                {
+                    //P: assert prev.next == run1;
+                    //P: Comparable run2item = (Comparable)run2.item;
+                    while (run1 != null && comparer.Compare(run2.item, run1.item) >= 0)
+                    {
+                        prev = run1;
+                        run1 = prev.Next;
+                    }
+
+                    if (run1 != null)
+                    { //P: prev.item <= run2.item < run1.item; insert run2
+                        prev.Next = run2;
+                        run2.Prev = prev;
+                        prev = run2;
+                        run2 = prev.Next;
+                        prev1 = false;
+                    }
+                }
+                else
+                {
+                    //P: assert prev.next == run2;
+                    //P: Comparable run1item = (Comparable)run1.item;
+                    while (run2 != null && comparer.Compare(run1.item, run2.item) > 0)
+                    {
+                        prev = run2;
+                        run2 = prev.Next;
+                    }
+
+                    if (run2 != null)
+                    { //P:  prev.item < run1.item <= run2.item; insert run1
+                        prev.Next = run1;
+                        run1.Prev = prev;
+                        prev = run1;
+                        run1 = prev.Next;
+                        prev1 = true;
+                    }
+                }
+            }
+
+            //P: assert !(run1 != null && prev1) && !(run2 != null && !prev1);
+            if (run1 != null)
+            { //P:  last run2 < all of run1; attach run1 at end
+                prev.Next = run1;
+                run1.Prev = prev;
+            }
+            else if (run2 != null)
+            { //P:  last run1 
+                prev.Next = run2;
+                run2.Prev = prev;
+            }
+
+            return start;
+        }
+
+        private void disposeOverlappingViews(bool b)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        private void RaiseForSort() => OnCollectionChanged();
+
+        private void RaiseForInsertRange(int index, SCG.IEnumerable<T> items) // ??? was T[] 
+        {
+            if (ActiveEvents.HasFlag(Inserted | Added))
+            {
+                var i = 0;
+                foreach (var item in items)
+                {
+                    OnItemInserted(item, index + i++); // View: ??? Offset
+                    OnItemsAdded(item, 1);
+                }
+            }
+
+            OnCollectionChanged();
+        }
 
         private void RaiseForRemoveAt(T item, int index)
         {
@@ -1060,6 +1328,36 @@ namespace C6.Collections
          
         private const int LogWordSize = 5;
 
+        private TagGroup GetTagGroup(Node pred, Node succ, out int lowbound, out int highbound)
+        {
+            TagGroup predgroup = pred.taggroup, succgroup = succ.taggroup;
+
+            if (predgroup == succgroup)
+            {
+                lowbound = pred.tag + 1;
+                highbound = succ.tag - 1;
+                return predgroup;
+            }
+
+            if (predgroup.First != null)
+            {
+                lowbound = pred.tag + 1;
+                highbound = int.MaxValue;
+                return predgroup;
+            }
+
+            if (succgroup.First != null)
+            {
+                lowbound = int.MinValue;
+                highbound = succ.tag - 1;
+                return succgroup;
+            }
+
+            lowbound = int.MinValue;
+            highbound = int.MaxValue;
+            return new TagGroup();
+        }
+
         /// <summary>
         /// Put a tag on a node (already inserted in the list). Split taggroups and renumber as 
         /// necessary.
@@ -1169,7 +1467,6 @@ namespace C6.Collections
                 n = n.Next;
             }
         }
-
 
         private void SplitTagGroupPrivate(TagGroup taggroup)
         {
@@ -1674,7 +1971,6 @@ namespace C6.Collections
             #endregion
         }
 
-
         [Serializable]
         [DebuggerTypeProxy(typeof(CollectionValueDebugView<>))]
         [DebuggerDisplay("{DebuggerDisplay}")]
@@ -2006,7 +2302,209 @@ namespace C6.Collections
         #endregion
 
 
+        public virtual void InsertFirst(T item) => Insert(0, item);
+               
+        public virtual void InsertLast(T item) => Insert(Count, item);
+               
+        public virtual void InsertRange(int index, SCG.IEnumerable<T> items)
+        {            
+            //TODO: some toArray() operations ???
 
-        
+            InsertRangePrivate(index, items);
+            (_underlying ?? this).RaiseForInsertRange(index, items); 
+            //  not corect should raise only for really inserted ???
+            // !!! it is correct, since we have a precondition checking that all the items are not in the list
+        }
+               
+        public virtual bool IsSorted(Comparison<T> comparison)
+        {
+            if (Count <= 1)
+            {
+                return true;
+            }
+
+            var cursor = _startSentinel.Next;
+            var prevItem = cursor.item;
+            cursor = cursor.Next;
+            while (cursor != _endSentinel)
+            {
+                if (comparison(prevItem, cursor.item) > 0)
+                {
+                    return false;
+                }
+
+                prevItem = cursor.item;
+                cursor = cursor.Next;
+            }
+
+            return true;
+        }
+               
+        public virtual bool IsSorted(SCG.IComparer<T> comparer) => IsSorted((comparer ?? SCG.Comparer<T>.Default).Compare);
+               
+        public virtual bool IsSorted() => IsSorted(SCG.Comparer<T>.Default.Compare);
+               
+        public virtual IList<T> LastViewOf(T item) => ViewOf(item);
+               
+        public virtual T RemoveFirst() => RemoveAt(0);
+               
+        public virtual T RemoveLast() => RemoveAt(Count - 1);
+               
+        public virtual void Reverse()
+        {
+            throw new NotImplementedException();
+        }
+               
+        public virtual void Shuffle()
+        {
+            throw new NotImplementedException();
+        }
+               
+        public virtual void Shuffle(Random random)
+        {
+            throw new NotImplementedException();
+        }
+               
+        public virtual IList<T> Slide(int offset)
+        {
+            throw new NotImplementedException();
+        }
+               
+        public virtual IList<T> Slide(int offset, int count)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void Sort(SCG.IComparer<T> comparer)
+        {
+            if (Count <= 1)
+                return;
+
+            if (comparer == null)
+            {
+                comparer = SCG.Comparer<T>.Default;
+            }
+
+ 
+            disposeOverlappingViews(false);
+            if (_underlying != null)
+            {
+                var cursor = _startSentinel.Next;
+                while (cursor != _endSentinel)
+                {
+                    cursor.taggroup.Count--;
+                    cursor = cursor.Next;
+                }
+            }
+            // Build a linked list of non-empty runs.
+            // The prev field in first node of a run points to next run's first node
+            Node runTail = _startSentinel.Next;
+            Node prevNode = _startSentinel.Next;
+
+            _endSentinel.Prev.Next = null;
+            while (prevNode != null)
+            {
+                var node = prevNode.Next;
+
+                while (node != null && comparer.Compare(prevNode.item, node.item) <= 0)
+                {
+                    prevNode = node;
+                    node = prevNode.Next;
+                }
+
+                // Completed a run; prevNode is the last node of that run
+                prevNode.Next = null; // Finish the run
+                runTail.Prev = node; // Link it into the chain of runs
+                runTail = node;
+                if (comparer.Compare(_endSentinel.Prev.item, prevNode.item) <= 0)
+                    _endSentinel.Prev = prevNode; // Update last pointer to point to largest
+
+                prevNode = node; // Start a new run
+            }
+
+            // Repeatedly merge runs two and two, until only one run remains
+            while (_startSentinel.Next.Prev != null)
+            {
+                Node run = _startSentinel.Next;
+                Node newRunTail = null;
+
+                while (run != null && run.Prev != null)
+                {
+                    // At least two runs, merge
+                    Node nextRun = run.Prev.Prev;
+                    Node newrun = MergeRuns(run, run.Prev, comparer);
+
+                    if (newRunTail != null)
+                        newRunTail.Prev = newrun;
+                    else
+                        _startSentinel.Next = newrun;
+
+                    newRunTail = newrun;
+                    run = nextRun;
+                }
+
+                if (run != null) // Add the last run, if any
+                    newRunTail.Prev = run;
+            }
+
+            _endSentinel.Prev.Next = _endSentinel;
+            _startSentinel.Next.Prev = _startSentinel;
+
+            //assert invariant();
+            //assert isSorted();
+            {
+                Node cursor = _startSentinel.Next, end = _endSentinel;
+                int tag, taglimit;
+                var t = GetTagGroup(_startSentinel, _endSentinel, out tag, out taglimit);
+                int tagdelta = taglimit / (Count + 1) - tag / (Count + 1);
+                tagdelta = tagdelta == 0 ? 1 : tagdelta;
+                if (_underlying == null)
+                    _taggroups = 1;
+                while (cursor != end)
+                {
+                    tag = tag + tagdelta > taglimit ? taglimit : tag + tagdelta;
+                    cursor.tag = tag;
+                    t.Count++;
+                    cursor.taggroup = t;
+                    cursor = cursor.Next;
+                }
+                if (t != _startSentinel.taggroup)
+                    t.First = _startSentinel.Next;
+                if (t != _endSentinel.taggroup)
+                    t.Last = _endSentinel.Prev;
+                if (tag == taglimit)
+                    SplitTagGroupPrivate(t);
+            }
+
+            UpdateVersion();
+
+            (_underlying ?? this).RaiseForSort();
+
+
+        }
+
+        public virtual void Sort() => Sort((SCG.Comparer<T>)null);
+
+        public virtual void Sort(Comparison<T> comparison) => Sort(comparison.ToComparer());
+                
+        public virtual bool TrySlide(int offset)
+        {
+            throw new NotImplementedException();
+        }
+               
+        public virtual bool TrySlide(int offset, int count)
+        {
+            throw new NotImplementedException();
+        }
+               
+        public virtual IList<T> View(int index, int count)
+        {
+            throw new NotImplementedException();
+        }
+               
+        public virtual IList<T> ViewOf(T item)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

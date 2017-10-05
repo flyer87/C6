@@ -18,6 +18,7 @@
 - General: public void RemoveIndexRange(int startIndex, int count), Code contracts
 	Requires(!IsEmpty) ???
 - General: when ActiveEvents si really set to something
+- General: why SC. methods should be explicitly implemented
 - ActiveEvents.HasFlag() passed for:
 	- private void RaiseForIndexSetter(T oldItem, T item, int index), RaiseForRemove(T item, int count)
 		Add a test
@@ -41,3 +42,6 @@ Thesis notes:
 			4.1.1 Order-Indifferent Equality
 	- C5.HLL new Range()
 		- field: endNode - needless
+	- InsertRangePrivate:
+		else C5.HLL: throw new DuplicateNotAllowedException("Item already in indexed list"); removed()
+		
