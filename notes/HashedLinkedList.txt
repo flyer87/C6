@@ -1,7 +1,5 @@
 //updateversion
-//IndexOf
-//void SCG.ICollection<T>.Clear() and other methods
-Code Contracts in the beginnig
+//Code Contracts in the beginnig
 =========
 - invariants in C5
 - RaiseForAddRange(array) - not correct

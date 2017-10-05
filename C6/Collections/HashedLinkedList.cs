@@ -433,6 +433,17 @@ namespace C6.Collections
 
         public virtual int IndexOf(T item)
         {
+            #region Code Contracts
+            // TODO: Add contract to IList<T>.LastIndexOf
+
+            Ensures(Contains(item)
+                ? 0 <= Result<int>() && Result<int>() < Count
+                : ~Result<int>() == Count);
+
+            // Item at index is the first equal to item
+            Ensures(Result<int>() < 0 || !this.Skip(Result<int>() + 1).Contains(item, EqualityComparer) && EqualityComparer.Equals(item, this.ElementAt(Result<int>())));
+            #endregion
+
             // is it in the dictionary
             if (!_itemNode.ContainsKey(item))
             {
@@ -452,33 +463,98 @@ namespace C6.Collections
             return index;
         }
 
-        private bool FindNodeAndIndexPrivate(T item, ref Node node, ref int index, EnumerationDirection direction) // FIFO style ???
+        public virtual IDirectedCollectionValue<T> GetIndexRange(int startIndex, int count)
+            => new Range(this, startIndex, count, EnumerationDirection.Forwards);
+
+        public virtual T this[int index]
         {
-            var endNode = direction.IsForward() ? _endSentinel : _startSentinel;
-            while (node != endNode)
+            get { return GetNodeAtPrivate(index).item; }
+            set
             {
-                if (item == null)
+                #region Code Contracts
+                // The version is updated
+                Ensures(_version != OldValue(_version));
+                #endregion
+
+                var node = GetNodeAtPrivate(index);
+
+                var oldItem = node.item;
+                if (Equals(oldItem, value))
                 {
-                    if (node.item == null)
-                    {
-                        return true;
-                    }
+                    node.item = value;
+                    _itemNode[value] = node;
                 }
                 else
                 {
-                    if (Equals(item, node.item))
-                    {
-                        return true;
-                    }
+                    node.item = value;
+                    _itemNode[value] = node;
+                    _itemNode.Remove(oldItem);
                 }
 
-                index = direction.IsForward() ? index + 1 : index - 1;
-                node = direction.IsForward() ? node.Next : node.Prev;
+                (_underlying ?? this).RaiseForIndexSetter(oldItem, value, index);
+            }
+        }
+
+        public virtual int LastIndexOf(T item) => IndexOf(item);
+                
+        public virtual T RemoveAt(int index)
+        {
+            #region Code Contracts
+            // If collection changes, the version is updated
+            //var old = OldValue(this.ToArray());            
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+            #endregion
+
+            var node = GetNodeAtPrivate(index);
+            _itemNode.Remove(node.item);
+            var item = RemoveNodePrivate(node, index);
+
+            (_underlying ?? this).RaiseForRemoveAt(item, Offset + index);
+            return item;
+        }
+
+        public virtual void RemoveIndexRange(int startIndex, int count)
+        {
+            #region Code Contracts            
+            // If collection changes, the version is updated
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+
+            #endregion
+
+            if (count == 0 || IsEmpty)
+            {
+                return;
             }
 
-            index = ~Count;
-            return false;
-        }
+            var oldCount = Count;
+            // Version with view: View(startIndex, count).Clear();
+
+            UpdateVersion();
+
+            // Version with NO view:
+            var startNode = GetNodeAtPrivate(startIndex);
+            var endNode = GetNodeAtPrivate(startIndex + count - 1);
+
+            // clean the _itemNode
+            var cursor = startNode;
+            for (var i = 0; i < count; i++)
+            {
+                _itemNode.Remove(cursor.item);
+                cursor = cursor.Next;
+            }
+
+            // clean the list
+            startNode.Prev.Next = endNode.Next;
+            endNode.Next.Prev = startNode.Prev;
+
+            Count -= count;
+            if (_underlying != null)
+            {
+                _underlying.Count -= count;
+            }
+
+            (_underlying ?? this).RaiseForRemoveIndexRange(Offset, oldCount);
+        }        
 
         #endregion
 
@@ -618,7 +694,35 @@ namespace C6.Collections
         #endregion
 
         #region Private methods
-       
+
+        private bool FindNodeAndIndexPrivate(T item, ref Node node, ref int index, EnumerationDirection direction) // FIFO style ???
+        {
+            var endNode = direction.IsForward() ? _endSentinel : _startSentinel;
+            while (node != endNode)
+            {
+                if (item == null)
+                {
+                    if (node.item == null)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (Equals(item, node.item))
+                    {
+                        return true;
+                    }
+                }
+
+                index = direction.IsForward() ? index + 1 : index - 1;
+                node = direction.IsForward() ? node.Next : node.Prev;
+            }
+
+            index = ~Count;
+            return false;
+        }
+
         private Node GetNodeAtPrivate(int index)
         {
             #region Code Contracts                        
@@ -789,6 +893,31 @@ namespace C6.Collections
 
             // See https://msdn.microsoft.com/library/system.collections.ienumerator.movenext.aspx
             throw new InvalidOperationException(CollectionWasModified);
+        }
+
+
+
+        private void RaiseForRemoveAt(T item, int index)
+        {
+            if (ActiveEvents == None)
+            {
+                return;
+            }
+
+            OnItemRemovedAt(item, index);
+            OnItemsRemoved(item, 1);
+            OnCollectionChanged();
+        }
+
+        private void RaiseForRemoveIndexRange(int start, int count)
+        {
+            if (ActiveEvents == None)
+            {
+                return;
+            }
+
+            OnCollectionCleared(false, count, start);
+            OnCollectionChanged();
         }
 
         private void RaiseForIndexSetter(T oldItem, T item, int index)
@@ -1876,100 +2005,8 @@ namespace C6.Collections
 
         #endregion
 
-        public virtual IDirectedCollectionValue<T> GetIndexRange(int startIndex, int count)
-            => new Range(this, startIndex, count, EnumerationDirection.Forwards);
 
-        public virtual T this[int index]
-        {
-            get { return GetNodeAtPrivate(index).item; }
-            set {
-                var node = GetNodeAtPrivate(index);
 
-                var oldItem = node.item;
-                if (Equals(oldItem, value))
-                {
-                    node.item = value;
-                    _itemNode[value] = node;
-                }
-                else
-                {
-                    node.item = value;
-                    _itemNode[value] = node;
-                    _itemNode.Remove(oldItem);
-                }
-
-                (_underlying ?? this).RaiseForIndexSetter(oldItem, value, index);
-            }
-        }
-
-        public virtual int LastIndexOf(T item) => IndexOf(item);
-
-        public virtual T RemoveAt(int index)
-        {
-            var node = GetNodeAtPrivate(index);
-            _itemNode.Remove(node.item);
-            var item = RemoveNodePrivate(node, index);
-
-            (_underlying ?? this).RaiseForRemoveAt(item, Offset + index);
-            return item;
-        }
-
-        private void RaiseForRemoveAt(T item, int index)
-        {
-            if (ActiveEvents == None)
-            {
-                return;
-            }
-
-            OnItemRemovedAt(item, index);
-            OnItemsRemoved(item, 1);       
-            OnCollectionChanged();     
-        }
-
-        public virtual void RemoveIndexRange(int startIndex, int count)
-        {
-            if (count == 0 || IsEmpty)
-            {
-                return;
-            }
-
-            var oldCount = Count;
-            // Version with view: View(startIndex, count).Clear();
-            
-            // Version with NO view:
-            var startNode = GetNodeAtPrivate(startIndex);
-            var endNode = GetNodeAtPrivate(startIndex + count - 1);
-
-            // clean the _itemNode
-            var cursor = startNode;
-            for (var i = 0; i < count; i++)
-            {
-                _itemNode.Remove(cursor.item);
-                cursor = cursor.Next;
-            }
-
-            // clean the list
-            startNode.Prev.Next = endNode.Next;
-            endNode.Next.Prev = startNode.Prev;
-
-            Count -= count;
-            if (_underlying != null)
-            {
-                _underlying.Count -= count;
-            }
-
-            (_underlying ?? this).RaiseForRemoveIndexRange(Offset, oldCount);
-        }
-
-        private void RaiseForRemoveIndexRange(int start, int count)
-        {
-            if (ActiveEvents == None)
-            {
-                return;
-            }
-
-            OnCollectionCleared(false, count, start);
-            OnCollectionChanged();
-        }
+        
     }
 }
