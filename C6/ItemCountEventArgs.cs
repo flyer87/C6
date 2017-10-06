@@ -48,7 +48,7 @@ namespace C6
         public ItemCountEventArgs(T item, int count)
         {
             // Argument must be non-null
-            // Requires(item != null, ItemMustBeNonNull);
+            Requires(item != null, ItemMustBeNonNull);
 
             // Argument must be positive
             Requires(count > 0, ArgumentMustBePositive);

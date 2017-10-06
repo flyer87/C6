@@ -832,7 +832,7 @@ namespace C6
 
                 if (run != null) // Add the last run, if any
                     newRunTail.Prev = run;
-            }m
+            }
 
             _endSentinel.Prev.Next = _endSentinel;
             _startSentinel.Next.Prev = _startSentinel;
@@ -1093,6 +1093,11 @@ namespace C6
 
         #endregion
 
+        #region IDisposable
+
+        public virtual void Dispose() => DisposePrivate(false);
+
+        #endregion
 
 
         #endregion

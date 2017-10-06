@@ -995,7 +995,7 @@ namespace C6.Tests
             // Arrange
             var collection = GetStringIndexed(Random);
             var count = Random.Next(1, collection.Count);
-            var startIndex = Random.Next(0, collection.Count - count);
+            var startIndex = Random.Next(0, collection.Count - count); // +1 ??? See notebook page "t9"
             var expectedEvents = new[] {
                 Cleared(false, count, startIndex, collection),
                 Changed(collection)

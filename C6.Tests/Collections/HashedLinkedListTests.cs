@@ -11,7 +11,7 @@ using static C6.Speed;
 
 namespace C6.Tests.Collections
 {
-    public class HashedLinkedListTests : IIndexedTests
+    public class HashedLinkedListTests : IListTests
     {
         protected override bool AllowsNull => false;
         protected override EventTypes ListenableEvents => All;
@@ -22,10 +22,10 @@ namespace C6.Tests.Collections
         protected override Speed ContainsSpeed => Constant;
         protected override Speed IndexingSpeed => Linear;
 
-        protected override IIndexed<T> GetEmptyIndexed<T>(IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
+        protected override IList<T> GetEmptyList<T>(IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
             => new HashedLinkedList<T>(equalityComparer);
 
-        protected override IIndexed<T> GetIndexed<T>(IEnumerable<T> enumerable, IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
-            => new HashedLinkedList<T>(enumerable, equalityComparer);        
-     }
+        protected override IList<T> GetList<T>(IEnumerable<T> enumerable, IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
+            => new HashedLinkedList<T>(enumerable, equalityComparer);
+    }
 }

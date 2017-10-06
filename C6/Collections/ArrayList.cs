@@ -922,7 +922,7 @@ namespace C6.Collections
             if (Count <= 1)
             {
                 return;
-            }           
+            }
 
             // Only update version if the collection is shuffled
             UpdateVersion();

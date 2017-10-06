@@ -138,6 +138,8 @@ namespace C6.Collections
 
         public T Last => _endSentinel.Prev.item;
 
+        public virtual T First => _startSentinel.Next.item;
+
         #endregion
 
         #endregion
@@ -461,7 +463,7 @@ namespace C6.Collections
             node = _startSentinel.Next;
             var index = 0;
             // find it in the list
-            FindNodeAndIndexPrivate(item, ref node, ref index, EnumerationDirection.Forwards);
+            FindNodeAndIndexByItemPrivate(item, ref node, ref index, EnumerationDirection.Forwards);
             return index;
         }
 
@@ -470,7 +472,7 @@ namespace C6.Collections
 
         public virtual T this[int index]
         {
-            get { return GetNodeAtPrivate(index).item; }
+            get { return GetNodeByIndexPrivate(index).item; }
             set
             {
                 #region Code Contracts
@@ -478,13 +480,14 @@ namespace C6.Collections
                 Ensures(_version != OldValue(_version));
                 #endregion
 
-                var node = GetNodeAtPrivate(index);
+                
+                var node = GetNodeByIndexPrivate(index);
 
                 var oldItem = node.item;
                 if (Equals(oldItem, value))
                 {
                     node.item = value;
-                    _itemNode[value] = node;
+                    _itemNode[value] = node; // does C5 update the key  as well ?
                 }
                 else
                 {
@@ -492,6 +495,9 @@ namespace C6.Collections
                     _itemNode[value] = node;
                     _itemNode.Remove(oldItem);
                 }
+                // else { } Exception or ?
+
+                UpdateVersion();
 
                 (_underlying ?? this).RaiseForIndexSetter(oldItem, value, index);
             }
@@ -507,7 +513,7 @@ namespace C6.Collections
             Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
             #endregion
 
-            var node = GetNodeAtPrivate(index);
+            var node = GetNodeByIndexPrivate(index);
             _itemNode.Remove(node.item);
             var item = RemoveNodePrivate(node, index);
 
@@ -527,15 +533,15 @@ namespace C6.Collections
             {
                 return;
             }
-
-            var oldCount = Count;
+            
             // Version with view: View(startIndex, count).Clear();
 
             UpdateVersion();
 
+            // =====================================
             // Version with NO view:
-            var startNode = GetNodeAtPrivate(startIndex);
-            var endNode = GetNodeAtPrivate(startIndex + count - 1);
+            var startNode = GetNodeByIndexPrivate(startIndex);
+            var endNode = GetNodeByIndexPrivate(startIndex + count - 1);
 
             // clean the _itemNode
             var cursor = startNode;
@@ -555,7 +561,7 @@ namespace C6.Collections
                 _underlying.Count -= count;
             }
 
-            (_underlying ?? this).RaiseForRemoveIndexRange(Offset, oldCount);
+            (_underlying ?? this).RaiseForRemoveIndexRange(Offset + startIndex, count);
         }
 
         #endregion
@@ -566,11 +572,251 @@ namespace C6.Collections
 
         #endregion
 
-        #region IList
-
-        public virtual T First => _startSentinel.Next.item;
+        #region IList       
 
         public virtual void Insert(int index, T item)
+        {
+            #region Code Contracts
+
+            // If collection changes, the version is updated
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));      
+            #endregion
+            
+            var succ = index == Count ? _endSentinel : GetNodeByIndexPrivate(index);
+            var node = new Node(item);
+            if (FindOrAddToHashPrivate(item, node)) // ??? return, Update or throw and excpetion 
+            {
+                return;
+            }
+            InsertNodeBeforePrivate(true, succ, node); // why true ???
+
+            (_underlying ?? this).RaiseForInsert(item, Offset + index);
+        }
+        
+        public virtual void InsertFirst(T item) => Insert(0 , item);
+
+        public virtual void InsertLast(T item) => Insert(Count, item);
+
+        public virtual void InsertRange(int index, SCG.IEnumerable<T> items)
+        {
+            //TODO: some toArray() operations ???
+
+            var array = items.ToArray(); // if it is enumerable we can't check with a method that it is Empty ???
+
+            if (array.IsEmpty())
+            {
+                return;
+            }
+
+            InsertRangePrivate(index, array);
+            (_underlying ?? this).RaiseForInsertRange(index, array);
+            //  not corect should raise only for really inserted ???
+            // !!! it is correct, since we have a precondition checking that all the items are not in the list
+        }
+
+        public virtual bool IsSorted(Comparison<T> comparison)
+        {
+            if (Count <= 1)
+            {
+                return true;
+            }
+
+            var cursor = _startSentinel.Next;
+            var prevItem = cursor.item;
+            cursor = cursor.Next;
+            while (cursor != _endSentinel)
+            {
+                if (comparison(prevItem, cursor.item) > 0)
+                {
+                    return false;
+                }
+
+                prevItem = cursor.item;
+                cursor = cursor.Next;
+            }
+
+            return true;
+        }
+
+        public virtual bool IsSorted(SCG.IComparer<T> comparer) => IsSorted((comparer ?? SCG.Comparer<T>.Default).Compare);
+
+        public virtual bool IsSorted() => IsSorted(SCG.Comparer<T>.Default.Compare);
+
+        public virtual IList<T> LastViewOf(T item) => ViewOf(item);
+
+        public virtual T RemoveFirst() => RemoveAt(0);
+
+        public virtual T RemoveLast() => RemoveAt(Count - 1);
+
+        public virtual void Reverse()
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void Shuffle() => Shuffle(new Random());
+
+        public virtual void Shuffle(Random random)
+        {
+            #region Code Contracts
+
+            // If collection changes, the version is updated
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+
+            #endregion
+
+            if (Count <= 1)
+            {
+                return;
+            }
+
+            // View: DisposeOverlappingViewsPrivate(false);
+            ShufflePrivate(random);
+
+            (_underlying ?? this).RaiseForShuffle();
+        }
+
+        public virtual IList<T> Slide(int offset)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual IList<T> Slide(int offset, int count)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void Sort(SCG.IComparer<T> comparer)
+        {
+            if (Count <= 1)
+                return;
+
+            if (comparer == null)
+            {
+                comparer = SCG.Comparer<T>.Default;
+            }
+
+            if (IsSorted(comparer))
+            {
+                return;
+            }
+
+            // View: DisposeOverlappingViewsPrivate(false);
+            if (_underlying != null)
+            {
+                var cursor = _startSentinel.Next;
+                while (cursor != _endSentinel)
+                {
+                    cursor.taggroup.Count--;
+                    cursor = cursor.Next;
+                }
+            }
+            // Build a linked list of non-empty runs.
+            // The prev field in first node of a run points to next run's first node
+            Node runTail = _startSentinel.Next;
+            Node prevNode = _startSentinel.Next;
+
+            _endSentinel.Prev.Next = null;
+            while (prevNode != null)
+            {
+                var node = prevNode.Next;
+
+                while (node != null && comparer.Compare(prevNode.item, node.item) <= 0)
+                {
+                    prevNode = node;
+                    node = prevNode.Next;
+                }
+
+                // Completed a run; prevNode is the last node of that run
+                prevNode.Next = null; // Finish the run
+                runTail.Prev = node; // Link it into the chain of runs
+                runTail = node;
+                if (comparer.Compare(_endSentinel.Prev.item, prevNode.item) <= 0)
+                    _endSentinel.Prev = prevNode; // Update last pointer to point to largest
+
+                prevNode = node; // Start a new run
+            }
+
+            // Repeatedly merge runs two and two, until only one run remains
+            while (_startSentinel.Next.Prev != null)
+            {
+                var run = _startSentinel.Next;
+                Node newRunTail = null;
+
+                while (run != null && run.Prev != null)
+                {
+                    // At least two runs, merge
+                    Node nextRun = run.Prev.Prev;
+                    Node newrun = MergeRuns(run, run.Prev, comparer);
+
+                    if (newRunTail != null)
+                        newRunTail.Prev = newrun;
+                    else
+                        _startSentinel.Next = newrun;
+
+                    newRunTail = newrun;
+                    run = nextRun;
+                }
+
+                if (run != null) // Add the last run, if any
+                    newRunTail.Prev = run;
+            }
+
+            _endSentinel.Prev.Next = _endSentinel;
+            _startSentinel.Next.Prev = _startSentinel;
+
+            //assert invariant();
+            //assert isSorted();
+            {
+                Node cursor = _startSentinel.Next, end = _endSentinel;
+                int tag, taglimit;
+                var t = GetTagGroup(_startSentinel, _endSentinel, out tag, out taglimit);
+                var tagdelta = taglimit / (Count + 1) - tag / (Count + 1);
+                tagdelta = tagdelta == 0 ? 1 : tagdelta;
+                if (_underlying == null)
+                    _taggroups = 1;
+                while (cursor != end)
+                {
+                    tag = tag + tagdelta > taglimit ? taglimit : tag + tagdelta;
+                    cursor.tag = tag;
+                    t.Count++;
+                    cursor.taggroup = t;
+                    cursor = cursor.Next;
+                }
+                if (t != _startSentinel.taggroup)
+                    t.First = _startSentinel.Next;
+                if (t != _endSentinel.taggroup)
+                    t.Last = _endSentinel.Prev;
+                if (tag == taglimit)
+                    SplitTagGroupPrivate(t);
+            }
+
+            UpdateVersion();
+
+            (_underlying ?? this).RaiseForSort();
+
+
+        }
+
+        public virtual void Sort() => Sort((SCG.Comparer<T>)null);
+
+        public virtual void Sort(Comparison<T> comparison) => Sort(comparison.ToComparer());
+
+        public virtual bool TrySlide(int offset)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual bool TrySlide(int offset, int count)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual IList<T> View(int index, int count)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual IList<T> ViewOf(T item)
         {
             throw new NotImplementedException();
         }
@@ -795,12 +1041,31 @@ namespace C6.Collections
         #endregion
 
         #region Private methods
-        
+
+        private void ShufflePrivate(Random random)
+        {
+            UpdateVersion();
+
+            var array = new ArrayList<T>();
+            array.AddRange(this);
+            array.Shuffle(random);
+
+            var index = 0;
+            var cursor = _startSentinel.Next;
+            while (cursor != _endSentinel)
+            {
+                cursor.item = array[index++];
+                _itemNode[cursor.item] = cursor;
+
+                cursor = cursor.Next;
+            }
+        }
+
         private void InsertRangePrivate(int i, SCG.IEnumerable<T> items)
         {
             Node node;
             var count = 0;
-            var succ = i == Count ? _endSentinel : GetNodeAtPrivate(i);
+            var succ = i == Count ? _endSentinel : GetNodeByIndexPrivate(i);
             var pred = node = succ.Prev;
             TagGroup taggroup = null;
             int taglimit = 0, thetag = 0;
@@ -862,7 +1127,7 @@ namespace C6.Collections
 
         private static bool IsCompatibleObject(object value) => value is T || value == null && default(T) == null;
 
-        private bool FindNodeAndIndexPrivate(T item, ref Node node, ref int index, EnumerationDirection direction) // FIFO style ???
+        private bool FindNodeAndIndexByItemPrivate(T item, ref Node node, ref int index, EnumerationDirection direction) // FIFO style ???
         {
             var endNode = direction.IsForward() ? _endSentinel : _startSentinel;
             while (node != endNode)
@@ -890,7 +1155,7 @@ namespace C6.Collections
             return false;
         }
 
-        private Node GetNodeAtPrivate(int index)
+        private Node GetNodeByIndexPrivate(int index)
         {
             #region Code Contracts                        
 
@@ -1142,11 +1407,25 @@ namespace C6.Collections
             return start;
         }
 
-        private void disposeOverlappingViews(bool b)
+        private void DisposeOverlappingViewsPrivate(bool b)
         {
             throw new NotImplementedException();
         }
 
+
+        private void RaiseForInsert(T item, int index)
+        {
+            if (ActiveEvents == None)
+            {
+                return;
+            }
+
+            OnItemInserted(item, index);
+            OnItemsAdded(item, 1);
+            OnCollectionChanged();
+        }
+
+        private void RaiseForShuffle() => OnCollectionChanged();
 
         private void RaiseForSort() => OnCollectionChanged();
 
@@ -1177,14 +1456,14 @@ namespace C6.Collections
             OnCollectionChanged();
         }
 
-        private void RaiseForRemoveIndexRange(int start, int count)
+        private void RaiseForRemoveIndexRange(int startIndex, int count)
         {
             if (ActiveEvents == None)
             {
                 return;
             }
 
-            OnCollectionCleared(false, count, start);
+            OnCollectionCleared(false, count, startIndex);
             OnCollectionChanged();
         }
 
@@ -1195,10 +1474,10 @@ namespace C6.Collections
                 return;
             }
 
-            OnItemsRemoved(oldItem, index);
             OnItemRemovedAt(oldItem, index);
-            OnItemsAdded(item, 1);
+            OnItemsRemoved(oldItem, 1);
             OnItemInserted(item, index);
+            OnItemsAdded(item, 1);            
             OnCollectionChanged();
         }
 
@@ -2194,7 +2473,7 @@ namespace C6.Collections
                 _direction = direction;
                 if (count > 0)
                 {
-                    _startNode = list.GetNodeAtPrivate(startIndex);
+                    _startNode = list.GetNodeByIndexPrivate(startIndex);
                 }                
             }
 
@@ -2300,211 +2579,5 @@ namespace C6.Collections
         }
 
         #endregion
-
-
-        public virtual void InsertFirst(T item) => Insert(0, item);
-               
-        public virtual void InsertLast(T item) => Insert(Count, item);
-               
-        public virtual void InsertRange(int index, SCG.IEnumerable<T> items)
-        {            
-            //TODO: some toArray() operations ???
-
-            InsertRangePrivate(index, items);
-            (_underlying ?? this).RaiseForInsertRange(index, items); 
-            //  not corect should raise only for really inserted ???
-            // !!! it is correct, since we have a precondition checking that all the items are not in the list
-        }
-               
-        public virtual bool IsSorted(Comparison<T> comparison)
-        {
-            if (Count <= 1)
-            {
-                return true;
-            }
-
-            var cursor = _startSentinel.Next;
-            var prevItem = cursor.item;
-            cursor = cursor.Next;
-            while (cursor != _endSentinel)
-            {
-                if (comparison(prevItem, cursor.item) > 0)
-                {
-                    return false;
-                }
-
-                prevItem = cursor.item;
-                cursor = cursor.Next;
-            }
-
-            return true;
-        }
-               
-        public virtual bool IsSorted(SCG.IComparer<T> comparer) => IsSorted((comparer ?? SCG.Comparer<T>.Default).Compare);
-               
-        public virtual bool IsSorted() => IsSorted(SCG.Comparer<T>.Default.Compare);
-               
-        public virtual IList<T> LastViewOf(T item) => ViewOf(item);
-               
-        public virtual T RemoveFirst() => RemoveAt(0);
-               
-        public virtual T RemoveLast() => RemoveAt(Count - 1);
-               
-        public virtual void Reverse()
-        {
-            throw new NotImplementedException();
-        }
-               
-        public virtual void Shuffle()
-        {
-            throw new NotImplementedException();
-        }
-               
-        public virtual void Shuffle(Random random)
-        {
-            throw new NotImplementedException();
-        }
-               
-        public virtual IList<T> Slide(int offset)
-        {
-            throw new NotImplementedException();
-        }
-               
-        public virtual IList<T> Slide(int offset, int count)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void Sort(SCG.IComparer<T> comparer)
-        {
-            if (Count <= 1)
-                return;
-
-            if (comparer == null)
-            {
-                comparer = SCG.Comparer<T>.Default;
-            }
-
- 
-            disposeOverlappingViews(false);
-            if (_underlying != null)
-            {
-                var cursor = _startSentinel.Next;
-                while (cursor != _endSentinel)
-                {
-                    cursor.taggroup.Count--;
-                    cursor = cursor.Next;
-                }
-            }
-            // Build a linked list of non-empty runs.
-            // The prev field in first node of a run points to next run's first node
-            Node runTail = _startSentinel.Next;
-            Node prevNode = _startSentinel.Next;
-
-            _endSentinel.Prev.Next = null;
-            while (prevNode != null)
-            {
-                var node = prevNode.Next;
-
-                while (node != null && comparer.Compare(prevNode.item, node.item) <= 0)
-                {
-                    prevNode = node;
-                    node = prevNode.Next;
-                }
-
-                // Completed a run; prevNode is the last node of that run
-                prevNode.Next = null; // Finish the run
-                runTail.Prev = node; // Link it into the chain of runs
-                runTail = node;
-                if (comparer.Compare(_endSentinel.Prev.item, prevNode.item) <= 0)
-                    _endSentinel.Prev = prevNode; // Update last pointer to point to largest
-
-                prevNode = node; // Start a new run
-            }
-
-            // Repeatedly merge runs two and two, until only one run remains
-            while (_startSentinel.Next.Prev != null)
-            {
-                Node run = _startSentinel.Next;
-                Node newRunTail = null;
-
-                while (run != null && run.Prev != null)
-                {
-                    // At least two runs, merge
-                    Node nextRun = run.Prev.Prev;
-                    Node newrun = MergeRuns(run, run.Prev, comparer);
-
-                    if (newRunTail != null)
-                        newRunTail.Prev = newrun;
-                    else
-                        _startSentinel.Next = newrun;
-
-                    newRunTail = newrun;
-                    run = nextRun;
-                }
-
-                if (run != null) // Add the last run, if any
-                    newRunTail.Prev = run;
-            }
-
-            _endSentinel.Prev.Next = _endSentinel;
-            _startSentinel.Next.Prev = _startSentinel;
-
-            //assert invariant();
-            //assert isSorted();
-            {
-                Node cursor = _startSentinel.Next, end = _endSentinel;
-                int tag, taglimit;
-                var t = GetTagGroup(_startSentinel, _endSentinel, out tag, out taglimit);
-                int tagdelta = taglimit / (Count + 1) - tag / (Count + 1);
-                tagdelta = tagdelta == 0 ? 1 : tagdelta;
-                if (_underlying == null)
-                    _taggroups = 1;
-                while (cursor != end)
-                {
-                    tag = tag + tagdelta > taglimit ? taglimit : tag + tagdelta;
-                    cursor.tag = tag;
-                    t.Count++;
-                    cursor.taggroup = t;
-                    cursor = cursor.Next;
-                }
-                if (t != _startSentinel.taggroup)
-                    t.First = _startSentinel.Next;
-                if (t != _endSentinel.taggroup)
-                    t.Last = _endSentinel.Prev;
-                if (tag == taglimit)
-                    SplitTagGroupPrivate(t);
-            }
-
-            UpdateVersion();
-
-            (_underlying ?? this).RaiseForSort();
-
-
-        }
-
-        public virtual void Sort() => Sort((SCG.Comparer<T>)null);
-
-        public virtual void Sort(Comparison<T> comparison) => Sort(comparison.ToComparer());
-                
-        public virtual bool TrySlide(int offset)
-        {
-            throw new NotImplementedException();
-        }
-               
-        public virtual bool TrySlide(int offset, int count)
-        {
-            throw new NotImplementedException();
-        }
-               
-        public virtual IList<T> View(int index, int count)
-        {
-            throw new NotImplementedException();
-        }
-               
-        public virtual IList<T> ViewOf(T item)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

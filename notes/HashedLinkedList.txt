@@ -22,7 +22,10 @@
 - ActiveEvents.HasFlag() passed for:
 	- private void RaiseForIndexSetter(T oldItem, T item, int index), RaiseForRemove(T item, int count)
 		Add a test
-	
+- General: CollectionExtensions - check for: // TODO: Test
+- InsertNodeBeforePrivate()	should be used with FindOrAddToHash()
+	if there is _itemNode.Contains BEFORE InsertNodeBeforePrivate(), replace it with FindOrAddToHash()
+- Insert 
 	
 ===========
 Thesis notes:
@@ -44,4 +47,5 @@ Thesis notes:
 		- field: endNode - needless
 	- InsertRangePrivate:
 		else C5.HLL: throw new DuplicateNotAllowedException("Item already in indexed list"); removed()
-		
+	- C5.Shuffle: count <= 0; now: C5.Shuffle: count <= 1
+	- inconsistency: Sort() accepts null for comparer; but Shuffle() doesnt accept Random as null
