@@ -743,6 +743,12 @@ namespace C6.Collections
 
             #endregion
 
+            removedItem = default(T);
+            if (Count <= 0)
+            {
+                return false;
+            }
+
             // Remove last instance of item, since this moves the fewest items
             var index = LastIndexOf(item);
 
@@ -752,8 +758,7 @@ namespace C6.Collections
                 (_underlying ?? this).RaiseForRemove(removedItem);
                 return true;
             }
-
-            removedItem = default(T);
+            
             return false;
         }
 
@@ -838,6 +843,7 @@ namespace C6.Collections
 
             #endregion
 
+            // toArray ???
             if (IsEmpty || items.IsEmpty())
             {
                 return false;
@@ -866,7 +872,7 @@ namespace C6.Collections
             {
                 // Optimize call, if no items should be retained
                 UpdateVersion();
-                var itemsRemoved = _items; // for views ???
+                var itemsRemoved = _items; // for views ??? Use "this"
                 ClearPrivate();
                 RaiseForRemoveAllWhere(itemsRemoved);
                 return true;
@@ -2003,14 +2009,16 @@ namespace C6.Collections
 
         private void RaiseForIndexSetter(T oldItem, T newItem, int index)
         {
-            if (ActiveEvents != None)
+            if (ActiveEvents == None)
             {
-                OnItemRemovedAt(oldItem, index);
-                OnItemsRemoved(oldItem, 1);
-                OnItemInserted(newItem, index);
-                OnItemsAdded(newItem, 1);
-                OnCollectionChanged();
+                return;
             }
+
+            OnItemRemovedAt(oldItem, index);
+            OnItemsRemoved(oldItem, 1);
+            OnItemInserted(newItem, index);
+            OnItemsAdded(newItem, 1);
+            OnCollectionChanged();
         }
 
         private void RaiseForInsert(int index, T item)

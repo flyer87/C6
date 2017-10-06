@@ -1307,8 +1307,8 @@ namespace C6
             
             while (node != _endSentinel)
             {
-                var predRes = !predicate(node.item);
-                if (predRes)
+                var predicateResult = predicate(node.item);
+                if (!predicateResult)
                 {
                     //updatecheck();
                     node = node.Next;
@@ -1319,7 +1319,7 @@ namespace C6
                 viewHandler.skipEndpoints(countRemoved, myoffset + index);
                 var localend = node.Prev; //Latest node not to be removed
 
-                if (!predRes)                
+                if (predicateResult)                
                 {                   
                     if (shouldRememberItems)
                     {

@@ -26,7 +26,7 @@ namespace C6.Collections
 
         private HashedLinkedList<T> _underlying; // null for proper list
         private WeakViewList<HashedLinkedList<T>> _views; 
-        private WeakViewList<HashedLinkedList<T>>.Node _myWeakView; // null for proper list
+        private WeakViewList<HashedLinkedList<T>>.Node _myWeakReference; // null for proper list
 
         private int _version, _sequencedHashCodeVersion = -1, _unsequencedHashCodeVersion = -1;
         private int _sequencedHashCode, _unsequencedHashCode;
@@ -204,6 +204,7 @@ namespace C6.Collections
 
             // ??? C6.LinkedList: All this below is in a private method InsertRangePrivate
             var countAdded = 0;
+            var pred = _endSentinel.Prev;
             foreach (var item in array) // or items???
             {
                 var node = new Node(item);
@@ -223,7 +224,8 @@ namespace C6.Collections
 
             UpdateVersion();
 
-            (_underlying ?? this).RaiseForAddRange(array); // not array, only the added ones ???
+            FixViewsAfterInsertPrivate(_endSentinel, pred, countAdded, 0);
+            (_underlying ?? this).RaiseForAddRange(array); // wrong! Not array, only the added ones ???
             return true;
         }
 
@@ -349,23 +351,51 @@ namespace C6.Collections
             return Remove(item, out removedItem);
         }
 
-        public virtual bool RemoveDuplicates(T item)
-        {
-            throw new NotImplementedException();
-        }
+        public virtual bool RemoveDuplicates(T item) => RemoveAllWhere(x => Equals(x, item));
 
         public virtual bool RemoveRange(SCG.IEnumerable<T> items)
         {
-            throw new NotImplementedException();
+            #region Code Contracts            
+            // If collection changes, the version is updated
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+
+            #endregion
+
+            var list = new HashedLinkedList<T>(items, EqualityComparer);
+            return RemoveAllWhere(x => !list.IsEmpty && list.Remove(x));
         }
 
         public virtual bool RetainRange(SCG.IEnumerable<T> items)
         {
-            throw new NotImplementedException();
+            #region Code Contracts 
+
+            // If collection changes, the version is updated
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+
+            #endregion
+
+            if (IsEmpty)
+            {
+                return false;
+            }
+
+            if (items.IsEmpty())
+            {
+                // Optimize call, if no items should be retained
+                UpdateVersion();
+                var itemsRemoved = this; // for views ??? yes, this 
+                ClearPrivate();
+                RaiseForRemoveAllWhere(itemsRemoved);
+                return true;
+            }
+
+            using (var list = new HashedLinkedList<T>(items, EqualityComparer))
+            {
+                return RemoveAllWhere(x => !list.Remove(x));
+            }
         }
 
-        public virtual ICollectionValue<T> UniqueItems()
-            => new ItemSet(this);
+        public virtual ICollectionValue<T> UniqueItems() => new ItemSet(this);
 
         public virtual bool UnsequencedEquals(ICollection<T> otherCollection) // ??? version check
             => this.UnsequencedEquals(otherCollection, EqualityComparer);
@@ -551,7 +581,7 @@ namespace C6.Collections
                 cursor = cursor.Next;
             }
 
-            // clean the list
+            // clean the list; ??? lines down can be replaced with RemoveFromListPrivate()
             startNode.Prev.Next = endNode.Next;
             endNode.Next.Prev = startNode.Prev;
 
@@ -649,8 +679,60 @@ namespace C6.Collections
         public virtual T RemoveLast() => RemoveAt(Count - 1);
 
         public virtual void Reverse()
-        {
-            throw new NotImplementedException();
+        {            
+            if (Count <= 1) return;
+
+            UpdateVersion(); // ??? here or 
+
+            Position[] positions = null;
+            int poslow = 0, poshigh = 0;
+            if (_views != null) // the code down - in a private method ???
+            {
+                LinkedList<Position> positionsInner = null;
+                foreach (var view in _views)
+                {
+                    if (view == this) continue;                    
+
+                    switch (ViewPositionPrivate(view))
+                    {
+                        case MutualViewPosition.ContainedIn:
+                            (positionsInner ?? (positionsInner = new LinkedList<Position>())).Add(new Position(view, true));
+                            positionsInner.Add(new Position(view, false)); // ??? once true, and now false;
+                            break;
+                        case MutualViewPosition.Overlapping:
+                            view.Dispose();
+                            break;
+                        case MutualViewPosition.Contains:
+                        case MutualViewPosition.NonOverlapping:
+                            break;
+                    }
+                }
+
+                if (positionsInner != null)
+                {
+                    positions = positionsInner.ToArray();
+                    //Sorting.IntroSort<Position>(positions, 0, positions.Length, PositionComparer.Default);
+                    Array.Sort(positions, 0, positions.Length, PositionComparer.Default);
+                    poshigh = positions.Length - 1;
+                }
+            }
+
+            // ??? the real reversing. Yes - through swapping
+            Node a = GetNodeByIndexPrivate(0), b = GetNodeByIndexPrivate(Count - 1);
+            for (var i = 0; i < Count / 2; i++)
+            {
+                var swap = a.item; a.item = b.item; b.item = swap;
+                _itemNode[a.item] = a; _itemNode[b.item] = b;
+
+                if (positions != null)
+                    MirrorViewSentinelsForReverse(positions, ref poslow, ref poshigh, a, b, i);
+                a = a.Next; b = b.Prev;
+            }
+
+            if (positions != null && Count % 2 != 0)
+                MirrorViewSentinelsForReverse(positions, ref poslow, ref poshigh, a, b, Count / 2);            
+
+            (_underlying ?? this).RaiseForRevered();
         }
 
         public virtual void Shuffle() => Shuffle(new Random());
@@ -669,38 +751,32 @@ namespace C6.Collections
                 return;
             }
 
-            // View: DisposeOverlappingViewsPrivate(false);
+            DisposeOverlappingViewsPrivate(false); // View:
             ShufflePrivate(random);
 
             (_underlying ?? this).RaiseForShuffle();
         }
 
-        public virtual IList<T> Slide(int offset)
-        {
-            throw new NotImplementedException();
-        }
+        public virtual IList<T> Slide(int offset) => Slide(offset, Count);
 
         public virtual IList<T> Slide(int offset, int count)
         {
-            throw new NotImplementedException();
+            TrySlide(offset, count);
+            return this;
         }
 
         public virtual void Sort(SCG.IComparer<T> comparer)
         {
-            if (Count <= 1)
-                return;
+            if (Count <= 1) return;
 
             if (comparer == null)
             {
                 comparer = SCG.Comparer<T>.Default;
             }
 
-            if (IsSorted(comparer))
-            {
-                return;
-            }
+            if (IsSorted(comparer)) return;
 
-            // View: DisposeOverlappingViewsPrivate(false);
+            DisposeOverlappingViewsPrivate(false); // View:
             if (_underlying != null)
             {
                 var cursor = _startSentinel.Next;
@@ -710,10 +786,11 @@ namespace C6.Collections
                     cursor = cursor.Next;
                 }
             }
+
             // Build a linked list of non-empty runs.
             // The prev field in first node of a run points to next run's first node
             Node runTail = _startSentinel.Next;
-            Node prevNode = _startSentinel.Next;
+            var prevNode = _startSentinel.Next;
 
             _endSentinel.Prev.Next = null;
             while (prevNode != null)
@@ -793,32 +870,54 @@ namespace C6.Collections
             UpdateVersion();
 
             (_underlying ?? this).RaiseForSort();
-
-
         }
 
         public virtual void Sort() => Sort((SCG.Comparer<T>)null);
 
         public virtual void Sort(Comparison<T> comparison) => Sort(comparison.ToComparer());
 
-        public virtual bool TrySlide(int offset)
-        {
-            throw new NotImplementedException();
-        }
+        public virtual bool TrySlide(int offset) => TrySlide(offset, Count);
 
         public virtual bool TrySlide(int offset, int count)
         {
-            throw new NotImplementedException();
+            if (Offset + offset < 0 || Offset + offset + count > UnderlyingCount)
+            {
+                return false;
+            }
+            // if (this.offset == null) in C5 offset is nullable ?? So what ?
+
+            var oldOffset = Offset;
+            GetPairPrivate(offset - 1, offset + count, out _startSentinel, out _endSentinel,
+                new[] { -oldOffset - 1, -1, Count, UnderlyingCount - oldOffset },
+                new[] { _underlying._startSentinel, _startSentinel, _endSentinel, _underlying._endSentinel });
+
+            Count = count;
+            Offset += offset;
+
+            return true;
         }
 
         public virtual IList<T> View(int index, int count)
         {
-            throw new NotImplementedException();
+            var view = (HashedLinkedList<T>) MemberwiseClone();
+            view._underlying = _underlying ?? this;
+            view.Offset = index;
+            view.Count = count;
+
+            GetPairPrivate(index - 1, index + count, out view._startSentinel, out view._endSentinel,
+                new [] { -1, Count }, new [] { _startSentinel, _endSentinel });
+
+            _myWeakReference = (_views ?? (_views = new WeakViewList<HashedLinkedList<T>>())).Add(view);
+
+            return view;
         }
 
         public virtual IList<T> ViewOf(T item)
         {
-            throw new NotImplementedException();
+            var node = _startSentinel.Next;
+            var index = 0;
+            return FindNodeAndIndexByItemPrivate(item, ref node, ref index, EnumerationDirection.Forwards) 
+                ? View(index, 1) : null;
         }
 
         #endregion
@@ -1042,6 +1141,107 @@ namespace C6.Collections
 
         #region Private methods
 
+        private bool RemoveAllWhere(Func<T, bool> predicate)
+        {
+            if (Count <= 0)
+                return false;
+
+            IExtensible<T> itemsRemoved = null; // new LinkedList<T>(); // LinkedList ??? small space            
+            var shouldRememberItems = ActiveEvents.HasFlag(Removed);
+
+            var countRemoved = 0;
+            var node = _startSentinel.Next;
+            while (node != _endSentinel)
+            {
+                var canRemove = predicate(node.item); //updatecheck(); ??? replace with somthing
+                if (canRemove)
+                {
+                    _itemNode.Remove(node.item);
+                    RemoveFromListPrivate(node, 119); // ??? 119
+                    if (shouldRememberItems)
+                        (itemsRemoved ?? (itemsRemoved = new LinkedList<T>(allowsNull: AllowsNull)))
+                            .Add(node.item);
+                    countRemoved++;
+                }
+
+                node = node.Next;
+            }
+
+            if (countRemoved == 0)
+            {
+                Assert(itemsRemoved == null); // why this ???
+                return false;
+            }
+
+            UpdateVersion(); // once or countRemoved times in the while ?
+
+            if (shouldRememberItems)
+            {
+                (_underlying ?? this).RaiseForRemoveAllWhere(itemsRemoved);
+            }
+
+            return true;
+        }
+
+        private void MirrorViewSentinelsForReverse(Position[] positions, ref int poslow, ref int poshigh, Node a, Node b, int i)
+        {
+            int? aindex = Offset + i, bindex = Offset + Count - 1 - i; // ??? int? aindex. Non of the vaues is nullable here
+
+            Position pos;
+
+            while (poslow <= poshigh && (pos = positions[poslow]).Endpoint == a)
+            {
+                //TODO: Note: in the case og hashed linked list, if this.offset == null, but pos.View.offset!=null
+                //we may at this point compute this.offset and non-null values of aindex and bindex
+                if (pos.Left)
+                    pos.View._endSentinel = b.Next;
+                else
+                {
+                    pos.View._startSentinel = b.Prev;
+                    pos.View.Offset = bindex.GetValueOrDefault();// ??? would this brake the logic of thr code?
+                }
+                poslow++;
+            }
+            while (poslow < poshigh && (pos = positions[poshigh]).Endpoint == b)
+            {
+                if (pos.Left)
+                    pos.View._endSentinel = a.Next;
+                else
+                {
+                    pos.View._startSentinel = a.Prev;
+                    pos.View.Offset = aindex.GetValueOrDefault(); // ??? would this brake the logic of thr code
+                }
+                poshigh--;
+            }
+        }
+
+        private T RemoveFromListPrivate(Node node, int index)
+        {
+            //View: fixViewsBeforeSingleRemove(node, Offset + index);
+
+            node.Prev.Next = node.Next;
+            node.Next.Prev = node.Next;
+
+            Count--;
+            if (_underlying != null)
+            {
+                _underlying.Count--;
+            }
+
+            RemoveFromTagGroupPrivate(node);
+
+            return node.item;
+        }
+
+        private void RaiseForRemoveAllWhere(SCG.IEnumerable<T> items)
+        {
+            foreach (var item in items)
+            {
+                OnItemsRemoved(item, 1);
+            }
+            OnCollectionChanged();
+        }
+
         private void ShufflePrivate(Random random)
         {
             UpdateVersion();
@@ -1113,16 +1313,39 @@ namespace C6.Collections
                     if (_underlying != null)
                         _underlying.Count += count;
 
-                    //View: fixViewsAfterInsert(succ, pred, count, 0);
+                     FixViewsAfterInsertPrivate(succ, pred, count, 0); //View:
                     // maybe no ??? raiseForInsertAll(pred, i, count, insertion); it is moved up !
                 }
             }
 
         }
 
-        private void DisposePrivate(bool b)
+        private void DisposePrivate(bool disposingUnderlying)
         {
-            throw new NotImplementedException();
+            if (!IsValid) return;
+
+            if (_underlying != null)
+            {
+                IsValid = false;
+                if (!disposingUnderlying)
+                    _views?.Remove(_myWeakReference);
+                _endSentinel = null;
+                _startSentinel = null;
+                _underlying = null;
+                _views = null;
+                _myWeakReference = null;
+            }
+            else
+            {
+                //isValid = false;
+                //endsentinel = null;
+                //startsentinel = null;
+                if (_views != null)
+                    foreach (var view in _views)
+                        view.DisposePrivate(true);
+                //views = null;
+                Clear();
+            }
         }
 
         private static bool IsCompatibleObject(object value) => value is T || value == null && default(T) == null;
@@ -1132,19 +1355,9 @@ namespace C6.Collections
             var endNode = direction.IsForward() ? _endSentinel : _startSentinel;
             while (node != endNode)
             {
-                if (item == null)
+                if (Equals(item, node.item))
                 {
-                    if (node.item == null)
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    if (Equals(item, node.item))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
 
                 index = direction.IsForward() ? index + 1 : index - 1;
@@ -1186,6 +1399,79 @@ namespace C6.Collections
             }
         }
 
+        /// <summary>
+        /// Find the distance from pos to the set given by positions. Return the
+        /// signed distance as return value and as an out parameter, the
+        /// array index of the nearest position. This is used for up to length 5 of
+        /// positions, and we do not assume it is sorted. 
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="positions"></param>
+        /// <param name="nearest"></param>
+        /// <returns></returns>
+        int CalcDistancePrivate(int pos, out int nearest, int[] positions)
+        {
+            nearest = -1;
+            int bestdist = int.MaxValue;
+            int signeddist = bestdist;
+            for (int i = 0; i < positions.Length; i++)
+            {
+                int thisdist = positions[i] - pos;
+                if (thisdist >= 0 && thisdist < bestdist) { nearest = i; bestdist = thisdist; signeddist = thisdist; }
+                if (thisdist < 0 && -thisdist < bestdist) { nearest = i; bestdist = -thisdist; signeddist = thisdist; }
+            }
+            return signeddist;
+        }
+
+        /// <summary>
+        /// Find the node at position pos, given known positions of several nodes.
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="positions"></param>
+        /// <param name="nodes"></param>
+        /// <returns></returns>
+        Node GetNodePrivate(int pos, int[] positions, Node[] nodes)
+        {
+            int nearest;
+            var delta = CalcDistancePrivate(pos, out nearest, positions);
+            var node = nodes[nearest];
+            if (delta > 0)
+                for (var i = 0; i < delta; i++)
+                    node = node.Prev;
+            else
+                for (var i = 0; i > delta; i--)
+                    node = node.Next;
+            return node;
+        }
+
+        /// <summary>
+        /// Get nodes at positions p1 and p2, given nodes at several positions.
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <param name="n1"></param>
+        /// <param name="n2"></param>
+        /// <param name="positions"></param>
+        /// <param name="nodes"></param>
+        void GetPairPrivate(int p1, int p2, out Node n1, out Node n2, int[] positions, Node[] nodes)
+        {
+            int nearest1, nearest2;
+            int delta1 = CalcDistancePrivate(p1, out nearest1, positions), d1 = delta1 < 0 ? -delta1 : delta1;
+            int delta2 = CalcDistancePrivate(p2, out nearest2, positions), d2 = delta2 < 0 ? -delta2 : delta2;
+
+            if (d1 < d2)
+            {
+                n1 = GetNodePrivate(p1, positions, nodes);
+                n2 = GetNodePrivate(p2, new int[] { positions[nearest2], p1 }, new Node[] { nodes[nearest2], n1 });
+            }
+            else
+            {
+                n2 = GetNodePrivate(p2, positions, nodes);
+                n1 = GetNodePrivate(p1, new int[] { positions[nearest1], p2 }, new Node[] { nodes[nearest1], n2 });
+            }
+        }
+
+
         [Pure]
         private bool Equals(T x, T y) => EqualityComparer.Equals(x, y);       
 
@@ -1193,14 +1479,14 @@ namespace C6.Collections
         {
             UpdateVersion();
 
-            //View: fixViewsBeforeSingleRemove(node, Offset + index);
+            FixViewsBeforeSingleRemovePrivate(node, Offset + index); //View: 
             node.Prev.Next = node.Next;
             node.Next.Prev = node.Prev;
 
             Count--;
             if (_underlying != null)
                 _underlying.Count--;
-            RemoveFromTagGroup(node);
+            RemoveFromTagGroupPrivate(node);
 
             return node.item;
         }
@@ -1263,7 +1549,7 @@ namespace C6.Collections
                 {
                     n.Next.Prev = _startSentinel;
                     _startSentinel.Next = n.Next;
-                    RemoveFromTagGroup(n);
+                    RemoveFromTagGroupPrivate(n);
                     n = n.Next;
                 }
             }
@@ -1290,10 +1576,10 @@ namespace C6.Collections
             UpdateVersion();
 
             node.Next = succ;
-            node.Prev = succ.Prev; // ??? why skipped in C5
+            var pred = node.Prev = succ.Prev; 
             succ.Prev.Next = node;
             succ.Prev = node;
-
+            
             Count++;
             if (_underlying != null)
             {
@@ -1301,8 +1587,7 @@ namespace C6.Collections
             }
 
             SetTagPrivate(node);
-
-            // View: if (updateViews) fixViewsAfterInsert(succ, pred, 1, 0);
+            if (updateViews) FixViewsAfterInsertPrivate(succ, pred, 1, 0); // View: 
         }
 
         private bool FindOrAddToHashPrivate(T item, Node node)
@@ -1407,11 +1692,93 @@ namespace C6.Collections
             return start;
         }
 
-        private void DisposeOverlappingViewsPrivate(bool b)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="otherView"></param>
+        /// <returns>The position of View(otherOffset, otherSize) wrt. this view</returns>
+        MutualViewPosition ViewPositionPrivate(HashedLinkedList<T> otherView)
         {
-            throw new NotImplementedException();
+            Node otherstartsentinel = otherView._startSentinel, otherendsentinel = otherView._endSentinel,
+                first = _startSentinel.Next, last = _endSentinel.Prev,
+                otherfirst = otherstartsentinel.Next, otherlast = otherendsentinel.Prev;
+            if (last.Precedes(otherfirst) || otherlast.Precedes(first))
+                return MutualViewPosition.NonOverlapping;
+            if (Count == 0 || (otherstartsentinel.Precedes(first) && last.Precedes(otherendsentinel)))
+                return MutualViewPosition.Contains;
+            if (otherView.Count == 0 || (_startSentinel.Precedes(otherfirst) && otherlast.Precedes(_endSentinel)))
+                return MutualViewPosition.ContainedIn;
+            return MutualViewPosition.Overlapping;
         }
 
+        private void DisposeOverlappingViewsPrivate(bool reverse)
+        {
+            if (_views == null) return;
+            
+            foreach (var view in _views)
+            {
+                if (view == this) continue;
+                                
+                switch (ViewPositionPrivate(view))
+                {
+                    case MutualViewPosition.ContainedIn:
+                        if (reverse)
+                        { }
+                        else
+                            view.Dispose();
+                        break;
+                    case MutualViewPosition.Overlapping:
+                        view.Dispose();
+                        break;
+                    case MutualViewPosition.Contains:
+                    case MutualViewPosition.NonOverlapping:
+                        break;
+                }
+            }
+        }
+
+        private void FixViewsAfterInsertPrivate(Node succ, Node pred, int added, int realInsertionIndex)
+        {
+            if (_views == null) return;
+
+            foreach (var view in _views)
+            {
+                if (view == this) continue;
+
+                if (pred.Precedes(view._startSentinel) || (view._startSentinel == pred && view.Count > 0))
+                    view.Offset += added;
+                if (view._startSentinel.Precedes(pred) && succ.Precedes(view._endSentinel))
+                    view.Count += added;
+                if (view._startSentinel == pred && view.Count > 0)
+                    view._startSentinel = succ.Prev;
+                if (view._endSentinel == succ)
+                    view._endSentinel = pred.Next;
+            }
+        }
+
+        private void FixViewsBeforeSingleRemovePrivate(Node node, int realRemovalIndex)
+        {
+            if (_views == null) return;
+
+            foreach (var view in _views)
+            {
+                if (view == this) continue;
+
+                if (view._startSentinel.Precedes(node) && node.Precedes(view._endSentinel))
+                    view.Count--;
+                if (!view._startSentinel.Precedes(node))
+                    view.Offset--;
+                if (view._startSentinel == node)
+                    view._startSentinel = node.Prev;
+                if (view._endSentinel == node)
+                    view._endSentinel = node.Next;
+            }
+        }
+
+
+
+
+        private void RaiseForRevered() => OnCollectionChanged();
 
         private void RaiseForInsert(T item, int index)
         {
@@ -1694,7 +2061,7 @@ namespace C6.Collections
         /// <br/> When this is called, node must already have been removed from the underlying list
         /// </summary>
         /// <param name="node">The node to remove</param>
-        private void RemoveFromTagGroup(Node node)
+        private void RemoveFromTagGroupPrivate(Node node)
         {
             TagGroup taggroup = node.taggroup;
 

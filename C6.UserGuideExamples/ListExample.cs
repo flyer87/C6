@@ -30,7 +30,7 @@ namespace C6.UserGuideExamples
             var collection = new HashedLinkedList<string>(items, ec);
 
             var item = items[3];
-            var rem = collection.RemoveAt(0);
+            var rem = collection.RetainRange(new [] {"1", "99"});
             Console.WriteLine(rem);
 
             

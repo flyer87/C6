@@ -26,6 +26,7 @@
 - InsertNodeBeforePrivate()	should be used with FindOrAddToHash()
 	if there is _itemNode.Contains BEFORE InsertNodeBeforePrivate(), replace it with FindOrAddToHash()
 - Insert 
+- General: Remove() methods: if Count <= 0 return false;
 	
 ===========
 Thesis notes:
@@ -49,3 +50,6 @@ Thesis notes:
 		else C5.HLL: throw new DuplicateNotAllowedException("Item already in indexed list"); removed()
 	- C5.Shuffle: count <= 0; now: C5.Shuffle: count <= 1
 	- inconsistency: Sort() accepts null for comparer; but Shuffle() doesnt accept Random as null
+	- in Reverse:
+		Sorting.IntroSort<Position>(positions, 0, positions.Length, PositionComparer.Default);
+		change with Array.Sort()
