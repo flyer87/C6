@@ -187,7 +187,6 @@ namespace C6
             get {
                 // No preconditions
 
-
                 // A set only contains distinct items // TODO: Is this the right place to put it?
                 Ensures(Result<bool>() || Count == this.Distinct(EqualityComparer).Count());
 

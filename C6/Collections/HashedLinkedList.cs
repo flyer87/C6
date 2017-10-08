@@ -389,8 +389,9 @@ namespace C6.Collections
                 return true;
             }
 
-            using (var list = new HashedLinkedList<T>(items, EqualityComparer))
+            //using (var list = new HashedLinkedList<T>(items, EqualityComparer))
             {
+                var list = new HashedLinkedList<T>(items, EqualityComparer);
                 return RemoveAllWhere(x => !list.Remove(x));
             }
         }
@@ -1217,10 +1218,10 @@ namespace C6.Collections
 
         private T RemoveFromListPrivate(Node node, int index)
         {
-            //View: fixViewsBeforeSingleRemove(node, Offset + index);
+            FixViewsBeforeSingleRemovePrivate(node, Offset + index); //View:
 
             node.Prev.Next = node.Next;
-            node.Next.Prev = node.Next;
+            node.Next.Prev = node.Prev;
 
             Count--;
             if (_underlying != null)

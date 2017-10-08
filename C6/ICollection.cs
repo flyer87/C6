@@ -1350,7 +1350,7 @@ namespace C6
             Requires(IsValid);
 
             // The collection is at most as big as the enumerable
-            Ensures(Count <= (AllowsDuplicates ? items.Count() : items.Distinct(EqualityComparer).Count()));
+            Ensures(Count <= (this.AllowsDuplicates ? items.Count() : items.Distinct(EqualityComparer).Count()));
 
             // The collection contains the same items as items, with a multiplicity equal or less
             Ensures(items.GroupBy(key => key, element => element, EqualityComparer).All(group => CountDuplicates(group.Key) <= group.Count()));
