@@ -264,25 +264,26 @@ namespace C6.Collections
         public virtual T this[int index]
         {
             get { return _items[_offsetField + index]; }
-            set
-            {
+            set {
                 #region Code Contracts
+
                 // The version is updated
                 Ensures(_version != OldValue(_version));
+
                 #endregion
 
                 UpdateVersion();
-                var oldItem = _items[_offsetField + index];
-                _items[_offsetField + index] = value;
+
+                index += _offsetField;
+                var oldItem = _items[index];
+                _items[index] = value;
+
                 (_underlying ?? this).RaiseForIndexSetter(oldItem, value, index);
             }
         }
 
         // View
-                
-        public virtual int Offset => _offsetField;
-
-        //public virtual bool IsValid { get; protected set; } // ???
+        public virtual int Offset => _offsetField;        
 
         /// <summary>
         /// Null if this list is not a view.
@@ -291,10 +292,10 @@ namespace C6.Collections
         /// ???????? move to Property region
         public virtual IList<T> Underlying => _underlying;
         // View ==========
-
         #endregion
 
         private int UnderlyingCount => (Underlying ?? this).Count;
+
         #region Public Methods
 
         public override T[] ToArray()
@@ -309,8 +310,7 @@ namespace C6.Collections
             #region Code Contracts            
 
             // The version is updated            
-            Ensures(_version != OldValue(_version));
-            RequireValidity();
+            Ensures(_version != OldValue(_version));            
             #endregion
 
             InsertPrivate(Count, item);            
@@ -336,8 +336,7 @@ namespace C6.Collections
 
         public virtual bool AddRange(SCG.IEnumerable<T> items)
         {
-            #region Code Contracts
-            RequireValidity();
+            #region Code Contracts            
             // If collection changes, the version is updated
             // !@ Ensures(this.IsSameSequenceAs(OldValue((_underlying ?? this).ToArray())) || _version != OldValue(_version));
 
@@ -361,28 +360,18 @@ namespace C6.Collections
 
         // Only creates one Range instead of two as with GetIndexRange(0, Count).Backwards()
         public virtual IDirectedCollectionValue<T> Backwards()
-        {
-            #region Code Contract
-
-            RequireValidity(); //Is the view(list) valid? if yes, only then can call Backwards()
-
-            #endregion
-
+        {            
             return new Range(this, Count - 1, Count, EnumerationDirection.Backwards);
         }
 
         public override T Choose()
-        {
-            #region Code Contract
-            RequireValidity();
-            #endregion
+        {            
             return _items[Count - 1];
         }
 
         public virtual void Clear()
         {
-            #region Code Contracts
-            RequireValidity();
+            #region Code Contracts            
             // If collection changes, the version is updated
             Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
             #endregion
@@ -411,11 +400,8 @@ namespace C6.Collections
         public virtual bool Contains(T item) => IndexOf(item) >= 0;
 
         public virtual bool ContainsRange(SCG.IEnumerable<T> items)
-        {
-            #region Code Contract
-            RequireValidity();
-            #endregion
-
+        {            
+            // ToDo: .toArray()
             if (items.IsEmpty())
             {
                 return true;
@@ -444,51 +430,37 @@ namespace C6.Collections
 
         // Explicitly check against null to avoid using the (slower) equality comparer
         public virtual int CountDuplicates(T item)
-        {
-            #region Code Contract
-            RequireValidity();
-            #endregion
+        {            
             return item == null ? this.Count(x => x == null) : this.Count(x => Equals(x, item));
         }
 
         public virtual bool Find(ref T item)
-        {
-            #region Code Contract
-            RequireValidity();
-            #endregion
+        {            
             var index = IndexOf(item);
-            //new 
+                        
             index += _offsetField;
-            //-new
-
-            if (index >= 0)
+            if (index < 0)
             {
-                item = _items[index];
-                return true;
+                return false;
             }
 
-            return false;
+            item = _items[index];
+            return true;
         }
 
         public virtual ICollectionValue<T> FindDuplicates(T item)
-        {
-            #region Code Contract
-            //RequireValidity();
-            #endregion
+        {            
             var duplicates = new Duplicates(this, item);            
-            _collValues.Add(duplicates); // ???        
+            _collValues.Add(duplicates); // ???  so far, no. Intsead of UpdateVersi() _collValues could be used, but ...
 
             return duplicates;
         }
 
         public virtual bool FindOrAdd(ref T item)
         {
-            #region Code Contracts
-
-            RequireValidity();
+            #region Code Contracts            
             // If collection changes, the version is updated            
             Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
-
             #endregion
 
             if (Find(ref item))
@@ -507,8 +479,7 @@ namespace C6.Collections
             #region Code Contracts                      
 
             // The version is not updated
-            Ensures(_version == OldValue(_version));
-            RequireValidity();
+            Ensures(_version == OldValue(_version));            
 
             #endregion
 
@@ -522,10 +493,7 @@ namespace C6.Collections
         }
 
         public virtual IDirectedCollectionValue<T> GetIndexRange(int startIndex, int count)
-        {
-            #region Code Contract
-            RequireValidity();
-            #endregion
+        {            
             return new Range(this, startIndex, count, EnumerationDirection.Forwards);
         }
 
@@ -556,8 +524,7 @@ namespace C6.Collections
         [Pure]
         public virtual int IndexOf(T item)
         {
-            #region Code Contracts            
-            RequireValidity();
+            #region Code Contracts                        
 
             // TODO: Add contract to IList<T>.IndexOf
             // Result is a valid index
@@ -597,9 +564,7 @@ namespace C6.Collections
 
         public virtual void Insert(int index, T item)
         {
-            #region Code Contracts
-
-            RequireValidity();
+            #region Code Contracts            
 
             // If collection changes, the version is updated
             Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
@@ -607,17 +572,16 @@ namespace C6.Collections
             #endregion
 
             InsertPrivate(index, item);
-            (_underlying ?? this).RaiseForInsert(index, item);
+            (_underlying ?? this).RaiseForInsert(Offset + index, item);
         }
 
-        public virtual void InsertFirst(T item) => Insert(0, item); // Offset ???
+        public virtual void InsertFirst(T item) => Insert(0, item); // Offset ? No!
 
-        public virtual void InsertLast(T item) => Insert(Count, item); // Offset ???
+        public virtual void InsertLast(T item) => Insert(Count, item); // Offset ? No!
 
         public virtual void InsertRange(int index, SCG.IEnumerable<T> items)
         {
-            #region Code Contracts           
-            RequireValidity();
+            #region Code Contracts                       
 
             // If collection changes, the version is updated
             Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
@@ -643,11 +607,7 @@ namespace C6.Collections
         public virtual bool IsSorted() => IsSorted(SCG.Comparer<T>.Default.Compare);
 
         public virtual bool IsSorted(Comparison<T> comparison)
-        {
-            #region Code Contract
-            RequireValidity();
-            #endregion
-
+        {            
             if (Count <= 1)
             {
                 return true;
@@ -678,9 +638,7 @@ namespace C6.Collections
             #region Code Contracts
 
             // TODO: Add contract to IList<T>.LastIndexOf
-            // Result is a valid index            
-            RequireValidity();
-            
+            // Result is a valid index                                    
             Ensures(Contains(item)
                 ? 0 <= Result<int>() && Result<int>() < Count
                 : ~Result<int>() == Count);
@@ -734,10 +692,7 @@ namespace C6.Collections
 
         public virtual bool Remove(T item, out T removedItem)
         {
-            #region Code Contracts
-
-            RequireValidity();
-
+            #region Code Contracts            
             // If collection changes, the version is updated
             Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
@@ -750,23 +705,20 @@ namespace C6.Collections
             }
 
             // Remove last instance of item, since this moves the fewest items
-            var index = LastIndexOf(item);
-
-            if (index >= 0)
+            int index;
+            if ((index = LastIndexOf(item)) < 0)
             {
-                removedItem = RemoveAtPrivate(index);
-                (_underlying ?? this).RaiseForRemove(removedItem);
-                return true;
+                return false;
             }
-            
-            return false;
+
+            removedItem = RemoveAtPrivate(index);
+            (_underlying ?? this).RaiseForRemove(removedItem);
+            return true;
         }
 
         public virtual T RemoveAt(int index)
         {
             #region Code Contracts
-
-            RequireValidity();
 
             // If collection changes, the version is updated
             //var old = OldValue(this.ToArray());            
@@ -775,15 +727,11 @@ namespace C6.Collections
             #endregion
 
             var item = RemoveAtPrivate(index);
-            (_underlying ?? this).RaiseForRemovedAt(item, index);
+            (_underlying ?? this).RaiseForRemovedAt(item, Offset + index);
             return item;
         }
 
-        public void DoSomething()
-        {
-            RequireValidity();
-            return;
-        }
+        public void DoSomething() {}
 
         // Explicitly check against null to avoid using the (slower) equality comparer
         public virtual bool RemoveDuplicates(T item) => item == null ? RemoveAllWhere(x => x == null) : RemoveAllWhere(x => Equals(item, x));
@@ -793,9 +741,7 @@ namespace C6.Collections
         public virtual void RemoveIndexRange(int startIndex, int count)
         {
             #region Code Contracts
-
-            RequireValidity();
-
+                       
             // If collection changes, the version is updated
             Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
@@ -808,15 +754,13 @@ namespace C6.Collections
 
             // Only update version if item is actually removed
             UpdateVersion();
-            // newa
+            
             startIndex += _offsetField;
-            FixViewsBeforeRemovePrivate(startIndex, count);
-            var underlyingCount = (_underlying ?? this).Count;
-            // -new
-
-            if ((underlyingCount - count) > startIndex)
+            FixViewsBeforeRemovePrivate(startIndex, count);            
+            
+            if ((UnderlyingCount - count) > startIndex)
             {
-                Array.Copy(_items, startIndex + count, _items, startIndex, underlyingCount - count - startIndex);
+                Array.Copy(_items, startIndex + count, _items, startIndex, UnderlyingCount - count - startIndex);
             }
 
             // new
@@ -825,9 +769,8 @@ namespace C6.Collections
             {
                 _underlying.Count -= count;
             }
-            // -new
-            underlyingCount = (_underlying ?? this).Count;
-            Array.Clear(_items, underlyingCount, count);
+                        
+            Array.Clear(_items, UnderlyingCount, count);
 
             (_underlying ?? this).RaiseForRemoveIndexRange(startIndex, count);
         }
@@ -836,8 +779,7 @@ namespace C6.Collections
 
         public virtual bool RemoveRange(SCG.IEnumerable<T> items)
         {
-            #region Code Contracts
-            RequireValidity();
+            #region Code Contracts            
             // If collection changes, the version is updated
             Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
@@ -856,8 +798,7 @@ namespace C6.Collections
 
         public virtual bool RetainRange(SCG.IEnumerable<T> items)
         {
-            #region Code Contracts
-            RequireValidity();
+            #region Code Contracts            
             // If collection changes, the version is updated
             Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
@@ -872,7 +813,7 @@ namespace C6.Collections
             {
                 // Optimize call, if no items should be retained
                 UpdateVersion();
-                var itemsRemoved = _items; // for views ??? Use "this"
+                var itemsRemoved = this; // for views ??? Use "this"
                 ClearPrivate();
                 RaiseForRemoveAllWhere(itemsRemoved);
                 return true;
@@ -885,8 +826,7 @@ namespace C6.Collections
 
         public virtual void Reverse()
         {
-            #region Code Contracts
-            RequireValidity();
+            #region Code Contracts            
             // If collection changes, the version is updated
             Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
@@ -907,10 +847,7 @@ namespace C6.Collections
         }
 
         public virtual bool SequencedEquals(ISequenced<T> otherCollection)
-        {
-            //#region Code Contract
-            //RequireValidity();
-            //#endregion
+        {            
             return this.SequencedEquals(otherCollection, EqualityComparer);
         }
 
@@ -918,8 +855,7 @@ namespace C6.Collections
 
         public virtual void Shuffle(Random random)
         {
-            #region Code Contracts
-            RequireValidity();
+            #region Code Contracts            
             // If collection changes, the version is updated
             Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
@@ -946,8 +882,7 @@ namespace C6.Collections
         public virtual void Sort(SCG.IComparer<T> comparer)
         {
             #region Code Contracts
-
-            RequireValidity();
+            
             // If collection changes, the version is updated            
             Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
@@ -972,7 +907,10 @@ namespace C6.Collections
 
         public override string ToString()
         {
-            RequireValidity();
+            #region Code Contracts
+            Requires(IsValid, ListOrViewMustBeValid);
+            #endregion            
+
             return ToString(null, null);
         }
         
@@ -989,10 +927,7 @@ namespace C6.Collections
         /// </remarks>
         public virtual void TrimExcess()
         {
-            // local method. 
-            #region Code Contract
-            RequireValidity();
-            #endregion
+            // local method. ??? IsValid            
 
             if (Capacity * 0.9 <= Count)
             {
@@ -1002,18 +937,12 @@ namespace C6.Collections
         }
 
         public virtual ICollectionValue<T> UniqueItems()
-        {
-            #region Code Contract
-            RequireValidity();
-            #endregion
+        {            
             return new ItemSet(this);
         }
 
         public virtual bool UnsequencedEquals(ICollection<T> otherCollection)
-        {
-            #region Code Contract
-            RequireValidity();
-            #endregion
+        {            
             return this.UnsequencedEquals(otherCollection, EqualityComparer);
         }
 
@@ -1032,14 +961,10 @@ namespace C6.Collections
 
         public virtual bool Update(T item, out T oldItem)
         {
-            #region Code Contracts
-            
-            RequireValidity();
+            #region Code Contracts                        
 
-            // If collection changes, the version is updated
-            // !@ 
+            // If collection changes, the version is updated            
             Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
-
             #endregion
 
             var index = IndexOf(item);
@@ -1078,8 +1003,7 @@ namespace C6.Collections
         {
             #region Code Contracts                                  
             // The version is updated
-            Ensures(_version != OldValue(_version));
-            RequireValidity();
+            Ensures(_version != OldValue(_version));            
             #endregion
 
             if (Update(item, out oldItem))
@@ -1129,10 +1053,8 @@ namespace C6.Collections
         /// <returns>The new list view.</returns>
         public virtual IList<T> LastViewOf(T item)
         {            
-            int index = lastIndexOf(item);
-            if (index < 0)
-                return null;
-            return View(index, 1);
+            var index = lastIndexOf(item); // ??? calling private method
+            return index < 0 ? null : View(index, 1);
         }
 
         public IList<T> Slide(int offset) // duplication ???;  => Slide(offset, Count); enough
@@ -1155,8 +1077,7 @@ namespace C6.Collections
         public bool TrySlide(int offset, int count)
         {
             // check the indices
-            var newOffset = Offset + offset;
-            var newCount = count;            
+            var newOffset = Offset + offset;                        
             if (newOffset < 0 || count < 0 || newOffset + count > Underlying.Count ) 
             {
                 return false;
@@ -1173,8 +1094,8 @@ namespace C6.Collections
 
         public virtual void Dispose()
         {
-            //View: Dispose(false);
-        }        
+            Dispose(false);
+        }
 
         public string Print()
         {
@@ -1416,11 +1337,11 @@ namespace C6.Collections
             }
         }
 
-        private bool RequireValidity()
+        /*private bool RequireValidity()
         {
             Requires(IsValid, ListOrViewMustBeValid);
             return true;
-        }
+        }*/
 
         private bool CheckVersion(int version)
         {
@@ -1435,8 +1356,7 @@ namespace C6.Collections
 
         private int indexOf(T item) //new!
         {
-            // ??? CodeContract here - NO. item could be null, no matter of AllowsNull's value
-            RequireValidity();
+            // ??? CodeContract here - NO. item could be null, no matter of AllowsNull's value            
             if (item == null)
             {
                 for (var i = 0; i < Count; i++)
@@ -1467,7 +1387,7 @@ namespace C6.Collections
             //return ~_size;
         }
 
-        private int lastIndexOf(T item) //new!
+        private int lastIndexOf(T item) //new! ??? Do we need this. There is already a public method.
         {
             // CodeContract here ???
             if (item == null)
@@ -1593,7 +1513,7 @@ namespace C6.Collections
         private bool Equals(T x, T y) => EqualityComparer.Equals(x, y);
 
         [Pure]
-        private int GetHashCode(T x) => EqualityComparer.GetHashCode(x);
+        private int GetHashCode(T x) => EqualityComparer.GetHashCode(x); // ??? Not used
 
         private void InsertPrivate(int index, T item)
         {
@@ -1609,21 +1529,16 @@ namespace C6.Collections
             #endregion
 
             // Only update version if items are actually added
-            UpdateVersion();
-
-            int underlyingCount = (_underlying ?? this).Count;
+            UpdateVersion();            
 
             // TODO: Check if Count == Capacity?
-            EnsureCapacity(underlyingCount + 1);
-
-            // new 
-            index += _offsetField;            
-            // -new
-
+            EnsureCapacity(UnderlyingCount + 1);
+            
+            index += _offsetField;                        
             // Move items one to the right
-            if (index < underlyingCount)
-            { // underlyingSize
-                Array.Copy(_items, index, _items, index + 1, underlyingCount - index);
+            if (index < UnderlyingCount)
+            {
+                Array.Copy(_items, index, _items, index + 1, UnderlyingCount - index);
             }
             _items[index] = item;
 
@@ -1638,17 +1553,17 @@ namespace C6.Collections
 
         private void FixViewsBeforeSingleRemovePrivate(int realRemovalIndex)
         {
-            if (_views != null)
-                foreach (ArrayList<T> view in _views)
-                {
-                    if (view != this)
-                    {
-                        if (view._offsetField <= realRemovalIndex && view._offsetField + view.Count > realRemovalIndex)
-                            view.Count--;
-                        if (view._offsetField > realRemovalIndex)
-                            view._offsetField--;
-                    }
-                }
+            if (_views == null) return;
+
+            foreach (var view in _views)
+            {
+                if (view == this) continue;
+
+                if (view._offsetField <= realRemovalIndex && view._offsetField + view.Count > realRemovalIndex)
+                    view.Count--;
+                if (view._offsetField > realRemovalIndex)
+                    view._offsetField--;
+            }
         }
 
         private void FixViewsBeforeRemovePrivate(int start, int count)
@@ -1708,19 +1623,14 @@ namespace C6.Collections
             // Only update version if items are actually added
             UpdateVersion();
                         
-            var count = items.Length;
-            // new
-            var underlyingCount = (_underlying ?? this).Count;
-            // -new
-            (_underlying ?? this).EnsureCapacity(underlyingCount + count); // old:EnsureCapacity(Count + count);
+            var count = items.Length;                               
 
-            // new 
-            index += _offsetField;
-            // -new
-
-            if (index < underlyingCount)
+            (_underlying ?? this).EnsureCapacity(UnderlyingCount + count); // ??? old:EnsureCapacity(Count + count);
+            
+            index += _offsetField;            
+            if (index < UnderlyingCount)
             {
-                Array.Copy(_items, index, _items, index + count, underlyingCount - index);
+                Array.Copy(_items, index, _items, index + count, UnderlyingCount - index);
             }
 
             // C5
@@ -1739,13 +1649,12 @@ namespace C6.Collections
             //    // raise                 
             //}
 
-            Array.Copy(items, 0, _items, index, count);            
-            Count += count;
-            // new             
+            Array.Copy(items, 0, _items, index, count);  // View:          
+
+            Count += count;                
             if (_underlying != null)
                 _underlying.Count += count;            
-            FixViewsAfterInsertPrivate(count, index);
-            // -new
+            FixViewsAfterInsertPrivate(count, index);            
         }
 
         #region Position, PositionComparer and ViewHandler nested types
@@ -1815,7 +1724,7 @@ namespace C6.Collections
                     Position endpoint;
                     while (leftEndIndex < viewCount && (endpoint = leftEnds[leftEndIndex]).index <= realindex)
                     {
-                        ArrayList<T> view = endpoint.view;
+                        var view = endpoint.view;
                         view._offsetField = view._offsetField - removed;
                         view.Count += removed;
                         leftEndIndex++;
@@ -1854,8 +1763,7 @@ namespace C6.Collections
         private bool RemoveAllWhere(Func<T, bool> predicate)
         {
             // If result is false, the collection remains unchanged
-            #region Code Contract
-            RequireValidity();
+            #region Code Contract            
             Ensures(Result<bool>() || this.IsSameSequenceAs(OldValue(ToArray())));
             #endregion
 
@@ -1929,7 +1837,7 @@ namespace C6.Collections
         private T RemoveAtPrivate(int index)
         {
             UpdateVersion();
-            // new
+                        
             index += _offsetField;
             FixViewsBeforeSingleRemovePrivate(index);
 
@@ -1938,16 +1846,14 @@ namespace C6.Collections
             {
                 _underlying.Count--;
             }
-            // -new
 
-            var item = _items[index];
-            var underlyingCount = (_underlying ?? this).Count; // -new
-            if (index < underlyingCount) // if (--Count > index)
+            var item = _items[index];            
+            if (index < UnderlyingCount) // if (--Count > index)
             {
-                Array.Copy(_items, index + 1, _items, index, underlyingCount - index);
+                Array.Copy(_items, index + 1, _items, index, UnderlyingCount - index);
             }
 
-            _items[underlyingCount] = default(T);
+            _items[UnderlyingCount] = default(T);
             return item;
         }
 

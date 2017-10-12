@@ -1,19 +1,14 @@
 //updateversion
 //Code Contracts in the beginnig
-=========
-- try to get how the tag staff in the views work
-- Double, triplle check C6.ArrayList with the view extension I did.
-- check views - if all at their places?
-- look at the test patterns of C6
-- look at the C5's view tests
-- write tests for the views
-=========
+====
 - General: invariants from C5
+- Addrange() in the constructor with Code Contracts included, fails.
 - RaiseForAddRange(array) - not correct
 	- some of array items can't bo added, since they're already there. Should raise only for the added ones.
 -     if (_underlying == null) or  if (_underlying == null) {
 			return true; 				return true;
 								   }
+								   
 - insideview or Isinsideview
 - methods with SCG.IEnumerable<T> items (ContainsRange, ...) some check in the beginnig of the method ?
 - Improve GetUnsequencedHashCode() ???
@@ -33,7 +28,9 @@
 	if there is _itemNode.Contains BEFORE InsertNodeBeforePrivate(), replace it with FindOrAddToHash()
 - Insert 
 - General: Remove() methods: if Count <= 0 return false;
-	
+- General: methods getting SCG.IEnumerable<T>, f.ex. ContainsRange(SCG.IEnumerable<T> items)
+	- should we call items.toArray() in the beginning of the method ?
+- General: set doesn't have Code Contracts preconditions in its Interface hierarchy
 ===========
 Thesis notes:
 	- void C5.AddNode() => bool C6.AddNode()
@@ -59,3 +56,6 @@ Thesis notes:
 	- in Reverse:
 		Sorting.IntroSort<Position>(positions, 0, positions.Length, PositionComparer.Default);
 		change with Array.Sort()
+	- Tests, improvements: C6.ArrayList doesn't contain tests for thring an expcetion when 
+AllowsDuplicate is false. Even if set AllowsDuplicate to false in ArrayList. Write test with AllowsDuplicate = true and expexted behvaior, which fails.
+	- General: Code Contracts (which are implemented on inerface level) keeps us far from repeating the precondtions (in terms of check-throw-expcetion) in the concrete implementations.

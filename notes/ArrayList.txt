@@ -1,0 +1,4 @@
+- General: methods with xxx(SCG.IEnumerable<T> items)
+	- do we need items.toArray() or what?
+- C5.public override bool Check()
+			C6."We can solve the first problem by wrapping the method in an #if DEBUG directive to remove it from release versions of the assembly."

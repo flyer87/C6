@@ -213,10 +213,8 @@ namespace C6
                 Requires(0 <= index, ArgumentMustBeWithinBounds);
                 Requires(index < Count, ArgumentMustBeWithinBounds);
 
-
                 // Result is item at index
                 Ensures(Result<T>().IsSameAs(this.ElementAt(index)));
-
 
                 return default(T);
             }

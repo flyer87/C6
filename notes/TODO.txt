@@ -1,0 +1,34 @@
+- try to get how the tag staff in the views work
+- Patterns - p.149
+	- C#6.0 additions
+	
+- Double, triplle check C6.ArrayList with the view extensions I did.
+	//- remove RequierValidity
+		//- put isValid
+	//- fixViews... - on their places
+		Where: look C5
+	- Offset+, where:
+		index, i, count
+		// GetHashCode never used ?
+				
+	- implement private void Dipose()
+	- run the tests
+	- private indexOf, lastIndexOf
+	============
+	- invalidate
+	
+- fix: Insert and this[] - they shoudl either throw an exception or require a precondition.
+
+- look at the test patterns of C6
+- look at the C5's view tests
+- write tests for the views
+	- ArrayList
+	- HashedArrayList
+	- LinkedList
+	- HashedLinkedList
+- implemnt some missing tests
+	those with suffix _fail, ...
+- collect the "???" from the .cs files
+---
+- Code Contracts for private methods - look and do it the same way for the rest.
+=========

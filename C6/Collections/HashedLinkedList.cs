@@ -510,7 +510,6 @@ namespace C6.Collections
                 // The version is updated
                 Ensures(_version != OldValue(_version));
                 #endregion
-
                 
                 var node = GetNodeByIndexPrivate(index);
 
@@ -698,7 +697,7 @@ namespace C6.Collections
                     {
                         case MutualViewPosition.ContainedIn:
                             (positionsInner ?? (positionsInner = new LinkedList<Position>())).Add(new Position(view, true));
-                            positionsInner.Add(new Position(view, false)); // ??? once true, and now false;
+                            positionsInner.Add(new Position(view, false)); // ??? in the row up: true, and now false;
                             break;
                         case MutualViewPosition.Overlapping:
                             view.Dispose();
@@ -1147,7 +1146,7 @@ namespace C6.Collections
             if (Count <= 0)
                 return false;
 
-            IExtensible<T> itemsRemoved = null; // new LinkedList<T>(); // LinkedList ??? small space            
+            IExtensible<T> itemsRemoved = null; 
             var shouldRememberItems = ActiveEvents.HasFlag(Removed);
 
             var countRemoved = 0;
@@ -1170,7 +1169,7 @@ namespace C6.Collections
 
             if (countRemoved == 0)
             {
-                Assert(itemsRemoved == null); // why this ???
+                Assert(itemsRemoved == null); // why Assert ???
                 return false;
             }
 
@@ -1278,7 +1277,7 @@ namespace C6.Collections
                 {
                     var tmp = new Node(item, node, null);
 
-                    if (_itemNode.ContainsKey(item)) // ??? contains, but should we update the found key [with curr. item]
+                    if (_itemNode.ContainsKey(item)) // No! ??? contains, but should we update the found key [with curr. item]
                     {
                         continue;
                     }
