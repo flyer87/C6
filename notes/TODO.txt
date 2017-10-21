@@ -1,6 +1,9 @@
-- try to get how the tag staff in the views work
+- .Net Framework design guidelines
 - Patterns - p.149
 	- C#6.0 additions
+---Prelez---
+====
+- try to get how the tag staff in the views work	
 	
 - Double, triplle check C6.ArrayList with the view extensions I did.
 	//- remove RequierValidity
