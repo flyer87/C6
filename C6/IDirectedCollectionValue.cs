@@ -106,8 +106,7 @@ namespace C6
         {
             // No preconditions
             // new !!!
-            // is Valid, not disposed
-            // Requires(IsValid);
+            Requires(IsValid);            
 
             // Result is non-null
             Ensures(Result<IDirectedCollectionValue<T>>() != null);

@@ -5,13 +5,32 @@ using System.Diagnostics.Contracts;
 
 namespace C6.MyTests
 {
-    class Program
+    public class Program
     {
         static void Main(string[] args)
         {
-            var sq = new Square(1, "");
-            Console.WriteLine(sq.Squared());
+           var res = DoSomething(x => {                
+                try
+                {
+                    var d = (double) x;
+                }
+                catch (Exception e)
+                {                    
+                    throw new ArgumentNullException(e.Message);
+                }
+
+                return 2;
+            });
+
+            Console.WriteLine(res);
+
+            //var sq = new Square(1, "");
+            //Console.WriteLine(sq.Squared());
         }
+
+        private static double DoSomething(Func<int, double> f) => f(5);
+
+
     }
 
     public abstract class Shape

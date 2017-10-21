@@ -62,7 +62,7 @@ namespace C6.Collections
         private int UnderlyingCount => (Underlying ?? this).Count;
 
         #endregion Fields
-
+        
         #region Constructors
 
         public HashedArrayList()
@@ -208,7 +208,7 @@ namespace C6.Collections
 
         #region ISequenced
 
-        public EnumerationDirection Direction => EnumerationDirection.Forwards;
+        public virtual EnumerationDirection Direction => EnumerationDirection.Forwards;
 
         #endregion
 
@@ -303,6 +303,7 @@ namespace C6.Collections
 
             #endregion
 
+            // TODO: insert range ???
             // TODO: Handle ICollectionValue<T> and ICollection<T>
             var array = items.ToArray();
             if (array.IsEmpty())
@@ -504,7 +505,7 @@ namespace C6.Collections
             }
 
             removedItem = RemoveAtPrivate(index);
-            RaiseForRemove(removedItem);
+            (_underlying ?? this).RaiseForRemove(removedItem);
             return true;
         }
 
@@ -548,13 +549,15 @@ namespace C6.Collections
             // TODO: Private method
             // TODO: ???Replace ArrayList<T> with more efficient data structure like HashBag<T>
             //var itemsToContain = new ArrayList<T>(items, EqualityComparer);
-            bool containsRange = true;
-            foreach (var item in items)
-            {
-                containsRange = containsRange && _itemIndex.ContainsKey(item); // ??? &= 
-            }
+            //bool containsRange = true;
+            //foreach (var item in items)
+            //{
+            //    containsRange = containsRange && _itemIndex.ContainsKey(item); // ??? &= 
+            //}
+            
+            //return containsRange;
 
-            return containsRange;
+            return items.All(item => _itemIndex.ContainsKey(item));
         }
 
         public virtual void Clear()
@@ -588,9 +591,9 @@ namespace C6.Collections
 
         public virtual bool Contains(T item) => IndexOf(item) >= 0;
 
-        public int CountDuplicates(T item) => IndexOf(item) >= 0 ? 1 : 0;
+        public virtual int CountDuplicates(T item) => IndexOf(item) >= 0 ? 1 : 0;
 
-        public bool Find(ref T item)
+        public virtual bool Find(ref T item)
         {
             #region Code Contracts          
 
@@ -602,7 +605,7 @@ namespace C6.Collections
                 return false;
             }
 
-            item = _items[index]; // View: offset
+            item = _items[Offset + index]; // View: offset ???
             return true;
         }
 
@@ -620,7 +623,7 @@ namespace C6.Collections
             return duplicates;
         }
 
-        public bool FindOrAdd(ref T item)
+        public virtual bool FindOrAdd(ref T item)
         {
             #region Code Contracts          
 
@@ -637,12 +640,13 @@ namespace C6.Collections
 
         public int GetUnsequencedHashCode()
         {
-            if (_unsequencedHashCodeVersion != _version)
+            if (_unsequencedHashCodeVersion == _version)
             {
-                _unsequencedHashCodeVersion = _version;
-                _unsequencedHashCode = this.GetUnsequencedHashCode(EqualityComparer);
+                return _unsequencedHashCode;
             }
 
+            _unsequencedHashCodeVersion = _version;
+            _unsequencedHashCode = this.GetUnsequencedHashCode(EqualityComparer);
             return _unsequencedHashCode;
         }
 
@@ -650,7 +654,8 @@ namespace C6.Collections
 
         #region ISequenced
 
-        public IDirectedCollectionValue<T> Backwards() => new Range(this, Count - 1, Count, EnumerationDirection.Backwards);
+        public virtual IDirectedCollectionValue<T> Backwards() 
+            => new Range(this, Count - 1, Count, EnumerationDirection.Backwards);
 
         public int GetSequencedHashCode()
         {
@@ -665,12 +670,6 @@ namespace C6.Collections
 
         public bool SequencedEquals(ISequenced<T> otherCollection)
         {
-            #region Code Contract
-
-            //RequireValidity();
-
-            #endregion
-
             return this.SequencedEquals(otherCollection, EqualityComparer);
         }
 
@@ -680,7 +679,7 @@ namespace C6.Collections
 
         public T this[int index]
         {
-            get { return _items[index]; } // View: offset +
+            get { return _items[Offset + index]; } // View: offset +
             set {
                 #region Code Contracst
 
@@ -703,6 +702,7 @@ namespace C6.Collections
                 {
                     // ???
                     _items[index] = value;
+                    _itemIndex.Remove(oldItem);
                     _itemIndex[value] = index;
                 }
                 // Allready there: Exception; C5 throws, but why ???
@@ -736,7 +736,7 @@ namespace C6.Collections
             #endregion
 
             var item = RemoveAtPrivate(index);
-            (_underlying ?? this).RaiseForRemovedAt(item, index); // View:
+            (_underlying ?? this).RaiseForRemovedAt(item, Offset + index); // View:
             return item;
         }
 
@@ -752,9 +752,11 @@ namespace C6.Collections
 
             UpdateVersion();
 
-            startIndex += Offset;
-            // fix views
+            startIndex += Offset;            
             FixViewsBeforeRemovePrivate(startIndex, count);
+
+            // ??? Alternative: View(start, count).Clear();
+
             // clean _itemIndex
             for (int i = startIndex, end = Offset + count; i < end ; i++)
             {
@@ -766,15 +768,17 @@ namespace C6.Collections
             {
                 Array.Copy(_items, startIndex + count, _items, startIndex, UnderlyingCount - startIndex - count);
             }
-                                    
-            //clear
+                                                
             Count -= count;
             if (_underlying != null)
             {
                 _underlying.Count -= count;
             }
+            
+            //clear
             Array.Clear(_items, UnderlyingCount, count);
             ReindexPrivate(startIndex);
+
             (_underlying ?? this).RaiseForRemoveIndexRange(startIndex, count);
         }
 
@@ -1374,19 +1378,19 @@ namespace C6.Collections
 
         private void FixViewsAfterInsertPrivate(int added, int realInsertionIndex)
         {
-            if (_views != null)
-                foreach (HashedArrayList<T> view in _views)
-                {
-                    if (view != this)
-                    {
-                        // in the middle
-                        if (view.Offset < realInsertionIndex && realInsertionIndex < view.Offset + view.Count)
-                            view.Count += added;
-                        // before the beginning
-                        if (view.Offset > realInsertionIndex || (view.Offset == realInsertionIndex && view.Count > 0))
-                            view.Offset += added;
-                    }
-                }
+            if (_views == null) return;
+
+            foreach (var view in _views)
+            {
+                if (view == this) continue;
+                
+                // in the middle
+                if (view.Offset < realInsertionIndex && realInsertionIndex < view.Offset + view.Count)
+                    view.Count += added;
+                // before the beginning
+                if (view.Offset > realInsertionIndex || (view.Offset == realInsertionIndex && view.Count > 0))
+                    view.Offset += added;
+            }
         }
 
         private void FixViewsBeforeSingleRemovePrivate(int realRemovalIndex)
@@ -1931,7 +1935,7 @@ namespace C6.Collections
                 }
             }
 
-            public override bool IsEmpty => /*CheckVersion() &*/ List.IsEmpty;
+            public override bool IsEmpty => CheckVersion() & List.IsEmpty;
 
             #endregion
 
@@ -2004,7 +2008,6 @@ namespace C6.Collections
 
             #endregion
         }
-
 
         [Serializable]
         [DebuggerTypeProxy(typeof(CollectionValueDebugView<>))]
@@ -2171,7 +2174,7 @@ namespace C6.Collections
 
             private readonly HashedArrayList<T> _base;
             private readonly int _version, _startIndex, _count, _sign;
-            private readonly EnumerationDirection _direction;
+            private readonly EnumerationDirection _direction;            
 
             #endregion
 
@@ -2277,7 +2280,7 @@ namespace C6.Collections
                 CheckVersion();
                 // Select the highest index in the range
                 var index = _direction.IsForward() ? _startIndex + _count - 1 : _startIndex;
-                return _base._items[index];
+                return _base._items[index]; // ??? Offset
             }
 
             public override void CopyTo(T[] array, int arrayIndex)

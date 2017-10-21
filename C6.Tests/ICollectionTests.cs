@@ -895,7 +895,7 @@ namespace C6.Tests
             // TODO: Refactor into separate CollectionValueConstraint
             // Assert
             Assert.That(() => findDuplicates.AllowsNull, Throws.InvalidOperationException.Because(CollectionWasModified));
-            // !!! restore them
+            // ??? restore them
             //Assert.That(() => findDuplicates.Count, Throws.InvalidOperationException.Because(CollectionWasModified));
             //Assert.That(() => findDuplicates.CountSpeed, Throws.InvalidOperationException.Because(CollectionWasModified));
             //Assert.That(() => findDuplicates.IsEmpty, Throws.InvalidOperationException.Because(CollectionWasModified));

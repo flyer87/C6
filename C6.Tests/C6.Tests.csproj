@@ -232,6 +232,7 @@
   <ItemGroup>
     <Compile Include="Collections\ArrayListTests.cs" />
     <Compile Include="Collections\HashedArrayListTests.cs" />
+    <Compile Include="Collections\HashedLinkedListTests.cs" />
     <Compile Include="Collections\LinkedListTests.cs" />
     <Compile Include="MyCollEventHolder.cs" />
     <Compile Include="ComparerFactoryTests.cs" />

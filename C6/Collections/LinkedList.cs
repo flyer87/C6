@@ -16,7 +16,6 @@ using static C6.Speed;
 
 using SC = System.Collections;
 using SCG = System.Collections.Generic;
-//using static EnumerationDirection;
 
 
 namespace C6
@@ -282,7 +281,7 @@ namespace C6
 
         public virtual ICollectionValue<T> FindDuplicates(T item) => new Duplicates(this, item);
 
-        public virtual bool FindOrAdd(ref T item) => Find(ref item) ? true : !Add(item);
+        public virtual bool FindOrAdd(ref T item) => Find(ref item) || !Add(item);
 
         // TODO: Update hash code when items are added, if the hash code version is not equal to -1
         public virtual int GetUnsequencedHashCode()
@@ -422,7 +421,7 @@ namespace C6
             return UpdateOrAdd(item, out olditem);
         }
                
-        public virtual bool UpdateOrAdd(T item, out T oldItem) => Update(item, out oldItem) ? true : !Add(item);
+        public virtual bool UpdateOrAdd(T item, out T oldItem) => Update(item, out oldItem) || !Add(item);
                 
         #endregion
 
@@ -1097,9 +1096,9 @@ namespace C6
         #region IDisposable
 
         public virtual void Dispose() => DisposePrivate(false);
-        
 
         #endregion
+
 
         #endregion
 
@@ -1308,8 +1307,8 @@ namespace C6
             
             while (node != _endSentinel)
             {
-                var predRes = !predicate(node.item);
-                if (predRes)
+                var predicateResult = predicate(node.item);
+                if (!predicateResult)
                 {
                     //updatecheck();
                     node = node.Next;
@@ -1320,7 +1319,7 @@ namespace C6
                 viewHandler.skipEndpoints(countRemoved, myoffset + index);
                 var localend = node.Prev; //Latest node not to be removed
 
-                if (!predRes)                
+                if (predicateResult)                
                 {                   
                     if (shouldRememberItems)
                     {
@@ -1657,6 +1656,7 @@ namespace C6
             UpdateVersion();
 
             FixViewsBeforeRemovePrivate(0, Count, _startSentinel.Next, _endSentinel.Prev);
+
             _startSentinel.Next = _endSentinel; //_startSentinel.Prev = null;
             _endSentinel.Prev = _startSentinel; //_endSentinel.Next = null;
 
@@ -1680,7 +1680,7 @@ namespace C6
             throw new InvalidOperationException(CollectionWasModified);
         }
 
-        private Node GetNodeAtPrivate(int index)
+        Node GetNodeAtPrivate(int index)
         {
             #region Code Contracts                        
 
@@ -1909,7 +1909,7 @@ namespace C6
         #region Nested types
 
         /// <summary>
-        /// Something ???
+        /// Node ???
         /// </summary>
         /// <typeparam name="V"></typeparam>
         private sealed class Node // Why not Node<T> ??

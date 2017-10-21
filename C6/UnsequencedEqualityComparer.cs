@@ -2,6 +2,7 @@
 // See https://github.com/C6/C6/blob/master/LICENSE.md for licensing details.
 
 using System.Diagnostics.Contracts;
+using System.Linq;
 
 using C6.Contracts;
 
@@ -44,7 +45,7 @@ namespace C6
             }
 
             if (equalityComparer == null) {
-                equalityComparer = SCG.EqualityComparer<T>.Default;
+                equalityComparer = SCG.EqualityComparer<T>.Default;                
             }
 
             var hashCode = 0; // TODO: Better intial value?
@@ -108,31 +109,54 @@ namespace C6
                 equalityComparer = SCG.EqualityComparer<T>.Default;
             }
 
-            // To avoid an O(n^2) algorithm, we make an auxiliary dictionary to hold the count of items
-            var dictionary = new SCG.Dictionary<T, int>(equalityComparer); // TODO: Use C6 version (HashBag<T>)
-
-            foreach (var item in second) {
-                int count;
-                if (dictionary.TryGetValue(item, out count)) {
-                    // Dictionary already contained item, so we increment count with one
-                    dictionary[item] = count + 1;
-                }
-                else {
-                    dictionary.Add(item, 1);
-                }
+            /*if (!first.AllowsDuplicates && (second.AllowsDuplicates || second.ContainsSpeed >= first.ContainsSpeed))
+            {
+                return first.All(second.Contains);
             }
-
-            foreach (var item in first) {
-                int count;
-                if (dictionary.TryGetValue(item, out count) && count > 0) {
-                    dictionary[item] = count - 1;
-                }
-                else {
-                    return false;
-                }
+            else if (!second.AllowsDuplicates)
+            {
+                return second.All(first.Contains);
             }
+            // Now first.AllowsDuplicates && second.AllowsDuplicates
+            else if (first.DuplicatesByCounting && second.DuplicatesByCounting)
+            {
+                return second.All(item => first.CountDuplicates(item) == second.CountDuplicates(item));
+            }
+            else */
+            {
+                // To avoid an O(n^2) algorithm, we make an auxiliary dictionary to hold the count of items
+                var dictionary = new SCG.Dictionary<T, int>(equalityComparer); // TODO: Use C6 version (HashBag<T>)
 
-            return true;
+                foreach (var item in second)
+                {
+                    int count;
+                    if (dictionary.TryGetValue(item, out count))
+                    {
+                        // Dictionary already contained item, so we increment count with one
+                        dictionary[item] = count + 1;
+                    }
+                    else
+                    {
+                        dictionary.Add(item, 1);
+                    }
+                }
+
+                foreach (var item in first)
+                {
+                    int count;
+                    if (dictionary.TryGetValue(item, out count) && count > 0)
+                    {
+                        dictionary[item] = count - 1;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+            
         }
     }
 }
