@@ -115,7 +115,7 @@ namespace C6
             Ensures(Result<SCG.IEqualityComparer<T>>() != null);
 
             #endregion
-
+            
             return new EqualityComparer<T>((x, y) => ReferenceEquals(x, y), SCG.EqualityComparer<T>.Default.GetHashCode);
         }
 

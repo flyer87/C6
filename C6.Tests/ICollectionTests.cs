@@ -1471,7 +1471,7 @@ namespace C6.Tests
 
             // Assert
             Assert.That(remove, Is.True);
-            Assert.That(removedItem, Is.SameAs(existingItem));
+            Assert.That(removedItem, Is.SameAs(existingItem));            
         }
 
         [Test]
@@ -1505,7 +1505,7 @@ namespace C6.Tests
             enumerator.MoveNext();
             collection.Remove(item, out removedItem);
 
-            // Assert
+            // Assert            
             Assert.That(() => enumerator.MoveNext(), Throws.InvalidOperationException.Because(CollectionWasModified));
         }
 

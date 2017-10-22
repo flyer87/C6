@@ -394,6 +394,7 @@ namespace C6.Tests
         public void SCIListItemSet_AllowsNull_Null()
         {
             Run.If(AllowsNull);
+            
             // Arrange
             var collection = GetStringList(Random, allowsNull: true);
             var index = GetIndex(collection, Random);
@@ -4961,10 +4962,192 @@ namespace C6.Tests
 
         #endregion
 
-        #region View(int, T)
+        #region View(int, int)
+
+        [Test]
+        public void View_IndexLessThanZero_ViolatesPrecondition()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var index = Random.Next(int.MinValue, 0);
+            var count = Random.Next(0, collection.Count);
 
 
+            // Act & Assert
+            Assert.That(() => collection.View(index, count), Violates.PreconditionSaying(ArgumentMustBeWithinBounds));
+        }
 
+        [Test]
+        public void View_CountLessThanZero_ViolatesPrecondition()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var count = Random.Next(int.MinValue, 0);
+            var index = Random.Next(0, collection.Count);
+
+            // Act & Assert
+            Assert.That(() => collection.View(index, count), Violates.PreconditionSaying(ArgumentMustBeWithinBounds));
+        }
+
+        [Test]
+        public void View_IndexPlusCountGreaterThanCount_ViolatesPrecondition()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var index = Random.Next(collection.Count + 1, int.MaxValue);
+            var count = index;
+
+            // Act & Assert
+            Assert.That(() => collection.View(index, count), Violates.PreconditionSaying(ArgumentMustBeWithinBounds));
+        }
+
+        [Test]
+        public void View_DisallowsNull_Equals()
+        {
+            // Arrange
+            var collection = GetStringList(Random, allowsNull: false);
+            var index = Random.Next(0, collection.Count);
+            var count = Random.Next(1, collection.Count - index); // + 1 ??? No!
+
+            // Act
+            var view = collection.View(index, count);
+
+            // Assert
+            Assert.That(view, Is.EqualTo(collection.Skip(index).Take(count)).Using(ReferenceEqualityComparer));
+        }
+
+        [Test]
+        public void View_AllowsNull_Equals()
+        {
+            // Arrange
+            var collection = GetStringList(Random, allowsNull: true);
+            var index = Random.Next(0, collection.Count);
+            var count = Random.Next(1, collection.Count - index); // + 1 ??? No!
+
+            // Act
+            var view = collection.View(index, count);
+
+            // Assert
+            Assert.That(view, Is.EqualTo(collection.Skip(index).Take(count)).Using(ReferenceEqualityComparer));
+        }
+
+        [Test]
+        public void View_ViewDuringEnumeration_ThrowsNothing()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var index = Random.Next(0, collection.Count);
+            var count = Random.Next(1, collection.Count - index); 
+
+            // Act
+            var enumerator = collection.GetEnumerator();
+            enumerator.MoveNext();
+            collection.View(index, count);
+
+            // Assert
+            Assert.That(() => enumerator.MoveNext(), Throws.Nothing);
+        }
+
+        [Test]
+        public void View_WithPostiveIndexAndCountAndEmptyCollection_ViolatesPrecondition()
+        {
+            // Arrange
+            var collection = GetEmptyList<string>();
+            var index = Random.Next(0, int.MaxValue);            
+            var count = Random.Next(1, int.MaxValue); 
+                        
+            // Act & Assert
+            Assert.That(() => collection.View(index, count), Violates.PreconditionSaying(ArgumentMustBeWithinBounds));
+        }            
+
+        // more ...
+        // IsValid
+
+        #endregion
+
+        #region ViewOf(T)
+
+        [Test]
+        public void ViewOf_DisallowsNull_ViolatesPrecondition()
+        {
+            // Arrange
+            var collection = GetStringList(Random, allowsNull: false);
+
+            // Act & Assert
+            Assert.That(() => collection.ViewOf(null), Violates.PreconditionSaying(ItemMustBeNonNull));
+        }
+
+        [Test]
+        public void ViewOf_AllowsNull_ViolatesPrecondition()
+        {
+            Run.If(AllowsNull);
+
+            // Arrange
+            var collection = GetStringList(Random, allowsNull: true);
+
+            // Act & Assert
+            Assert.That(() => collection.ViewOf(null), Throws.Nothing);
+        }
+ 
+        [Test]
+        public void ViewOf_ExistingItem_IsTheSame()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var item = collection.First;
+
+            // Act
+            var view = collection.ViewOf(item);
+
+            // Assert
+            Assert.That(item, Is.SameAs(view.First));
+        }
+
+        [Test]
+        public void ViewOf_NonExistingItem_NullView()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var item = GetUppercaseString(Random);
+
+            // Act
+            var view = collection.ViewOf(item);
+
+            // Assert
+            Assert.That(view, Is.Null);
+        }
+
+        [Test]
+        public void ViewOf_ViewOfDuringEnumeration_ThrowsNothing()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var item = collection.ToArray().Choose(Random);
+
+            // Act
+            var enumerator = collection.GetEnumerator();
+            enumerator.MoveNext();
+            collection.ViewOf(item);
+
+            // Assert
+            Assert.That(() => enumerator.MoveNext(), Throws.Nothing);
+        }
+
+        [Test]
+        public void ViewOf_EmptyCollection_IsNull()
+        {
+            // Arrange
+            var collection = GetEmptyList<string>();
+            var item = GetUppercaseString(Random);
+
+            // Act
+            var viewOf = collection.ViewOf(item);
+
+            // Assert
+            Assert.That(viewOf, Is.Null);
+        }
+
+        // more 
         #endregion
 
         #endregion

@@ -1,0 +1,3 @@
+====
+Thesis notes:
+	- public static string GetUppercaseString(Randomizer random) => random.GetString(25, "ABCDEFGHIJKLMNOPQRSTUVWXYZ"); - missing "I"

@@ -182,7 +182,7 @@ namespace C6
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        IList<T> ViewOf(T item); // names?
+        IList<T> ViewOf(T item); // names???
 
 
         IList<T> LastViewOf(T item); // names?
@@ -736,6 +736,7 @@ namespace C6
 
         public IList<T> ViewOf(T item)
         {
+            Requires(AllowsNull || item != null);
             Requires(IsValid);
 
             return default(IList<T>);
