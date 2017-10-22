@@ -36,6 +36,7 @@ namespace C6.Tests
 
         private static NonComparable[] GetNonComparables(Random random) => GetNonComparables(random, GetCount(random));
         private static NonComparable[] GetNonComparables(Random random, int count) => Enumerable.Range(0, count).Select(i => new NonComparable(random.Next())).ToArray();
+
         private static Comparable[] GetComparables(Random random) => GetComparables(random, GetCount(random));
         private static Comparable[] GetComparables(Random random, int count) => Enumerable.Range(0, count).Select(i => new Comparable(random.Next())).ToArray();
 
@@ -4957,6 +4958,12 @@ namespace C6.Tests
         {
             Assert.That(IsReadOnly, Is.False, "Tests have not been written yet");
         }
+
+        #endregion
+
+        #region View(int, T)
+
+
 
         #endregion
 

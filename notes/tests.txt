@@ -1,0 +1,36 @@
+Test Reference List for views:
+	" Most of the unit tests on the test reference list (section 5.3.1) were coded as a Live Templates."
+=============
+Learn how it is done in C6:
+- custom reference equality comparer
+=============
+C6, notes
+	"The test class has the same name as the interface it tests"
+	"multiple inheritance is not possible with classes in C#"
+	"C5 contains many duplicate tests acting on different implementations, and it can be very difficult to figure out if they differ. "
+	"To test a collection class, we simply inherit from the appropriate test class(es) and implement the abstract methods."
+	"A test reference list was used to ensure that all necessary tests were included for each interface method. "
+	"Notice that we check that the enumerables contain the same items by using a custom reference equality comparer, since NUnit has no support for this yet [48]"
+	
+	"Some properties always return a fixed value for a given data structure. These are the properties that specify a collection’s behavior. To allow us to test the data-structure-specific values, abstract properties are introduced in the interface classes. The data structure test class must simply implement the abstract properties to specify the data structure’s behavior."
+	
+	"It is often recommended that tests contain little to no logic. Logic can introduce bugs that are hard to track down without testing the tests themselves."
+	
+	5.3.4 Logic in Tests
+	"Writing interface tests therefore often requires us to adapt the tests to the given collection."
+		Assert.That(result, Is.EqualTo( AllowsDuplicates));
+		
+	5.4.2 Events
+	"Ensuring that a collection properly raises the expected events requires extensive unit testing as Code Contracts does not support contracts on events – or even delegates."
+	
+	"A related challenge is that events may be raised pairwise: methods like IList<T>’s InsertRange() will raise both ItemInserted and ItemsAdded for each item."
+	
+	"And last but not least is item equality. When an event argument contains an item, we prefer to ensure that the item is the same reference item, e.g. when removing an item at a specific index. This is, however, not always possible, for instance when removing an item from a collection with duplicates. If the item has duplicates, we do not know which instance is removed, and we can only compare equality and not identicality."
+	
+	- 5.4.2.1 Testing Events with NUnit
+	"I have chosen to use this project to lay the foundation for event testing in C6."
+	
+	"C6 uses the same testing strategy as C5 for event testing: each event test provides a list of expected events which is then compared to the actual events raised by the collection. "
+============
+
+	

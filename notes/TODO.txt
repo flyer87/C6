@@ -10,12 +10,12 @@
 		//- put isValid
 	//- fixViews... - on their places
 		Where: look C5
-	- Offset+, where:
+	//- Offset+, where:
 		index, i, count
 		// GetHashCode never used ?
 				
-	- implement private void Dipose()
-	- run the tests
+	//- implement private void Dipose()
+	//- run the tests
 	- private indexOf, lastIndexOf
 	============
 	- invalidate
@@ -26,12 +26,13 @@
 - look at the C5's view tests
 - write tests for the views
 	- ArrayList
+		- implement Span
 	- HashedArrayList
 	- LinkedList
 	- HashedLinkedList
 - implemnt some missing tests
 	those with suffix _fail, ...
 - collect the "???" from the .cs files
----
+=================
 - Code Contracts for private methods - look and do it the same way for the rest.
 =========
