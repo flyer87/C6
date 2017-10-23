@@ -758,6 +758,14 @@ namespace C6
 
         public virtual bool TrySlide(int offset) => TrySlide(offset, Count);
 
+        public virtual IList<T> Span(IList<T> other)
+        {
+            if (other.Offset + other.Count - Offset < 0)
+                return null;
+
+            return (_underlying ?? this).View(Offset, other.Offset + other.Count - Offset);
+        }
+
         public virtual void Sort(SCG.IComparer<T> comparer)
         {
             #region Code Contracts            

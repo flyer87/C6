@@ -183,7 +183,6 @@ namespace C6
         /// <returns></returns>
         IList<T> ViewOf(T item); // names???
 
-
         IList<T> LastViewOf(T item); // names?
 
         /// <summary>
@@ -215,6 +214,8 @@ namespace C6
         /// <param name="count"></param>
         /// <returns></returns>
         bool TrySlide(int offset, int count);
+
+        IList<T> Span(IList<T> other);
         // View part ============
 
         /// <summary>
@@ -774,6 +775,15 @@ namespace C6
             Requires(Underlying != null, NotAView); 
             
             return default(bool);
+        }
+
+        public IList<T> Span(IList<T> other)
+        {
+            Requires(IsValid, ListOrViewMustBeValid);
+            Requires(other != null, ArgumentMustBeNonNull);
+            Requires((Underlying ?? this) == (other.Underlying ?? this), ""); // TODO Message
+
+            return default(IList<T>);
         }
         // View ===========        
 

@@ -765,6 +765,14 @@ namespace C6.Collections
             return this;
         }
 
+        public virtual IList<T> Span(IList<T> other)
+        {
+            if (other.Offset + other.Count - Offset < 0)
+                return null;
+
+            return (_underlying ?? this).View(Offset, other.Offset + other.Count - Offset);
+        }
+
         public virtual void Sort(SCG.IComparer<T> comparer)
         {
             if (Count <= 1) return;

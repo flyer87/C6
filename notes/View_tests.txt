@@ -14,7 +14,7 @@ Quest:
 	- Do for all the methods like Mikkel
 		Add, Insert, Insert. 
 			But we already have them 
-	
+	- Read about the contribution of Code Contracts to the Testing
 ====
 Test Reference List for views:
 	" Most of the unit tests on the test reference list (section 5.3.1) were coded as a Live Templates."

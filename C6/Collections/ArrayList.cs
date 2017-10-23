@@ -1056,24 +1056,24 @@ namespace C6.Collections
             return index < 0 ? null : View(index, 1);
         }
 
-        public IList<T> Slide(int offset) // duplication ???;  => Slide(offset, Count); enough
+        public virtual IList<T> Slide(int offset) // duplication ???;  => Slide(offset, Count); enough
         {
             TrySlide(offset, Count);
             return this;
         }
-
-        public IList<T> Slide(int offset, int count)
+               
+        public virtual IList<T> Slide(int offset, int count)
         {
             TrySlide(offset, count);
             return this;
         }
-
-        public bool TrySlide(int offset)
+               
+        public virtual bool TrySlide(int offset)
         {
             return TrySlide(offset, Count);
         }
-
-        public bool TrySlide(int offset, int count)
+               
+        public virtual bool TrySlide(int offset, int count)
         {
             // check the indices
             var newOffset = Offset + offset;                        
@@ -1089,6 +1089,14 @@ namespace C6.Collections
             Count = count;
 
             return true;
+        }
+
+        public virtual IList<T> Span(IList<T> other)
+        {
+            if (other.Offset + other.Count - Offset < 0)
+                return null;
+
+            return (_underlying ?? this).View(Offset, other.Offset + other.Count - Offset);
         }
 
         public virtual void Dispose()

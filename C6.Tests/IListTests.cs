@@ -5646,7 +5646,7 @@ namespace C6.Tests
         #region Slide(int)
 
         [Test]
-        public void Slide_NewOffSetLessThanZero_ViolatesPrecondition()
+        public void Slide_NewOffsetLessThanZero_ViolatesPrecondition()
         {
             // Arrange
             var collection = GetStringList(Random);
