@@ -281,8 +281,7 @@ namespace C6.Collections
                 (_underlying ?? this).RaiseForIndexSetter(oldItem, value, index);
             }
         }
-
-        // View
+        
         public virtual int Offset => _offsetField;        
 
         /// <summary>
@@ -291,7 +290,7 @@ namespace C6.Collections
         /// <value>Underlying list for view.</value>
         /// ???????? move to Property region
         public virtual IList<T> Underlying => _underlying;
-        // View ==========
+                
         #endregion
 
         private int UnderlyingCount => (Underlying ?? this).Count;

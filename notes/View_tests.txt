@@ -1,3 +1,32 @@
+Quest:
+	- Act - only one method and and the method under considertaion
+	- Arrange - is it fine like: 
+		// Arrange
+		var collection = ...
+		var view = collection.View(i, c);
+		
+		// Act
+		view.Reverse(); 		
+	
+	- More tests: modify a view and then:
+		- check: Count, Offset, items; //What does Peter do ?
+		
+	- Do for all the methods like Mikkel
+		Add, Insert, Insert. 
+			But we already have them 
+	
+====
+Test Reference List for views:
+	" Most of the unit tests on the test reference list (section 5.3.1) were coded as a Live Templates."
+	ViewOf existing, non-exisitng item		
 ====
 Thesis notes:
 	- public static string GetUppercaseString(Randomizer random) => random.GetString(25, "ABCDEFGHIJKLMNOPQRSTUVWXYZ"); - missing "I"
+	- public void TrySlide_NotAView_ViolatesPrecondition()
+		Assert.That(() => collection.TrySlide(index), Violates.Precondition);
+			??? Requires(Underlying != null, NotAView); 
+			
+	- Mikkel: was Last_RandomCollectionStartingWithNull_Null, but should by ...EndingWith...
+=====
+Learn how it is done in C6:
+- custom reference equality comparer	

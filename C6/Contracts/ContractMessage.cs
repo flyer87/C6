@@ -34,5 +34,6 @@ namespace C6.Contracts
         public static string TypeMustBeStruct => "Generic type must be a structure.";
 
         public static string ListOrViewMustBeValid => "The list or view must be valid.";
+        public static string NotAView => "Not a view.";
     }
 }

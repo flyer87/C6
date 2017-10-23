@@ -156,8 +156,7 @@ namespace C6
         // View part
         /// <summary>
         /// 
-        /// </summary>
-        //bool IsValid { get; }
+        /// </summary>        
 
         /// <summary>
         /// 
@@ -706,14 +705,6 @@ namespace C6
             }
         }
 
-        //public bool IsValid
-        //{
-        //    get
-        //    {
-        //        return default(bool);
-        //    }
-        //}
-
         public IList<T> Underlying
         {
             get
@@ -736,7 +727,7 @@ namespace C6
 
         public IList<T> ViewOf(T item)
         {
-            Requires(AllowsNull || item != null);
+            Requires(AllowsNull || item != null, ItemMustBeNonNull);
             Requires(IsValid);
 
             return default(IList<T>);
@@ -745,6 +736,7 @@ namespace C6
 
         public IList<T> LastViewOf(T item)
         {
+            Requires(AllowsNull || item != null, ItemMustBeNonNull);
             Requires(IsValid);
 
             return default(IList<T>);
@@ -752,20 +744,20 @@ namespace C6
         }
 
         public IList<T> Slide(int offset)
-        {
-            // ignore requires ??? duplicate ?!
+        {            
             Requires(IsValid);
-            Requires(Offset + offset >= 0); // TODO: message 
-            Requires(Offset + offset + Count <= Underlying.Count); // TODO: message           
+            Requires(Offset + offset >= 0, ArgumentMustBeWithinBounds); 
+            Requires(Offset + offset + Count <= Underlying.Count, ArgumentMustBeWithinBounds);
             return default(IList<T>);
         }
 
         public IList<T> Slide(int offset, int count)
         {
-            Requires(IsValid);
-            Requires(count >= 0); // TODO: message 
-            Requires(Offset + offset >= 0); // TODO: message 
-            Requires(Offset + offset + count <= Underlying.Count); // TODO: message             
+            Requires(IsValid, ListOrViewMustBeValid);
+            Requires(count >= 0, ArgumentMustBeWithinBounds);
+            Requires(Offset + offset >= 0, ArgumentMustBeWithinBounds);
+            Requires(Offset + offset + count <= Underlying.Count, ArgumentMustBeWithinBounds);
+
             return default(IList<T>);
         }
 
@@ -779,7 +771,7 @@ namespace C6
         {
             Requires(IsValid); 
             Requires(!IsReadOnly);
-            Requires(Underlying != null); //TODO: not a view message            
+            Requires(Underlying != null, NotAView); 
             
             return default(bool);
         }

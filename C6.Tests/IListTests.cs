@@ -34,11 +34,46 @@ namespace C6.Tests
         private IList<string> GetStringList(Randomizer random, SCG.IEqualityComparer<string> equalityComparer = null, bool allowsNull = false)
             => GetList(GetStrings(random, GetCount(random)), equalityComparer, allowsNull);
 
+
+
         private static NonComparable[] GetNonComparables(Random random) => GetNonComparables(random, GetCount(random));
         private static NonComparable[] GetNonComparables(Random random, int count) => Enumerable.Range(0, count).Select(i => new NonComparable(random.Next())).ToArray();
 
         private static Comparable[] GetComparables(Random random) => GetComparables(random, GetCount(random));
         private static Comparable[] GetComparables(Random random, int count) => Enumerable.Range(0, count).Select(i => new Comparable(random.Next())).ToArray();
+
+        private static IList<T> GetEmptyView<T>(IList<T> list)
+        {
+            // TODO: Requires
+            var index = Random.Next(0, list.Count);
+            var count = 0;
+            return list.View(index, count);
+        }
+
+        private static IList<T> GetView<T>(IList<T> list)
+        {
+            // TODO: Requires
+            var index = Random.Next(0, list.Count);
+            var count = Random.Next(1, list.Count - index);
+            return list.View(index, count);
+        }
+
+        private static int GetOffset<T>(IList<T> view)
+        {
+            // TODO: Requires
+            var maxOffset = view.Underlying.Count - view.Count;
+            var withOffset = Random.Next(0, maxOffset + 1);
+            return withOffset;
+        }
+
+        private static int GetNewCount<T>(IList<T> view)
+        {
+            // TODO: Requires
+            var maxOffset = view.Underlying.Count - view.Count;
+            var withOffset = Random.Next(0, maxOffset + 1);
+            var newCount = Random.Next(0, view.Underlying.Count - (view.Offset + withOffset));
+            return newCount;
+        }
 
         #region Inherited
 
@@ -394,7 +429,7 @@ namespace C6.Tests
         public void SCIListItemSet_AllowsNull_Null()
         {
             Run.If(AllowsNull);
-            
+
             // Arrange
             var collection = GetStringList(Random, allowsNull: true);
             var index = GetIndex(collection, Random);
@@ -589,7 +624,8 @@ namespace C6.Tests
             var items = GetStrings(Random, count);
 
             // Act
-            foreach (var item in items) {
+            foreach (var item in items)
+            {
                 ((SC.IList) collection).Add(item); // TODO: Verify that items were added?
             }
 
@@ -1921,6 +1957,7 @@ namespace C6.Tests
         public void First_RandomCollectionStartingWithNull_Null()
         {
             Run.If(AllowsNull);
+
             // Arrange
             var items = new string[] { null }.Concat(GetStrings(Random));
             var collection = GetList(items, allowsNull: true);
@@ -1976,7 +2013,7 @@ namespace C6.Tests
         }
 
         [Test]
-        public void Last_RandomCollectionStartingWithNull_Null()
+        public void Last_RandomCollectionEndingWithNull_Null()
         {
             Run.If(AllowsNull);
             // Arrange
@@ -2194,6 +2231,92 @@ namespace C6.Tests
         public void ItemSet_ReadOnlyCollection_Fail()
         {
             Assert.That(IsReadOnly, Is.False, "Tests have not been written yet");
+        }
+
+        #endregion
+
+        #region Offset
+        
+        [Test]
+        public void Offset_List_IsZero()
+        {
+            // Arrange
+            var collection = GetStringList(Random);                                   
+
+            // Act & Assert
+            Assert.That(collection.Offset, Is.Zero);
+        }
+        
+        [Test]
+        public void Offset_EmptyView_IsNonZero()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = GetEmptyView(collection);            
+
+            // Act & Assert
+            Assert.That(view.Offset, Is.Not.Zero);
+        }
+
+        [Test]
+        public void Offset_RandomView_ItemCountBeforeView()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = GetView(collection);
+            var first = view.First();
+
+            // Act & Assert 
+            //Assert.That(view.First(), Is.SameAs(collection.Skip(view.Offset).First()));
+            Assert.That(view.Offset, Is.EqualTo(collection.TakeWhile(x => x != first).Count()));
+        }
+
+        #endregion
+
+        #region Underlying        
+
+        [Test]
+        public void Underlying_List_IsNull()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+
+            // Act & Assert
+            Assert.That(collection.Underlying, Is.Null);
+        }
+
+        [Test]
+        public void Underlying_EmptyView_IsList()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = GetEmptyView(collection);
+
+            // Act & Assert
+            Assert.That(view.Underlying, Is.SameAs(collection));
+        }
+
+        [Test]
+        public void Underlying_RandomView_IsList()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = GetView(collection);            
+
+            // Act & Assert 
+            Assert.That(view.Underlying, Is.SameAs(collection));
+        }
+
+        [Test]
+        public void Underlying_ViewOfView_IsList()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = GetView(collection);
+            var subView = GetView(view);
+
+            // Act & Assert 
+            Assert.That(subView.Underlying, Is.SameAs(collection));
         }
 
         #endregion
@@ -4970,8 +5093,7 @@ namespace C6.Tests
             // Arrange
             var collection = GetStringList(Random);
             var index = Random.Next(int.MinValue, 0);
-            var count = Random.Next(0, collection.Count);
-
+            var count = 0;
 
             // Act & Assert
             Assert.That(() => collection.View(index, count), Violates.PreconditionSaying(ArgumentMustBeWithinBounds));
@@ -4983,52 +5105,22 @@ namespace C6.Tests
             // Arrange
             var collection = GetStringList(Random);
             var count = Random.Next(int.MinValue, 0);
-            var index = Random.Next(0, collection.Count);
+            var index = 0;
 
             // Act & Assert
             Assert.That(() => collection.View(index, count), Violates.PreconditionSaying(ArgumentMustBeWithinBounds));
         }
 
         [Test]
-        public void View_IndexPlusCountGreaterThanCount_ViolatesPrecondition()
+        public void View_IndexPlusCountGreaterThanUnderlyingCount_ViolatesPrecondition()
         {
             // Arrange
             var collection = GetStringList(Random);
             var index = Random.Next(collection.Count + 1, int.MaxValue);
-            var count = index;
+            var count = 0;
 
-            // Act & Assert
+            // Act & Assert // TODO: somettimes doesn't throw an expcetio. When ?
             Assert.That(() => collection.View(index, count), Violates.PreconditionSaying(ArgumentMustBeWithinBounds));
-        }
-
-        [Test]
-        public void View_DisallowsNull_Equals()
-        {
-            // Arrange
-            var collection = GetStringList(Random, allowsNull: false);
-            var index = Random.Next(0, collection.Count);
-            var count = Random.Next(1, collection.Count - index); // + 1 ??? No!
-
-            // Act
-            var view = collection.View(index, count);
-
-            // Assert
-            Assert.That(view, Is.EqualTo(collection.Skip(index).Take(count)).Using(ReferenceEqualityComparer));
-        }
-
-        [Test]
-        public void View_AllowsNull_Equals()
-        {
-            // Arrange
-            var collection = GetStringList(Random, allowsNull: true);
-            var index = Random.Next(0, collection.Count);
-            var count = Random.Next(1, collection.Count - index); // + 1 ??? No!
-
-            // Act
-            var view = collection.View(index, count);
-
-            // Assert
-            Assert.That(view, Is.EqualTo(collection.Skip(index).Take(count)).Using(ReferenceEqualityComparer));
         }
 
         [Test]
@@ -5037,7 +5129,7 @@ namespace C6.Tests
             // Arrange
             var collection = GetStringList(Random);
             var index = Random.Next(0, collection.Count);
-            var count = Random.Next(1, collection.Count - index); 
+            var count = Random.Next(1, collection.Count - index);
 
             // Act
             var enumerator = collection.GetEnumerator();
@@ -5053,12 +5145,12 @@ namespace C6.Tests
         {
             // Arrange
             var collection = GetEmptyList<string>();
-            var index = Random.Next(0, int.MaxValue);            
-            var count = Random.Next(1, int.MaxValue); 
-                        
+            var index = Random.Next(0, int.MaxValue);
+            var count = Random.Next(1, int.MaxValue);
+
             // Act & Assert
             Assert.That(() => collection.View(index, count), Violates.PreconditionSaying(ArgumentMustBeWithinBounds));
-        }            
+        }
 
         // more ...
         // IsValid
@@ -5088,7 +5180,7 @@ namespace C6.Tests
             // Act & Assert
             Assert.That(() => collection.ViewOf(null), Throws.Nothing);
         }
- 
+
         [Test]
         public void ViewOf_ExistingItem_IsTheSame()
         {
@@ -5107,7 +5199,8 @@ namespace C6.Tests
         public void ViewOf_NonExistingItem_NullView()
         {
             // Arrange
-            var collection = GetStringList(Random);
+            var items = GetLowercaseStrings(Random);
+            var collection = GetList(items);
             var item = GetUppercaseString(Random);
 
             // Act
@@ -5147,8 +5240,494 @@ namespace C6.Tests
             Assert.That(viewOf, Is.Null);
         }
 
-        // more 
+        // more ...
+
         #endregion
+
+        #region LastViewOf(T)
+
+        [Test]
+        public void LastViewOf_DisallowsNull_ViolatesPrecondition()
+        {
+            // Arrange
+            var collection = GetStringList(Random, allowsNull: false);
+
+            // Act & Assert
+            Assert.That(() => collection.LastViewOf(null), Violates.PreconditionSaying(ItemMustBeNonNull));
+        }
+
+        [Test]
+        public void LastViewOf_AllowsNull_ViolatesPrecondition()
+        {
+            Run.If(AllowsNull);
+
+            // Arrange
+            var collection = GetStringList(Random, allowsNull: true);
+
+            // Act & Assert
+            Assert.That(() => collection.LastViewOf(null), Throws.Nothing);
+        }
+
+        [Test]
+        public void LastViewOf_ExistingItem_IsTheSame()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var item = collection.Last;
+
+            // Act
+            var view = collection.LastViewOf(item);
+
+            // Assert
+            Assert.That(item, Is.SameAs(view.First));
+        }
+
+        [Test]
+        public void LastViewOf_NonExistingItem_NullView()
+        {
+            // Arrange
+            var items = GetLowercaseStrings(Random);
+            var collection = GetList(items);
+            var item = GetUppercaseString(Random);
+
+            // Act
+            var view = collection.LastViewOf(item);
+
+            // Assert
+            Assert.That(view, Is.Null);
+        }
+
+        [Test]
+        public void LastViewOf_LastViewOfDuringEnumeration_ThrowsNothing()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var item = collection.ToArray().Choose(Random);
+
+            // Act
+            var enumerator = collection.GetEnumerator();
+            enumerator.MoveNext();
+            collection.LastViewOf(item);
+
+            // Assert
+            Assert.That(() => enumerator.MoveNext(), Throws.Nothing);
+        }
+
+        [Test]
+        public void LastViewOf_EmptyCollection_IsNull()
+        {
+            // Arrange
+            var collection = GetEmptyList<string>();
+            var item = GetUppercaseString(Random);
+
+            // Act
+            var view = collection.LastViewOf(item);
+
+            // Assert
+            Assert.That(view, Is.Null);
+        }
+
+        #endregion
+
+        #region TrySlide(int)
+
+        [Test]
+        public void TrySlide_TrySlideDuringEnumerationOfView_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = GetView(collection);
+            //var index = Random.Next(0, collection.Count);
+            //var count = Random.Next(1, collection.Count - index);
+            //var view = collection.View(index, count); // TODO: is it fine to ahve 2 arrangements - coll + view ?
+
+            // Act
+            var viewEnumerator = view.GetEnumerator(); // TODO: coll's or view's enumerator ?
+            viewEnumerator.MoveNext();
+            view.TrySlide(GetOffset(view));
+
+            // Assert
+            Assert.That(() => viewEnumerator.MoveNext(), Throws.InvalidOperationException.Because(CollectionWasModified));
+        }
+
+        [Test]
+        public void TrySlide_EmptyView_True()
+        {
+            // Arrange
+            var collection = GetEmptyList<string>();
+
+            //var index = Random.Next(0, collection.Count);
+            //var count = 0;
+            //var emptpyView = collection.View(index, count);
+            var emptyView = GetEmptyView(collection);
+
+            //var maxOffset = emptyView.Underlying.Count - emptyView.Count + 1;
+            //var withOffset = Random.Next(0, maxOffset);
+
+            // Act
+            var result = emptyView.TrySlide(GetOffset(emptyView));
+
+            // Assert
+            Assert.That(result, Is.True);
+        }
+
+        [Test]
+        public void TrySlide_NonEmptyView_RaisesNoEvents()
+        {
+            // Arrange
+            var items = GetUppercaseStrings(Random);
+            var collection = GetList(items);
+            var view = GetView(collection);
+
+            // Act & Assert
+            Assert.That(() => view.TrySlide(GetOffset(view)), RaisesNoEventsFor(collection));
+        }
+
+        [Test]
+        public void TrySlide_NewOffsetLargerThanUnderlyingCount_False()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+
+            //var index = Random.Next(0, collection.Count);
+            //var count = Random.Next(1, collection.Count - index);
+            //var view = collection.View(index, count);
+            var view = GetView(collection);
+
+            //var withOffset = Random.Next(view.Underlying.Count + 1, int.MaxValue);
+
+            // Act & Assert
+            Assert.That(view.TrySlide(GetOffset(view)), Is.False);
+        }
+
+        [Test]
+        public void TrySlide_NonEmptyViewNewOffsetOfUnderlyingCount_False()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+
+            //var index = Random.Next(0, collection.Count);
+            //var count = Random.Next(1, collection.Count - index);
+            //var view = collection.View(index, count);
+            var view = GetView(collection);
+
+            //var withOffset = view.Underlying.Count - view.Offset;
+
+            // Act & Assert
+            Assert.That(() => view.TrySlide(GetOffset(view)), Is.False);
+        }
+
+        // TODO: view.TrySlide(withOffset), withOffset < Underlying.0
+
+        [Test]
+        public void TrySlide_EmptyViewNewOffsetOfUnderlyingCount_True()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+
+            //var index = Random.Next(0, collection.Count);
+            //var count = 0;
+            //var view = collection.View(index, count);
+            var view = GetView(collection);
+
+            //var withOffset = view.Underlying.Count - view.Offset;
+
+            // Act & Assert
+            Assert.That(() => view.TrySlide(GetOffset(view)), Is.True);
+        }
+
+        #endregion
+
+        #region TrySlide(int, int)
+
+        [Test]
+        public void TrySlide2_NotAView_ViolatesPrecondition()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+
+            // Act & Assert
+            //Assert.That(() => collection.TrySlide(index), Violates.PreconditionSaying(NotAView));
+            Assert.That(() => collection.TrySlide(0, 0), Violates.Precondition);
+        }
+
+        [Test]
+        public void TrySlide2_TrySlideDuringEnumerationOfView_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = GetView(collection);
+
+            // Act
+            var viewEnumerator = view.GetEnumerator(); // TODO: coll's or view's enumerator ?
+            viewEnumerator.MoveNext();
+            view.TrySlide(GetOffset(view), GetNewCount(view));
+
+            // Assert
+            Assert.That(() => viewEnumerator.MoveNext(), Throws.InvalidOperationException.Because(CollectionWasModified));
+        }
+
+        [Test]
+        public void TrySlide2_EmptyView_True()
+        {
+            // Arrange
+            var collection = GetEmptyList<string>();
+            var view = GetEmptyView(collection);
+
+            // Act
+            var result = view.TrySlide(GetOffset(view), GetNewCount(view));
+
+            // Assert
+            Assert.That(result, Is.Not.Null);
+        }
+
+        [Test]
+        public void TrySlide2_NonEmptyView_RaisesNoEvents()
+        {
+            // Arrange
+            var items = GetUppercaseStrings(Random);
+            var collection = GetList(items); //TODO why GetCollection(items);
+            var view = GetView(collection);
+
+            // Act & Assert
+            Assert.That(() => view.TrySlide(GetOffset(view), GetNewCount(view)), RaisesNoEventsFor(collection));
+        }
+
+        [Test]
+        public void TrySlide2_NewOffsetPlusNewCountLargerThanUnderlyingCount_False()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = GetView(collection);
+            var index = Random.Next(collection.Count + 1, int.MaxValue);
+
+            // Act & Assert
+            Assert.That(view.TrySlide(index, 0), Is.False);
+        }
+
+        [Test]
+        public void TrySlide2_NewCountLessThanZero_ViolatesPrecondition()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = GetView(collection);
+            var newCount = Random.Next(int.MinValue, 0);
+
+            // Act & Assert
+            Assert.That(view.TrySlide(0, newCount), Is.False);
+        }
+
+        [Test]
+        public void TrySlide2_NewOffsetLessThanZero_False()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = GetView(collection);
+            var index = Random.Next(int.MinValue, -collection.Count);
+
+            // Act & Assert
+            Assert.That(view.TrySlide(index, 0), Is.False);
+        }
+
+        [Test]
+        public void TrySlide2_NonEmptyView_Equals()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = GetView(collection);
+
+            // Act
+            view.TrySlide(GetOffset(view), GetNewCount(view));
+
+            // Assert
+            // TODO: is it ok ?
+            Assert.That(view, Is.EqualTo(collection.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer));
+        }
+
+        #endregion
+
+        #region Slide(int, int)
+
+        [Test]
+        public void Slide2_NewOffSetLessThanZero_ViolatesPrecondition()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = GetView(collection);
+            var withOffset = Random.Next(int.MinValue, -collection.Count);
+
+            // Act & Assert
+            Assert.That(() => view.Slide(withOffset, 0), Violates.PreconditionSaying(ArgumentMustBeWithinBounds));
+        }
+
+        [Test]
+        public void Slide2_NewCountLessThanZero_ViolatesPrecondition()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = GetView(collection);
+            var newCount = Random.Next(int.MinValue, 0);
+
+            // Act & Assert
+            Assert.That(() => view.Slide(0, newCount), Violates.PreconditionSaying(ArgumentMustBeWithinBounds));
+        }
+
+        [Test]
+        public void Slide2_NewOffsetPlusNewCountGraterThanUnderlyingCount_ViolatesPrecondition()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = GetView(collection);
+            var withOffset = Random.Next(view.Underlying.Count + 1, int.MaxValue);
+
+            // Act & Assert
+            Assert.That(() => view.Slide(withOffset, 0), Violates.PreconditionSaying(ArgumentMustBeWithinBounds));
+        }
+
+        [Test]
+        public void Slide2_SlideDuringEnumerationOfView_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = GetView(collection);
+
+            // Act
+            var viewEnumerator = view.GetEnumerator();
+            viewEnumerator.MoveNext();
+            view.Slide(GetOffset(view), GetNewCount(view));
+
+            // Assert
+            Assert.That(() => viewEnumerator.MoveNext(), Throws.InvalidOperationException.Because(CollectionWasModified));
+        }
+
+        [Test]
+        public void Slide2_EmptyView_True()
+        {
+            // Arrange
+            var collection = GetEmptyList<string>();
+            var view = GetEmptyView(collection);
+
+            // Act
+            var result = view.Slide(GetOffset(view), GetNewCount(view));
+
+            // Assert
+            Assert.That(result, Is.Not.Null);
+        }
+
+        [Test]
+        public void Slide2_NonEmptyView_RaisesNoEvents()
+        {
+            // Arrange
+            var items = GetUppercaseStrings(Random);
+            var collection = GetList(items);
+            var view = GetView(collection);
+
+            // Act & Assert
+            Assert.That(() => view.Slide(GetOffset(view), GetNewCount(view)), RaisesNoEventsFor(collection));
+        }
+        
+        [Test]
+        public void Slide2_NonEmptyView_Equals()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = GetView(collection);
+
+            // Act
+            view.Slide(GetOffset(view), GetNewCount(view));
+
+            // Assert
+            Assert.That(view, Is.EqualTo(collection.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer));
+        }
+
+
+        #endregion
+
+        #region Slide(int)
+
+        [Test]
+        public void Slide_NewOffSetLessThanZero_ViolatesPrecondition()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = GetView(collection);
+            var withOffset = Random.Next(int.MinValue, -collection.Count);
+
+            // Act & Assert
+            Assert.That(() => view.Slide(withOffset), Violates.PreconditionSaying(ArgumentMustBeWithinBounds));
+        }
+
+        [Test]
+        public void Slide_NewOffsetPlusNewCountGraterThanUnderlyingCount_ViolatesPrecondition()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = GetView(collection);
+            var withOffset = Random.Next(view.Underlying.Count + 1, int.MaxValue);
+
+            // Act & Assert
+            Assert.That(() => view.Slide(withOffset), Violates.PreconditionSaying(ArgumentMustBeWithinBounds));
+        }
+
+        [Test]
+        public void Slide_SlideDuringEnumerationOfView_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = GetView(collection);
+
+            // Act
+            var viewEnumerator = view.GetEnumerator();
+            viewEnumerator.MoveNext();
+            view.Slide(GetOffset(view));
+
+            // Assert
+            Assert.That(() => viewEnumerator.MoveNext(), Throws.InvalidOperationException.Because(CollectionWasModified));
+        }
+
+        [Test]
+        public void Slide_EmptyView_True()
+        {
+            // Arrange
+            var collection = GetEmptyList<string>();
+            var view = GetEmptyView(collection);
+
+            // Act
+            var result = view.Slide(GetOffset(view));
+
+            // Assert
+            Assert.That(result, Is.Not.Null);
+        }
+
+        [Test]
+        public void Slide_NonEmptyView_RaisesNoEvents()
+        {
+            // Arrange
+            var items = GetUppercaseStrings(Random);
+            var collection = GetList(items);
+            var view = GetView(collection);
+
+            // Act & Assert
+            Assert.That(() => view.Slide(GetOffset(view)), RaisesNoEventsFor(collection));
+        }
+
+        [Test]
+        public void Slide_NonEmptyView_Equals()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = GetView(collection);
+
+            // Act
+            view.Slide(GetOffset(view));
+
+            // Assert
+            Assert.That(view, Is.EqualTo(collection.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer));
+        }
+
+        #endregion
+
+
 
         #endregion
 
@@ -5171,7 +5750,7 @@ namespace C6.Tests
 
         private class Comparable : NonComparable, IComparable<NonComparable>
         {
-            public Comparable(int value) : base(value) {}
+            public Comparable(int value) : base(value) { }
             public int CompareTo(NonComparable other) => Value.CompareTo(other.Value);
         }
 

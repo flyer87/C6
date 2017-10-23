@@ -405,8 +405,10 @@ namespace C6.Tests.Collections
         protected override bool IsReadOnly => false;
         protected override EventTypes ListenableEvents => All;
 
-        protected override IList<T> GetEmptyList<T>(SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false) => new ArrayList<T>(equalityComparer: equalityComparer, allowsNull: allowsNull);
-        protected override IList<T> GetList<T>(SCG.IEnumerable<T> enumerable, SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false) => new ArrayList<T>(enumerable, equalityComparer, allowsNull);        
+        protected override IList<T> GetEmptyList<T>(SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false) 
+            => new ArrayList<T>(equalityComparer: equalityComparer, allowsNull: allowsNull);
+        protected override IList<T> GetList<T>(SCG.IEnumerable<T> enumerable, SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false) 
+            => new ArrayList<T>(enumerable, equalityComparer, allowsNull);        
     }
 
 

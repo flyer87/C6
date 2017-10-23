@@ -116,7 +116,8 @@ namespace C6.Tests.Helpers
         public static CollectionEventConstraint<T> RaisesNoEventsFor<T>(IListenable<T> collection) => new CollectionEventConstraint<T>(collection, new CollectionEvent<T>[0]);
         public static CollectionEventConstraint<T> RaisesCollectionChangedEventFor<T>(IListenable<T> collection) => new CollectionEventConstraint<T>(collection, new[] { CollectionEvent.Changed(collection) });
 
-        public static EqualConstraint Because(this ExactTypeConstraint constraint, string exceptionMessage) => constraint.With.Message.EqualTo(exceptionMessage);
+        public static EqualConstraint Because(this ExactTypeConstraint constraint, string exceptionMessage) 
+            => constraint.With.Message.EqualTo(exceptionMessage);
 
         public static BadEnumerable<T> AsBadEnumerable<T>(this SCG.IEnumerable<T> enumerable) => 
             new BadEnumerable<T>(enumerable);
