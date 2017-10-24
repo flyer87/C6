@@ -765,7 +765,7 @@ namespace C6.Tests
             // Arrange
             var collection = GetStringIndexed(Random);
             var items = collection.ToArray();
-            var index = 0;
+            const int index = 0;
             var firstItem = collection[index];
 
             // Act

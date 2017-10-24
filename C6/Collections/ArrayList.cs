@@ -95,7 +95,20 @@ namespace C6.Collections
             Invariant(EqualityComparer != null);
 
             // Empty array is always empty
-            Invariant(EmptyArray.IsEmpty());            
+            Invariant(EmptyArray.IsEmpty());
+
+            #region View invarints 
+                       
+            Invariant(UnderlyingCount <= _items.Length);
+                        
+            Invariant(Offset + Count <= UnderlyingCount);
+
+            // Offset is non-negative
+            Invariant(Offset >= 0);
+
+            // TODO: If there are views all should the same underlying(???) _items 
+            Invariant((_underlying ?? this)._views == null || ForAll((_underlying ?? this)._views, view => view._items == (_underlying ?? this)._items ));            
+            #endregion
 
             // ReSharper restore InvocationIsSkipped
         }
@@ -106,7 +119,7 @@ namespace C6.Collections
 
         //public ArrayList()
         //{
-                                       
+
         //}
 
         public ArrayList(SCG.IEnumerable<T> items, SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false) 
@@ -2514,7 +2527,7 @@ namespace C6.Collections
 
         // tags 
         // Code contract
-        private sealed class WeakViewList<V> where V : class
+        private sealed class WeakViewList<V> : SCG.IEnumerable<V> where V : class
         {
             Node start;
 
@@ -2564,6 +2577,11 @@ namespace C6.Collections
                         yield return view;
                     n = n.next;
                 }
+            }
+
+            SC.IEnumerator SC.IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
             }
         }
 

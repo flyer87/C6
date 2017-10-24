@@ -39,6 +39,29 @@ namespace C6.Collections
         private int _taggroups;
         #endregion
 
+        #region Code Contracts
+
+        [ContractInvariantMethod]
+        private void ObjectInvariant()
+        {
+            // ReSharper disable InvocationIsSkipped                        
+
+            Invariant(_startSentinel != null);
+
+            Invariant(_endSentinel != null);
+
+            // If Count is 0 then _startSentinel.Next points to _endSentinel
+            Invariant(Count != 0 || _startSentinel.Next == _endSentinel);
+
+            // If Count is 0 then _endSentinel.Prev points to _startSentinel
+            Invariant(Count != 0 || _endSentinel.Prev == _startSentinel);
+
+
+            // ReSharper enable InvocationIsSkipped            
+        }
+
+        #endregion
+
         #region Constructors
 
         public HashedLinkedList(SCG.IEqualityComparer<T> equalityComparer = null)

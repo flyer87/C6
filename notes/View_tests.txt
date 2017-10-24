@@ -1,21 +1,20 @@
 Quest:
-	- Act - only one method and and the method under considertaion
-	- Arrange - is it fine like: 
-		// Arrange
-		var collection = ...
-		var view = collection.View(i, c);
-		
-		// Act
-		view.Reverse(); 		
-	
-	- More tests: modify a view and then:
-		- check: Count, Offset, items; //What does Peter do ?
-		
-	- Do for all the methods like Mikkel
-		Add, Insert, Insert. 
-			But we already have them 
+	- C6: "It can sometimes be necessary to delay execution, for instance when testing preconditions (section 5.4.1.1) or events (section 5.4.2.1), in which case the act is inlined using a delegate"
+	- C6."Each test has its own random number generator accessible with TestContext.CurrentContext.Random"
+		- FsCheck ???
+	- C5.Check() -> into Invariants
+		??? MSDN."You must use the binary rewriter for run-time enforcement of this invariant."			
+		!!! heavy checks
+	- Scenarious:	
+		- Reverse() 0-item, 1-item, N-item view, check the list. Do it for all M methods ???			
+	- What is #if DEBUG directive?
+=======
+TODO:	
+	//- C5.Check() -> into Invariants
+	- Raises expected events
+	- slow MS Studio					
 	- Read about the contribution of Code Contracts to the Testing
-====
+=======
 Test Reference List for views:
 	" Most of the unit tests on the test reference list (section 5.3.1) were coded as a Live Templates."
 	ViewOf existing, non-exisitng item		
@@ -27,6 +26,11 @@ Thesis notes:
 			??? Requires(Underlying != null, NotAView); 
 			
 	- Mikkel: was Last_RandomCollectionStartingWithNull_Null, but should by ...EndingWith...
+	- public void RemoveAt_RandomCollection_ItemAtIndex()
+		used: var expectedItem = collection[index];
+		better: var expectedItem = collection.ElementAt()
+	- private sealed class WeakViewList<V> : SCG.IEnumerable<V> where V : class. It was not implementing the IEnum... interface which was a problem for ForAll() in the invariants
+	- LL.Invariant(ForAll(_underlying._views, v => { ... })) includes many conditions. Otherwise it would be heavy
 =====
 Learn how it is done in C6:
 - custom reference equality comparer	

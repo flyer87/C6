@@ -62,7 +62,61 @@ namespace C6.Collections
         private int UnderlyingCount => (Underlying ?? this).Count;
 
         #endregion Fields
+
         
+        #region Code Contracts
+
+        [ContractInvariantMethod]
+        private void ObjectInvariant()
+        {
+            // ReSharper disable InvocationIsSkipped
+
+            // Array is non-null
+            Invariant(_items != null);
+
+            // Count is not bigger than the capacity
+            Invariant(Count <= Capacity);
+
+            // All items must be non-null if collection disallows null values
+            Invariant(AllowsNull || ForAll(this, item => item != null));
+
+            // The unused part of the array contains default values
+            Invariant(ForAll(Count, Capacity, i => Equals(_items[i], default(T))));
+
+            // Equality comparer is non-null
+            Invariant(EqualityComparer != null);
+
+            // Empty array is always empty
+            Invariant(EmptyArray.IsEmpty());
+
+            #region View invarints 
+
+            Invariant(UnderlyingCount <= _items.Length);
+
+            Invariant(Offset + Count <= UnderlyingCount);
+
+            // Offset is non-negative
+            Invariant(Offset >= 0);
+
+            // TODO: If there are views all should the same underlying(???) _items 
+            Invariant((_underlying ?? this)._views == null || ForAll((_underlying ?? this)._views, view => view._items == (_underlying ?? this)._items));
+
+            Invariant(UnderlyingCount == _itemIndex.Count);
+
+            // _itemIndex contains the items of _items and the each item is in the right position 
+            Invariant(ForAll(0, Count, i => {
+                int value;
+                _itemIndex.TryGetValue(_items[i], out value);
+                return value == i && _itemIndex.ContainsKey(_items[i]);
+            })); // TODO: Heavy?
+
+            #endregion
+
+            // ReSharper restore InvocationIsSkipped
+        }
+
+        #endregion
+
         #region Constructors
 
         public HashedArrayList()
@@ -2345,7 +2399,7 @@ namespace C6.Collections
         /// Something ???
         /// </summary>
         /// <typeparam name="V"></typeparam>
-        private sealed class WeakViewList<V> where V : class
+        private sealed class WeakViewList<V> : SCG.IEnumerable<V> where V : class
         {
             Node start;
 
@@ -2416,6 +2470,9 @@ namespace C6.Collections
                     n = n.next;
                 }
             }
+
+            SC.IEnumerator SC.IEnumerable.GetEnumerator() => GetEnumerator();
+
         }
 
         #endregion

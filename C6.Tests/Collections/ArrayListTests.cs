@@ -392,7 +392,6 @@ namespace C6.Tests.Collections
         #endregion
     }
 
-
     [TestFixture]
     public class ArrayListListTests : IListTests
     {

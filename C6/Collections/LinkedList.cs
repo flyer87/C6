@@ -17,7 +17,6 @@ using static C6.Speed;
 using SC = System.Collections;
 using SCG = System.Collections.Generic;
 
-
 namespace C6
 {
     public class LinkedList<T> : IList<T>
@@ -45,25 +44,60 @@ namespace C6
         [ContractInvariantMethod]
         private void ObjectInvariant()
         {
-            // ReSharper disable InvocationIsSkipped
+            // ReSharper disable InvocationIsSkipped            
+            
+            Invariant(_startSentinel != null);
+            
+            Invariant(_endSentinel != null);
 
-            // Array is non-null
-            //Invariant(_items != null);
+            // If Count is 0 then _startSentinel.Next points to _endSentinel
+            Invariant(Count != 0 || _startSentinel.Next == _endSentinel);
 
-            // Count is not bigger than the capacity
-            //Invariant(Count <= Capacity);
+            // If Count is 0 then _endSentinel.Prev points to _startSentinel
+            Invariant(Count != 0 || _endSentinel.Prev == _startSentinel);
+
+            // Each .Prev points to the correct node TODO: heavy
+            // TODO count++ in C5.Check()
+            Node node = _startSentinel.Next, prev = _startSentinel;
+            Invariant(ForAll(0, Count, i => {
+                var result = node.Prev == prev;
+
+                prev = node;
+                node = node.Next;
+                return result;
+            }));
+
+            // Next pointers are not null ??? TODO: heavy
+            node = _startSentinel.Next;
+            prev = _startSentinel;
+            Invariant(ForAll(0, Count, i => {
+                var result = node == null;
+
+                prev = node;
+                node = node.Next;
+                return result;
+            }));                   
 
             // All items must be non-null if collection disallows null values
-            Invariant(AllowsNull || ForAll(this, item => item != null));
-
-            // The unused part of the array contains default values
-            //Invariant(ForAll(Count, Capacity, i => Equals(_items[i], default(T))));
+            Invariant(AllowsNull || ForAll(this, item => item != null));           
 
             // Equality comparer is non-null
             Invariant(EqualityComparer != null);
 
-            // Empty array is always empty
-            //Invariant(EmptyArray.IsEmpty());
+            #region Views
+
+            // views are correct ??? 
+            Invariant(ForAll(_underlying._views, v => v.Offset >= 0 &&
+                                                      v.Offset <= UnderlyingCount &&
+                                                      // else if (view.startsentinel != nodes[view.Offset]) ??? 
+                                                      v.Offset + v.Count >= 0 &&
+                                                      v.Offset + v.Count <= UnderlyingCount &&
+                                                      // else if (view.endsentinel != nodes[view.Offset + view.size + 1]) ??? 
+                                                      v._views == _underlying._views &&
+                                                      v.Underlying == Underlying
+            ));
+
+            #endregion
 
             // ReSharper restore InvocationIsSkipped
         }
@@ -1944,7 +1978,8 @@ namespace C6
             }
         }
 
-        private sealed class WeakViewList<V> where V : class
+
+        private sealed class WeakViewList<V> : SCG.IEnumerable<V> where V : class
         {
             Node start;
 
@@ -2015,6 +2050,8 @@ namespace C6
                     n = n.next;
                 }
             }
+
+            SC.IEnumerator SC.IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
         /*
