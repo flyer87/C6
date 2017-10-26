@@ -43,12 +43,15 @@ namespace C6.Collections
 
         [ContractInvariantMethod]
         private void ObjectInvariant()
-        {
-            // ReSharper disable InvocationIsSkipped                        
+        {             
+            // Equality comparer is non-null
+            Invariant(EqualityComparer != null);
 
             Invariant(_startSentinel != null);
 
             Invariant(_endSentinel != null);
+
+            // if (underlying == null ??? corectly transfered
 
             // If Count is 0 then _startSentinel.Next points to _endSentinel
             Invariant(Count != 0 || _startSentinel.Next == _endSentinel);
@@ -56,8 +59,45 @@ namespace C6.Collections
             // If Count is 0 then _endSentinel.Prev points to _startSentinel
             Invariant(Count != 0 || _endSentinel.Prev == _startSentinel);
 
+            /* View related part !!!!!!
+            // Bad startsentinel tag group
+            var tg = _startSentinel.taggroup;
+            Invariant(Underlying != null || tg.Count == 0 && tg.First == null && tg.Last == null && tg.Tag  == int.MinValue);
 
-            // ReSharper enable InvocationIsSkipped            
+            // Bad endsentinel tag group
+            tg = _endSentinel.taggroup;
+            Invariant(Underlying != null || tg.Count == 0 && tg.First == null && tg.Last == null && tg.Tag == int.MaxValue);
+
+
+            Node node = _startSentinel.Next, prev = _startSentinel;
+            Invariant(ForAll(0, Count, i => {
+                var res = node.Prev == prev &&
+                          node != null &&
+                          true;
+
+
+                prev = node;
+                node = node.Next;
+                return res;
+            })); // TODO: to complete the rest check elements
+            
+            // For empty proper list -> taggroups == 0 ??? Check
+            Invariant(!(Underlying == null && Count == 0 ) || Taggroups == 0 );
+
+            Invariant(!(Underlying == null && Count > 0 && _endSentinel.Prev.taggroup != null) || _endSentinel.Prev.taggroup == taggroups);
+            */
+
+            // The underying list and the dictioonary have the same number of items
+            Invariant(Underlying != null || Count == _itemNode.Count);
+
+            // Each list item is in the dictionary, the nodes are the same
+            Node node = _startSentinel.Next, nodeOut;
+            Invariant(Underlying != null || ForAll(0, Count, i => {                
+                var res = _itemNode.TryGetValue(node.item, out nodeOut) && nodeOut == node;
+                node = node.Next;
+
+                return res;
+            }));            
         }
 
         #endregion

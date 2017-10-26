@@ -99,14 +99,14 @@ namespace C6.Collections
 
             #region View invarints 
                        
-            Invariant(UnderlyingCount <= _items.Length);
+            Invariant(UnderlyingCount <= Capacity);
                         
             Invariant(Offset + Count <= UnderlyingCount);
 
             // Offset is non-negative
             Invariant(Offset >= 0);
 
-            // TODO: If there are views all should the same underlying(???) _items 
+            // TODO: If there are views all should the same underlying(???) _items             
             Invariant((_underlying ?? this)._views == null || ForAll((_underlying ?? this)._views, view => view._items == (_underlying ?? this)._items ));            
             #endregion
 

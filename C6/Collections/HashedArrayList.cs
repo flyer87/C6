@@ -77,6 +77,9 @@ namespace C6.Collections
             // Count is not bigger than the capacity
             Invariant(Count <= Capacity);
 
+            // UnderlyingCount is not bigger than the capacity
+            Invariant(UnderlyingCount <= Capacity);
+
             // All items must be non-null if collection disallows null values
             Invariant(AllowsNull || ForAll(this, item => item != null));
 
@@ -89,26 +92,24 @@ namespace C6.Collections
             // Empty array is always empty
             Invariant(EmptyArray.IsEmpty());
 
-            #region View invarints 
-
-            Invariant(UnderlyingCount <= _items.Length);
-
-            Invariant(Offset + Count <= UnderlyingCount);
-
-            // Offset is non-negative
-            Invariant(Offset >= 0);
-
-            // TODO: If there are views all should the same underlying(???) _items 
-            Invariant((_underlying ?? this)._views == null || ForAll((_underlying ?? this)._views, view => view._items == (_underlying ?? this)._items));
-
+            // The number of items is equal to the number of items in the dictionary 
             Invariant(UnderlyingCount == _itemIndex.Count);
 
             // _itemIndex contains the items of _items and the each item is in the right position 
             Invariant(ForAll(0, Count, i => {
                 int value;
-                _itemIndex.TryGetValue(_items[i], out value);
-                return value == i && _itemIndex.ContainsKey(_items[i]);
+                return _itemIndex.TryGetValue(_items[i], out value) && value == i;
             })); // TODO: Heavy?
+
+            #region View invariants             
+
+            // Offset is non-negative
+            Invariant(Offset >= 0);
+
+            Invariant(Offset + Count <= UnderlyingCount);
+
+            // TODO: If there are views all should the same underlying(???) _items 
+            Invariant((_underlying ?? this)._views == null || ForAll((_underlying ?? this)._views, view => view._items == (_underlying ?? this)._items));            
 
             #endregion
 

@@ -50,14 +50,19 @@ namespace C6
             
             Invariant(_endSentinel != null);
 
+            // All items must be non-null if collection disallows null values
+            Invariant(AllowsNull || ForAll(this, item => item != null));
+
+            // Equality comparer is non-null
+            Invariant(EqualityComparer != null);
+
             // If Count is 0 then _startSentinel.Next points to _endSentinel
-            Invariant(Count != 0 || _startSentinel.Next == _endSentinel);
+            Invariant( !(Count == 0 && _startSentinel != null) || _startSentinel.Next == _endSentinel);
 
             // If Count is 0 then _endSentinel.Prev points to _startSentinel
-            Invariant(Count != 0 || _endSentinel.Prev == _startSentinel);
+            Invariant( !(Count == 0 && _endSentinel   != null) || _endSentinel.Prev == _startSentinel);
 
-            // Each .Prev points to the correct node TODO: heavy
-            // TODO count++ in C5.Check()
+            // Each .Prev points to the correct node TODO: heavy && count++ in C5.Check()            
             Node node = _startSentinel.Next, prev = _startSentinel;
             Invariant(ForAll(0, Count, i => {
                 var result = node.Prev == prev;
@@ -78,23 +83,19 @@ namespace C6
                 return result;
             }));                   
 
-            // All items must be non-null if collection disallows null values
-            Invariant(AllowsNull || ForAll(this, item => item != null));           
-
-            // Equality comparer is non-null
-            Invariant(EqualityComparer != null);
-
             #region Views
 
             // views are correct ??? 
-            Invariant(ForAll(_underlying._views, v => v.Offset >= 0 &&
-                                                      v.Offset <= UnderlyingCount &&
+            Invariant(ForAll(_views, v =>
+                                                      v.Offset >= 0 &&
+                                                      // ??? v.IsValid &&                                                      
                                                       // else if (view.startsentinel != nodes[view.Offset]) ??? 
                                                       v.Offset + v.Count >= 0 &&
-                                                      v.Offset + v.Count <= UnderlyingCount &&
+                                                      v.Offset + v.Count <= UnderlyingCount &&                                                      
                                                       // else if (view.endsentinel != nodes[view.Offset + view.size + 1]) ??? 
                                                       v._views == _underlying._views &&
                                                       v.Underlying == Underlying
+                                                      // ??? if (view.stamp != stamp)
             ));
 
             #endregion

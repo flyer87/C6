@@ -8,9 +8,21 @@ Quest:
 	- Scenarious:	
 		- Reverse() 0-item, 1-item, N-item view, check the list. Do it for all M methods ???			
 	- What is #if DEBUG directive?
+	- ??? _item ?= underlying or _underlying = underlying
+	- LL.view.Invariants 
+		- should I split them? Would't be heavy if I split them ?
+		- ??? if (view.stamp != stamp)
+		- ??? v.IsValid && 
+	- HLL.view.invariants - don't implement
 =======
 TODO:	
 	//- C5.Check() -> into Invariants
+		- HLL
+		- test especially ForAll(node = node.next)
+		- C6.LL. Invariant(ForAll(_underlying._views, v => v.Offset >= 0 &&
+			?? v.IsValid 
+		
+	- create a view(UnderlyingCount, 0)		
 	- Raises expected events
 	- slow MS Studio					
 	- Read about the contribution of Code Contracts to the Testing
@@ -30,7 +42,7 @@ Thesis notes:
 		used: var expectedItem = collection[index];
 		better: var expectedItem = collection.ElementAt()
 	- private sealed class WeakViewList<V> : SCG.IEnumerable<V> where V : class. It was not implementing the IEnum... interface which was a problem for ForAll() in the invariants
-	- LL.Invariant(ForAll(_underlying._views, v => { ... })) includes many conditions. Otherwise it would be heavy
+	- LL.Invariant(ForAll(_underlying._views, v => { ... })) includes many conditions. Otherwise it would be heavy		
 =====
 Learn how it is done in C6:
 - custom reference equality comparer	
