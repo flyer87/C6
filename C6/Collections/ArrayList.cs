@@ -76,7 +76,7 @@ namespace C6.Collections
 
         [ContractInvariantMethod]
         private void ObjectInvariant()
-        {
+        {/*
             // ReSharper disable InvocationIsSkipped
                     
             // Array is non-null
@@ -111,7 +111,7 @@ namespace C6.Collections
             #endregion
 
             // ReSharper restore InvocationIsSkipped
-        }
+        */}
 
         #endregion
 
@@ -243,7 +243,13 @@ namespace C6.Collections
                         return;
                     }
 
-                    Array.Resize(ref _items, value);
+                    Array.Resize(ref (_underlying ?? this)._items, value);
+                    if (_views == null)
+                    {
+                        return;
+                    }
+                    foreach (var v in _views)
+                        v._items = (_underlying ?? this)._items;
                 }
                 else
                 {
@@ -376,11 +382,8 @@ namespace C6.Collections
             return new Range(this, Count - 1, Count, EnumerationDirection.Backwards);
         }
 
-        public override T Choose()
-        {            
-            return _items[Count - 1];
-        }
-
+        public override T Choose() => Last;
+        
         public virtual void Clear()
         {
             #region Code Contracts            
@@ -449,13 +452,13 @@ namespace C6.Collections
         public virtual bool Find(ref T item)
         {            
             var index = IndexOf(item);
-                        
-            index += _offsetField;
+
             if (index < 0)
             {
                 return false;
             }
 
+            index += _offsetField;
             item = _items[index];
             return true;
         }
@@ -498,7 +501,7 @@ namespace C6.Collections
             var version = _version;
             // Check version at each call to MoveNext() to ensure an exception is thrown even when the enumerator was really finished
             // for (var i = 0; CheckVersion(version) & i < Count; i++)
-            for (var i = _offsetField; CheckVersion(version) & i < Count + _offsetField; i++)
+            for (var i = Offset; CheckVersion(version) && i < Offset + Count; i++)
             {
                 yield return _items[i];
             }
@@ -579,7 +582,7 @@ namespace C6.Collections
             #region Code Contracts            
 
             // If collection changes, the version is updated
-            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+            //Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
             #endregion
 
@@ -1032,12 +1035,11 @@ namespace C6.Collections
             if (_views == null)
                 _views = new WeakViewList<ArrayList<T>>();
 
-            ArrayList<T> view = (ArrayList<T>)MemberwiseClone();
-            
+            var view = (ArrayList<T>)MemberwiseClone();
+            view._underlying = _underlying ?? this;
             view._offsetField = _offsetField + index;
             view.Count = count;            
-            
-            view._underlying = _underlying ?? this;
+                        
             view._myWeakReference = _views.Add(view);// ??? add this view (retval) to the list of my other views
             return view;
         }
@@ -1096,8 +1098,7 @@ namespace C6.Collections
             }
 
             UpdateVersion();
-
-            // set the new values: offsetField, Count
+            
             _offsetField = newOffset;
             Count = count;
 

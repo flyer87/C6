@@ -877,7 +877,7 @@ namespace C6
             Ensures(item.IsSameAs(this[index]));
 
             // The item is inserted into the list without replacing other items            
-            Ensures(this.IsSameSequenceAs(OldValue(this.Take(index).Append(item).Concat(this.Skip(index)).ToList())));
+            //Ensures(this.IsSameSequenceAs(OldValue(this.Take(index).Append(item).Concat(this.Skip(index)).ToList())));
 
             return;
         }

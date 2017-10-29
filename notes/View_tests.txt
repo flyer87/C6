@@ -17,11 +17,14 @@ Quest:
 =======
 TODO:	
 	//- C5.Check() -> into Invariants
-		- HLL
-		- test especially ForAll(node = node.next)
+		//- HLL
+		Peters suggestion
+			- implement the the tests for the rest 8/9 situations
+			- test for the rest 
+		- test Invariants 
+			especially ForAll(node = node.next)
 		- C6.LL. Invariant(ForAll(_underlying._views, v => v.Offset >= 0 &&
-			?? v.IsValid 
-		
+			?? v.IsValid 		
 	- create a view(UnderlyingCount, 0)		
 	- Raises expected events
 	- slow MS Studio					
@@ -42,7 +45,17 @@ Thesis notes:
 		used: var expectedItem = collection[index];
 		better: var expectedItem = collection.ElementAt()
 	- private sealed class WeakViewList<V> : SCG.IEnumerable<V> where V : class. It was not implementing the IEnum... interface which was a problem for ForAll() in the invariants
-	- LL.Invariant(ForAll(_underlying._views, v => { ... })) includes many conditions. Otherwise it would be heavy		
+	- LL.Invariant(ForAll(_underlying._views, v => { ... })) includes many conditions. Otherwise it would be heavy	
+	- NUnit test: I found that in TrySlide(int, int) UpdateVersion was missing
+	- C5.LL int enumeratorstamp = underlying != null ? underlying.stamp : this.stamp; WRONG. It ate my whole day !!!!! Found by testing.
+	- Peter:
+		- Test strategy in the report - the photo - the effect on the other views, bla, bla
+		- Corner cases
+		- Thesis idea: C5.view_tests -> C6.view_tests
+			- Modern testing approach (1 Assert, random views/collections) - here are they. Ok, but not enough. 
+			- Combine with other test methods: check the effect on the neighbouring views
+			- I couldn't cover all the test cases, but generally, yes
+			- "The art of ..." (and C6) recommend one assert per test. C5 does the opposite. Mine is in the middle. Closer to C5 when I check the effect of a modifying operation to the other views.			
 =====
 Learn how it is done in C6:
 - custom reference equality comparer	

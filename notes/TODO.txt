@@ -22,16 +22,23 @@
 	
 - fix: Insert and this[] - they shoudl either throw an exception or require a precondition.
 
+//- implement Span
 - look at the test patterns of C6
 - look at the C5's view tests
 - write tests for the views (of ArrayList; HashedArrayList; LinkedList; HashedLinkedList)
 	- test refernce list tests for
-		View, ViewOf, LastViewOf, TrySlide x2, Slide x2
-	- implement Span
+		Peter's tests // View, ViewOf, LastViewOf, TrySlide x2, Slide x2	
+			Test case 1/9 using
+			View
+			ViewOf
+			LastViewOf			
+			Slide1, Slide2, 
+			TrySlide1, TrySlide2
+			Span - doesn't change anything
 	- IsValid tests	
-- implemnt some missing tests
+- implemnt some missing tests in C6
 	those with suffix _fail, ...
-- collect the "???" from the .cs files
+- collect the "???" from the .cs files !!! Re-look at them
 =================
 - Code Contracts for private methods - look and do it the same way for the rest.
 =========

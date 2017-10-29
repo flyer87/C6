@@ -29,7 +29,7 @@ namespace C6
         private LinkedList<T> _underlying; // always null for a proper list
         private WeakViewList<LinkedList<T>>.Node _myWeakReference; // always null for a proper list
 
-        private int _version, _sequencedHashCodeVersion = -1, _unsequencedHashCodeVersion = -1;
+        public int _version, _sequencedHashCodeVersion = -1, _unsequencedHashCodeVersion = -1;
         private int _sequencedHashCode, _unsequencedHashCode;
 
         private event EventHandler _collectionChanged;
@@ -43,7 +43,7 @@ namespace C6
 
         [ContractInvariantMethod]
         private void ObjectInvariant()
-        {
+        {/*
             // ReSharper disable InvocationIsSkipped            
             
             Invariant(_startSentinel != null);
@@ -101,7 +101,7 @@ namespace C6
             #endregion
 
             // ReSharper restore InvocationIsSkipped
-        }
+        */}
 
         #endregion
 
@@ -776,15 +776,18 @@ namespace C6
 
         public virtual bool TrySlide(int offset, int count)
         {
-            if (Offset + offset < 0 || Offset + offset + count > UnderlyingCount)
+            var newOffset = Offset + offset;
+            if ( newOffset < 0 || count < 0 || newOffset + count > UnderlyingCount)
             {
                 return false;
             }
-
+            
             var oldOffset = Offset;
             GetPairPrivate(offset - 1, offset + count, out _startSentinel, out _endSentinel,
                 new[] { -oldOffset - 1, -1, Count, UnderlyingCount - oldOffset },
                 new[] { _underlying._startSentinel, _startSentinel, _endSentinel, _underlying._endSentinel });
+
+            UpdateVersion();
 
             Count = count;
             Offset += offset;
@@ -1025,7 +1028,7 @@ namespace C6
 
         public SCG.IEnumerator<T> GetEnumerator() // overrides valuebase 
         {
-            var version = _underlying?._version ?? _version; // ??? underlying
+            var version = _version; //_underlying?._version ?? _version; 
 
             var cursor = _startSentinel.Next;
             while (cursor != _endSentinel && CheckVersion(version))

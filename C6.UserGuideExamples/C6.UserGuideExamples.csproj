@@ -213,6 +213,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\C6.Tests\C6.Tests.csproj">
+      <Project>{067456c0-086c-46a8-b37f-1405717b7bfc}</Project>
+      <Name>C6.Tests</Name>
+    </ProjectReference>
     <ProjectReference Include="..\C6\C6.csproj">
       <Project>{af8b1aeb-6418-41df-b728-e35508c71de7}</Project>
       <Name>C6</Name>

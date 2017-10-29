@@ -1,0 +1,8 @@
+IList.cs // Code Contracts section
+	Why do we have extra Add here for SCG.ICollection and SCG.IList ?
+        #region SCG.ICollection<T>
+
+        void SCG.ICollection<T>.Add(T item) {}
+        void SCG.IList<T>.Insert(int index, T item) {}
+
+        #endregion

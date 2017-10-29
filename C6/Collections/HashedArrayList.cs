@@ -68,7 +68,7 @@ namespace C6.Collections
 
         [ContractInvariantMethod]
         private void ObjectInvariant()
-        {
+        {/*
             // ReSharper disable InvocationIsSkipped
 
             // Array is non-null
@@ -114,7 +114,7 @@ namespace C6.Collections
             #endregion
 
             // ReSharper restore InvocationIsSkipped
-        }
+        */}
 
         #endregion
 

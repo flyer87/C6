@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 
+using C6.Collections;
 using C6.Contracts;
 using C6.Tests.Contracts;
 using C6.Tests.Helpers;
@@ -34,8 +35,6 @@ namespace C6.Tests
         private IList<string> GetStringList(Randomizer random, SCG.IEqualityComparer<string> equalityComparer = null, bool allowsNull = false)
             => GetList(GetStrings(random, GetCount(random)), equalityComparer, allowsNull);
 
-
-
         private static NonComparable[] GetNonComparables(Random random) => GetNonComparables(random, GetCount(random));
         private static NonComparable[] GetNonComparables(Random random, int count) => Enumerable.Range(0, count).Select(i => new NonComparable(random.Next())).ToArray();
 
@@ -53,25 +52,34 @@ namespace C6.Tests
         private static IList<T> GetView<T>(IList<T> list)
         {
             // TODO: Requires
-            var index = Random.Next(0, list.Count);
+            var index = Random.Next(0, list.Count - 1); // 
             var count = Random.Next(1, list.Count - index);
+            
             return list.View(index, count);
         }
 
-        private static int GetOffset<T>(IList<T> view)
+        private static int GetOffset<T>(IList<T> view, Random random)
         {
             // TODO: Requires
             var maxOffset = view.Underlying.Count - view.Count;
-            var withOffset = Random.Next(0, maxOffset + 1);
+            var withOffset = random.Next(0, maxOffset - view.Offset + 1);
             return withOffset;
         }
 
-        private static int GetNewCount<T>(IList<T> view)
+        private static int GetNewCount<T>(IList<T> view, int withOffset, Random random)
         {
             // TODO: Requires
-            var maxOffset = view.Underlying.Count - view.Count;
-            var withOffset = Random.Next(0, maxOffset + 1);
-            var newCount = Random.Next(0, view.Underlying.Count - (view.Offset + withOffset));
+            //var maxOffset = view.Underlying.Count - view.Count;
+            //var withOffset = Random.Next(0, maxOffset + 1);
+            //var newCount = Random.Next(0, view.Underlying.Count - (view.Offset + withOffset));
+
+            //var maxOffset = view.Underlying.Count - view.Count;
+            //var withOffset = Random.Next(0, maxOffset + 1);
+
+            // ! var newCount = Random.Next(0, view.Underlying.Count - view.Offset + 1);
+            var newOffset = view.Offset + withOffset;
+            var newCount = random.Next(0, view.Underlying.Count - newOffset  + 1);
+
             return newCount;
         }
 
@@ -5145,7 +5153,7 @@ namespace C6.Tests
         {
             // Arrange
             var collection = GetEmptyList<string>();
-            var index = Random.Next(0, int.MaxValue);
+            var index = Random.Next(1, int.MaxValue);
             var count = Random.Next(1, int.MaxValue);
 
             // Act & Assert
@@ -5337,14 +5345,12 @@ namespace C6.Tests
             // Arrange
             var collection = GetStringList(Random);
             var view = GetView(collection);
-            //var index = Random.Next(0, collection.Count);
-            //var count = Random.Next(1, collection.Count - index);
-            //var view = collection.View(index, count); // TODO: is it fine to ahve 2 arrangements - coll + view ?
+            var withOffset = GetOffset(view, Random);
 
             // Act
             var viewEnumerator = view.GetEnumerator(); // TODO: coll's or view's enumerator ?
             viewEnumerator.MoveNext();
-            view.TrySlide(GetOffset(view));
+            view.TrySlide(withOffset);
 
             // Assert
             Assert.That(() => viewEnumerator.MoveNext(), Throws.InvalidOperationException.Because(CollectionWasModified));
@@ -5354,33 +5360,28 @@ namespace C6.Tests
         public void TrySlide_EmptyView_True()
         {
             // Arrange
-            var collection = GetEmptyList<string>();
-
-            //var index = Random.Next(0, collection.Count);
-            //var count = 0;
-            //var emptpyView = collection.View(index, count);
+            var collection = GetEmptyList<string>();            
             var emptyView = GetEmptyView(collection);
-
-            //var maxOffset = emptyView.Underlying.Count - emptyView.Count + 1;
-            //var withOffset = Random.Next(0, maxOffset);
-
+            var withOffset = GetOffset(emptyView, Random);
+            
             // Act
-            var result = emptyView.TrySlide(GetOffset(emptyView));
+            var result = emptyView.TrySlide(withOffset);
 
             // Assert
             Assert.That(result, Is.True);
         }
 
         [Test]
-        public void TrySlide_NonEmptyView_RaisesNoEvents()
+        public void TrySlide_RandomView_RaisesNoEvents()
         {
             // Arrange
             var items = GetUppercaseStrings(Random);
             var collection = GetList(items);
             var view = GetView(collection);
+            var withOffset = GetOffset(view, Random);
 
             // Act & Assert
-            Assert.That(() => view.TrySlide(GetOffset(view)), RaisesNoEventsFor(collection));
+            Assert.That(() => view.TrySlide(withOffset), RaisesNoEventsFor(collection));
         }
 
         [Test]
@@ -5388,33 +5389,23 @@ namespace C6.Tests
         {
             // Arrange
             var collection = GetStringList(Random);
-
-            //var index = Random.Next(0, collection.Count);
-            //var count = Random.Next(1, collection.Count - index);
-            //var view = collection.View(index, count);
             var view = GetView(collection);
-
-            //var withOffset = Random.Next(view.Underlying.Count + 1, int.MaxValue);
+            var withOffset = Random.Next(view.Underlying.Count + 1, int.MaxValue);
 
             // Act & Assert
-            Assert.That(view.TrySlide(GetOffset(view)), Is.False);
+            Assert.That(view.TrySlide(withOffset), Is.False);
         }
 
         [Test]
-        public void TrySlide_NonEmptyViewNewOffsetOfUnderlyingCount_False()
+        public void TrySlide_RandomViewNewOffsetOfUnderlyingCount_False()
         {
             // Arrange
-            var collection = GetStringList(Random);
-
-            //var index = Random.Next(0, collection.Count);
-            //var count = Random.Next(1, collection.Count - index);
-            //var view = collection.View(index, count);
+            var collection = GetStringList(Random);            
             var view = GetView(collection);
-
-            //var withOffset = view.Underlying.Count - view.Offset;
+            var withOffset = Random.Next(collection.Count + 1, int.MaxValue);
 
             // Act & Assert
-            Assert.That(() => view.TrySlide(GetOffset(view)), Is.False);
+            Assert.That(() => view.TrySlide(withOffset), Is.False);
         }
 
         // TODO: view.TrySlide(withOffset), withOffset < Underlying.0
@@ -5424,16 +5415,11 @@ namespace C6.Tests
         {
             // Arrange
             var collection = GetStringList(Random);
-
-            //var index = Random.Next(0, collection.Count);
-            //var count = 0;
-            //var view = collection.View(index, count);
             var view = GetView(collection);
-
-            //var withOffset = view.Underlying.Count - view.Offset;
+            var withOffset = GetOffset(view, Random);
 
             // Act & Assert
-            Assert.That(() => view.TrySlide(GetOffset(view)), Is.True);
+            Assert.That(() => view.TrySlide(withOffset), Is.True);
         }
 
         #endregion
@@ -5457,11 +5443,13 @@ namespace C6.Tests
             // Arrange
             var collection = GetStringList(Random);
             var view = GetView(collection);
+            var withOffset = GetOffset(view, Random);
+            var newCount = GetNewCount(view, withOffset, Random);
 
             // Act
             var viewEnumerator = view.GetEnumerator(); // TODO: coll's or view's enumerator ?
             viewEnumerator.MoveNext();
-            view.TrySlide(GetOffset(view), GetNewCount(view));
+            view.TrySlide(withOffset, newCount);
 
             // Assert
             Assert.That(() => viewEnumerator.MoveNext(), Throws.InvalidOperationException.Because(CollectionWasModified));
@@ -5473,24 +5461,28 @@ namespace C6.Tests
             // Arrange
             var collection = GetEmptyList<string>();
             var view = GetEmptyView(collection);
+            var withOffset = GetOffset(view, Random);
+            var newCount = GetNewCount(view, withOffset, Random);
 
             // Act
-            var result = view.TrySlide(GetOffset(view), GetNewCount(view));
+            var result = view.TrySlide(withOffset, newCount);
 
             // Assert
             Assert.That(result, Is.Not.Null);
         }
 
         [Test]
-        public void TrySlide2_NonEmptyView_RaisesNoEvents()
+        public void TrySlide2_RandomView_RaisesNoEvents()
         {
             // Arrange
             var items = GetUppercaseStrings(Random);
             var collection = GetList(items); //TODO why GetCollection(items);
             var view = GetView(collection);
+            var withOffset = GetOffset(view, Random);
+            var newCount = GetNewCount(view, withOffset, Random);
 
             // Act & Assert
-            Assert.That(() => view.TrySlide(GetOffset(view), GetNewCount(view)), RaisesNoEventsFor(collection));
+            Assert.That(() => view.TrySlide(withOffset, newCount), RaisesNoEventsFor(collection));
         }
 
         [Test]
@@ -5514,7 +5506,7 @@ namespace C6.Tests
             var newCount = Random.Next(int.MinValue, 0);
 
             // Act & Assert
-            Assert.That(view.TrySlide(0, newCount), Is.False);
+            Assert.That(() => view.TrySlide(0, newCount), Is.False);
         }
 
         [Test]
@@ -5530,14 +5522,16 @@ namespace C6.Tests
         }
 
         [Test]
-        public void TrySlide2_NonEmptyView_Equals()
+        public void TrySlide2_RandomView_Equals()
         {
             // Arrange
             var collection = GetStringList(Random);
             var view = GetView(collection);
+            var withOffset = GetOffset(view, Random);
+            var newCount = GetNewCount(view, withOffset, Random);
 
             // Act
-            view.TrySlide(GetOffset(view), GetNewCount(view));
+            view.TrySlide(withOffset, newCount);
 
             // Assert
             // TODO: is it ok ?
@@ -5590,11 +5584,13 @@ namespace C6.Tests
             // Arrange
             var collection = GetStringList(Random);
             var view = GetView(collection);
+            var withOffset = GetOffset(view, Random);
+            var newCount = GetNewCount(view, withOffset, Random);
 
             // Act
             var viewEnumerator = view.GetEnumerator();
             viewEnumerator.MoveNext();
-            view.Slide(GetOffset(view), GetNewCount(view));
+            view.Slide(withOffset, newCount);
 
             // Assert
             Assert.That(() => viewEnumerator.MoveNext(), Throws.InvalidOperationException.Because(CollectionWasModified));
@@ -5606,40 +5602,48 @@ namespace C6.Tests
             // Arrange
             var collection = GetEmptyList<string>();
             var view = GetEmptyView(collection);
+            var withOffset = GetOffset(view, Random);
+            var newCount = GetNewCount(view, withOffset, Random);
 
             // Act
-            var result = view.Slide(GetOffset(view), GetNewCount(view));
+            var result = view.Slide(withOffset, newCount);
 
             // Assert
             Assert.That(result, Is.Not.Null);
         }
 
         [Test]
-        public void Slide2_NonEmptyView_RaisesNoEvents()
+        public void Slide2_RandomView_RaisesNoEvents()
         {
             // Arrange
             var items = GetUppercaseStrings(Random);
             var collection = GetList(items);
             var view = GetView(collection);
+            var withOffset = GetOffset(view, Random);
+            var newCount = GetNewCount(view, withOffset, Random);
+            
 
             // Act & Assert
-            Assert.That(() => view.Slide(GetOffset(view), GetNewCount(view)), RaisesNoEventsFor(collection));
+            Assert.That(() => view.Slide(withOffset, newCount), RaisesNoEventsFor(collection));            
         }
-        
+
         [Test]
-        public void Slide2_NonEmptyView_Equals()
+        public void Slide2_RandomView_Equals()
         {
             // Arrange
             var collection = GetStringList(Random);
             var view = GetView(collection);
+            var withOffset = GetOffset(view, Random);
+            var newCount = GetNewCount(view, withOffset, Random);
 
             // Act
-            view.Slide(GetOffset(view), GetNewCount(view));
+            view.Slide(withOffset, newCount);
 
-            // Assert
-            Assert.That(view, Is.EqualTo(collection.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer));
+            // Assert            
+            var coll = collection.Skip(view.Offset).Take(view.Count);
+            Assert.That(view, Is.EqualTo(coll).Using(ReferenceEqualityComparer));            
         }
-
+        
 
         #endregion
 
@@ -5675,11 +5679,12 @@ namespace C6.Tests
             // Arrange
             var collection = GetStringList(Random);
             var view = GetView(collection);
+            var withOffset = GetOffset(view, Random);
 
             // Act
             var viewEnumerator = view.GetEnumerator();
             viewEnumerator.MoveNext();
-            view.Slide(GetOffset(view));
+            view.Slide(withOffset);
 
             // Assert
             Assert.That(() => viewEnumerator.MoveNext(), Throws.InvalidOperationException.Because(CollectionWasModified));
@@ -5691,43 +5696,255 @@ namespace C6.Tests
             // Arrange
             var collection = GetEmptyList<string>();
             var view = GetEmptyView(collection);
+            var withOffset = GetOffset(view, Random);
 
             // Act
-            var result = view.Slide(GetOffset(view));
+            var result = view.Slide(withOffset);
 
             // Assert
             Assert.That(result, Is.Not.Null);
         }
 
         [Test]
-        public void Slide_NonEmptyView_RaisesNoEvents()
+        public void Slide_RandomView_RaisesNoEvents()
         {
             // Arrange
             var items = GetUppercaseStrings(Random);
             var collection = GetList(items);
             var view = GetView(collection);
+            var withOffset = GetOffset(view, Random);
 
             // Act & Assert
-            Assert.That(() => view.Slide(GetOffset(view)), RaisesNoEventsFor(collection));
+            Assert.That(() => view.Slide(withOffset), RaisesNoEventsFor(collection));
         }
 
         [Test]
-        public void Slide_NonEmptyView_Equals()
+        public void Slide_RandomView_Equals()
         {
             // Arrange
             var collection = GetStringList(Random);
             var view = GetView(collection);
+            var withOffset = GetOffset(view, Random);
 
-            // Act
-            view.Slide(GetOffset(view));
+            view.Slide(withOffset);
 
-            // Assert
+            // Act & Assert
+            //Assert.That(() => view.Slide(withOffset), Is.EqualTo(collection.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer));
             Assert.That(view, Is.EqualTo(collection.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer));
         }
 
         #endregion
 
+        #region GeneralViewTests
 
+        [Test]
+        public void Case2ViewIntheMiddle_SCENARIO_BEHAVIOR()
+        {
+            // Arrange
+            var list = new [] { "aa", "bb", "cc", "dd", "ee", "ff", "gg", "hh", "ii", "jj", "kk", "ll", "mm", "nn",  "oo", "pp", "qq", "rr", "ss", "tt", "uu", "vv", "ww", "xx", "yy", "zz" };
+            var coll = new ArrayList<string>(list);  //GetStringList(Random);
+            //var item = coll[coll.Count/2]; // middle item
+            var views = new IList<string>[3];
+
+            // Arrange
+            var view = coll.View(coll.Count / 2 - 1, 3); // from the middle;
+            // ViewOf - no, 1-item view
+            // LastViewOf - no, 1-item view
+            views[0] = coll.View(coll.Count / 2 - 1, 3);
+            views[1] = view.Slide(-1);
+            views[2] = view.Slide(view.Count + 1, 3);
+            // TrySlide1 ???
+            // TrySlide2 ???
+
+            var auxView1 = coll.View(1, 2);
+            var auxView2 = coll.View(coll.Count - 2, 2); // last 2 items, beginning from index: Count - 3
+
+            // Act, methods to test + Asserts
+            foreach (var v in views)
+            {
+                // public T RemoveAt(int index)
+                var offset1 = auxView1.Offset;
+                var offset2 = auxView2.Offset;
+                v.RemoveAt(1); // ??? 1
+                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
+                Assert.That(auxView2.Offset, Is.EqualTo(offset2 - 1), "");
+                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
+
+                // public T RemoveFirst()
+                offset1 = auxView1.Offset;
+                offset2 = auxView2.Offset;
+                v.RemoveFirst();
+                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
+                Assert.That(auxView2.Offset, Is.EqualTo(offset2 - 1), "");
+                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
+
+                // public T RemoveLast()
+                offset1 = auxView1.Offset;
+                offset2 = auxView2.Offset;
+                v.RemoveLast();
+                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
+                Assert.That(auxView2.Offset, Is.EqualTo(offset2 - 1), "");
+                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
+
+                // public bool Add(T item)
+                offset1 = auxView1.Offset;
+                offset2 = auxView2.Offset;
+                v.Add("30"); //??? v.Add(GetUppercaseString(Random));
+                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
+                Assert.That(auxView2.Offset, Is.EqualTo(offset2 + 1), "");
+                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
+
+                // public void InsertRange(int index, SCG.IEnumerable<T> items)
+                offset1 = auxView1.Offset;
+                offset2 = auxView2.Offset;
+                var items = GetUppercaseStrings(Random).Take(3).ToArray();
+                v.InsertRange(1, items);
+                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
+                Assert.That(auxView2.Offset, Is.EqualTo(offset2 + items.Length), "");
+                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
+
+                // public void Insert(int index, T item)   
+                offset1 = auxView1.Offset;
+                offset2 = auxView2.Offset;
+                v.Insert(1, "5"); 
+                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "" );
+                Assert.That(auxView2.Offset, Is.EqualTo(offset2 + 1), "");
+                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
+
+                // public void InsertFirst(T item)
+                offset1 = auxView1.Offset;
+                offset2 = auxView2.Offset;
+                v.InsertFirst("10");                
+                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
+                Assert.That(auxView2.Offset, Is.EqualTo(offset2 + 1), "");
+                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
+
+                // public void InsertLast(T item)
+                offset1 = auxView1.Offset;
+                offset2 = auxView2.Offset;
+                v.InsertLast("20");                
+                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
+                Assert.That(auxView2.Offset, Is.EqualTo(offset2 + 1), "");
+                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
+
+                // public void Reverse()
+                offset1 = auxView1.Offset;
+                offset2 = auxView2.Offset;
+                v.Reverse();
+                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
+                Assert.That(auxView2.Offset, Is.EqualTo(offset2), "");
+                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
+
+                // public void Shuffle()
+                offset1 = auxView1.Offset;
+                offset2 = auxView2.Offset;
+                v.Shuffle();
+                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
+                Assert.That(auxView2.Offset, Is.EqualTo(offset2), "");
+                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
+
+                // public void Sort()
+                offset1 = auxView1.Offset;
+                offset2 = auxView2.Offset;
+                v.Sort();
+                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
+                Assert.That(auxView2.Offset, Is.EqualTo(offset2), "");
+                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
+
+                // public bool Remove(T item)
+                offset1 = auxView1.Offset;
+                offset2 = auxView2.Offset;
+                v.Remove(v.Choose());
+                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
+                Assert.That(auxView2.Offset, Is.EqualTo(offset2 - 1), "");
+                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
+
+                // public bool Remove(T item, out T removedItem)
+                offset1 = auxView1.Offset;
+                offset2 = auxView2.Offset;
+                string removedItem;
+                v.Remove(v.Choose(), out removedItem);
+                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
+                Assert.That(auxView2.Offset, Is.EqualTo(offset2 - 1), "");
+                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
+
+                // public bool RemoveDuplicates(T item) - how many are deleted ???
+                // public bool RemoveRange(SCG.IEnumerable<T> items) - how many are deleted ???
+                // public bool RetainRange(SCG.IEnumerable<T> items) - how many are deleted ???
+
+                // public bool Update(T item)
+                offset1 = auxView1.Offset;
+                offset2 = auxView2.Offset;
+                v.Update(v.Choose());
+                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
+                Assert.That(auxView2.Offset, Is.EqualTo(offset2), "");
+                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
+
+                // public bool Update(T item, out T oldItem)
+                offset1 = auxView1.Offset;
+                offset2 = auxView2.Offset;
+                string oldItem;
+                v.Update(v.Choose(), out oldItem);
+                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
+                Assert.That(auxView2.Offset, Is.EqualTo(offset2), "");
+                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
+
+                //public bool UpdateOrAdd(T item)
+                offset1 = auxView1.Offset;
+                offset2 = auxView2.Offset;
+                v.UpdateOrAdd(GetUppercaseString(Random));
+                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
+                Assert.That(auxView2.Offset, Is.EqualTo(offset2 + 1), "");
+                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
+
+                // public bool UpdateOrAdd(T item, out T oldItem)
+                offset1 = auxView1.Offset;
+                offset2 = auxView2.Offset;                
+                v.UpdateOrAdd(GetUppercaseString(Random), out oldItem);
+                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
+                Assert.That(auxView2.Offset, Is.EqualTo(offset2 + 1), "");
+                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
+
+                // public abstract bool AddRange(SCG.IEnumerable<T> items)
+                offset1 = auxView1.Offset;
+                offset2 = auxView2.Offset;
+                items = GetLowercaseStrings(Random).Take(3).ToArray(); // ??? 2
+                v.AddRange(items);
+                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
+                Assert.That(auxView2.Offset, Is.EqualTo(offset2 + items.Length), "");
+                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
+
+                // public abstract bool FindOrAdd(ref T item);
+                offset1 = auxView1.Offset;
+                offset2 = auxView2.Offset;
+                var item = GetUppercaseString(Random);
+                v.FindOrAdd(ref item);
+                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
+                Assert.That(auxView2.Offset, Is.EqualTo(offset2 + 1), "");
+                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
+
+                // public abstract void RemoveIndexRange(int startIndex, int count);
+                offset1 = auxView1.Offset;
+                offset2 = auxView2.Offset;
+                var count = 1; // ??? 1
+                v.RemoveIndexRange(0, count);
+                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
+                Assert.That(auxView2.Offset, Is.EqualTo(offset2 - count), "");
+                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
+
+                
+                // public void Clear()
+                //offset1 = auxView1.Offset;
+                //offset2 = auxView2.Offset;
+                //count = v.Count;
+                //v.Clear();
+                //Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
+                //Assert.That(auxView2.Offset, Is.EqualTo(offset2 - count), "");
+                //Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
+            }
+        }
+
+        #endregion
 
         #endregion
 
