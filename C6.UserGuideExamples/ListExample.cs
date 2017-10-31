@@ -31,14 +31,10 @@ namespace C6.UserGuideExamples
             //var collection = new HashedLinkedList<string>(items, ec);                
 
             var items = new[] { "8", "Ab", "3", "4", "5", "6", "7", "8" };
-            var collection = new ArrayList<string>(items);
-            var view = collection.View(3, 2);
-            var v2 = collection.View(5, 1);
-            //view.Insert(1, "001");
-            Console.WriteLine("Offset before {0}", v2.Offset);
-            view.InsertLast("0000");
-            Console.WriteLine("Offset after {0}", v2.Offset);
-            //collection.Insert(1, "001");
+            var collection = new HashedArrayList<string>(items);
+            Console.WriteLine("under: {0}", collection.Underlying);
+
+
 
             //Console.WriteLine(view);
             //Console.WriteLine(collection);

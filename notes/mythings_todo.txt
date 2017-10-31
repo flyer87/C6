@@ -1,6 +1,8 @@
 Tests
-	- learn to write
+	- learn to write tests
 	- make interface hierarchy with tests
+	- how to write: Raises(expectedEvents).For(collection) in
+		Assert.That(() => ((SC.IList) collection)[index] = item, Raises(expectedEvents).For(collection));
 	
 Documnetation
 	

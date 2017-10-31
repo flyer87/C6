@@ -39,13 +39,13 @@ namespace C6.Collections
     {
         #region Fields
 
-        public static readonly T[] EmptyArray = new T[0];
+        private static readonly T[] EmptyArray = new T[0];
         private const int MinArrayLength = 0x00000004;
         private const int MaxArrayLength = 0x7FEFFFFF;
 
 
-        private T[] _items;
-        private SCG.Dictionary<T, int> _itemIndex;
+        public T[] _items;
+        public SCG.Dictionary<T, int> _itemIndex;
         private WeakViewList<HashedArrayList<T>> _views;
         private WeakViewList<HashedArrayList<T>>.Node _myWeakReference;
         private HashedArrayList<T> _underlying;
@@ -62,13 +62,12 @@ namespace C6.Collections
         private int UnderlyingCount => (Underlying ?? this).Count;
 
         #endregion Fields
-
         
         #region Code Contracts
 
         [ContractInvariantMethod]
         private void ObjectInvariant()
-        {/*
+        {
             // ReSharper disable InvocationIsSkipped
 
             // Array is non-null
@@ -114,7 +113,7 @@ namespace C6.Collections
             #endregion
 
             // ReSharper restore InvocationIsSkipped
-        */}
+        }
 
         #endregion
 
@@ -160,7 +159,7 @@ namespace C6.Collections
             //else
             //{
             _items = EmptyArray;
-            _itemIndex = new SCG.Dictionary<T, int>(EqualityComparer); // EqualityComparer as paramter ??
+            _itemIndex = new SCG.Dictionary<T, int>(equalityComparer ?? SCG.EqualityComparer<T>.Default); // EqualityComparer as paramter ??
             AddRange(items); // ??? do we need it
             //}
         }
@@ -808,17 +807,18 @@ namespace C6.Collections
             UpdateVersion();
 
             startIndex += Offset;            
-            FixViewsBeforeRemovePrivate(startIndex, count);
+            FixViewsBeforeRemovePrivate(startIndex, count); 
 
             // ??? Alternative: View(start, count).Clear();
 
             // clean _itemIndex
-            for (int i = startIndex, end = Offset + count; i < end ; i++)
+            var end = startIndex + count;
+            for (var i = startIndex; i < end; i++)
             {
-                _itemIndex.Remove(_items[i]);
+                _itemIndex.Remove(_items[i]);                
             }
 
-            //copy; otherwise jump to CLear, no need of extra array operations
+            //copy; otherwise jump to Clear, no need of extra array operations
             if (startIndex < UnderlyingCount - count)
             {
                 Array.Copy(_items, startIndex + count, _items, startIndex, UnderlyingCount - startIndex - count);

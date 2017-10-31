@@ -33,13 +33,6 @@ namespace C6.Tests.Collections
             => new LinkedList<T>(equalityComparer, allowsNull);
 
         protected override IList<T> GetList<T>(IEnumerable<T> enumerable, IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
-            => new LinkedList<T>(enumerable, equalityComparer, allowsNull);
-
-        //protected override IIndexed<T> GetEmptyIndexed<T>(IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
-        //    => new LinkedList<T>(equalityComparer, allowsNull);
-
-        //protected override IIndexed<T> GetIndexed<T>(IEnumerable<T> enumerable, IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
-        //    => new LinkedList<T>(enumerable, equalityComparer, allowsNull);
-
+            => new LinkedList<T>(enumerable, equalityComparer, allowsNull);        
     }
 }

@@ -6,3 +6,7 @@ IList.cs // Code Contracts section
         void SCG.IList<T>.Insert(int index, T item) {}
 
         #endregion
+		
+Invarinats, user guide:
+	- "Invariants are conditionally defined on the full-contract symbol. " ???
+	- ! "Automatic properties are getters and setters without an explicit implementation. Due to the lack of a code body, it isn’t possible to write Requires or Ensures directly on such auto-properties. Instead, we use invariants on auto-properties to indirectly write such pre- and postconditions on the setters and getters of auto-properties."

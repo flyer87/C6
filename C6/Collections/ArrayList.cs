@@ -76,9 +76,9 @@ namespace C6.Collections
 
         [ContractInvariantMethod]
         private void ObjectInvariant()
-        {/*
+        {
             // ReSharper disable InvocationIsSkipped
-                    
+
             // Array is non-null
             Invariant(_items != null);
 
@@ -98,20 +98,21 @@ namespace C6.Collections
             Invariant(EmptyArray.IsEmpty());
 
             #region View invarints 
-                       
+
             Invariant(UnderlyingCount <= Capacity);
-                        
+
             Invariant(Offset + Count <= UnderlyingCount);
 
             // Offset is non-negative
             Invariant(Offset >= 0);
 
             // TODO: If there are views all should the same underlying(???) _items             
-            Invariant((_underlying ?? this)._views == null || ForAll((_underlying ?? this)._views, view => view._items == (_underlying ?? this)._items ));            
+            Invariant((_underlying ?? this)._views == null || ForAll((_underlying ?? this)._views, view => view._items == (_underlying ?? this)._items));
+
             #endregion
 
             // ReSharper restore InvocationIsSkipped
-        */}
+        }
 
         #endregion
 

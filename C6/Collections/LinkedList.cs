@@ -29,7 +29,7 @@ namespace C6
         private LinkedList<T> _underlying; // always null for a proper list
         private WeakViewList<LinkedList<T>>.Node _myWeakReference; // always null for a proper list
 
-        public int _version, _sequencedHashCodeVersion = -1, _unsequencedHashCodeVersion = -1;
+        private int _version, _sequencedHashCodeVersion = -1, _unsequencedHashCodeVersion = -1;
         private int _sequencedHashCode, _unsequencedHashCode;
 
         private event EventHandler _collectionChanged;
@@ -43,11 +43,11 @@ namespace C6
 
         [ContractInvariantMethod]
         private void ObjectInvariant()
-        {/*
+        {
             // ReSharper disable InvocationIsSkipped            
-            
+
             Invariant(_startSentinel != null);
-            
+
             Invariant(_endSentinel != null);
 
             // All items must be non-null if collection disallows null values
@@ -57,10 +57,10 @@ namespace C6
             Invariant(EqualityComparer != null);
 
             // If Count is 0 then _startSentinel.Next points to _endSentinel
-            Invariant( !(Count == 0 && _startSentinel != null) || _startSentinel.Next == _endSentinel);
+            Invariant(!(Count == 0 && _startSentinel != null) || _startSentinel.Next == _endSentinel);
 
             // If Count is 0 then _endSentinel.Prev points to _startSentinel
-            Invariant( !(Count == 0 && _endSentinel   != null) || _endSentinel.Prev == _startSentinel);
+            Invariant(!(Count == 0 && _endSentinel != null) || _endSentinel.Prev == _startSentinel);
 
             // Each .Prev points to the correct node TODO: heavy && count++ in C5.Check()            
             Node node = _startSentinel.Next, prev = _startSentinel;
@@ -76,32 +76,44 @@ namespace C6
             node = _startSentinel.Next;
             prev = _startSentinel;
             Invariant(ForAll(0, Count, i => {
-                var result = node == null;
+                var result = node != null;
 
                 prev = node;
                 node = node.Next;
                 return result;
-            }));                   
+            }));
 
             #region Views
 
+            /* var nodes = new Node[UnderlyingCount];
+            var index = 0;
+            var cursor = _startSentinel.Next;
+            while (cursor != _endSentinel)
+            {
+                nodes[index++] = cursor;
+                cursor = cursor.Next;
+            } */
+
             // views are correct ??? 
-            Invariant(ForAll(_views, v =>
-                                                      v.Offset >= 0 &&
-                                                      // ??? v.IsValid &&                                                      
-                                                      // else if (view.startsentinel != nodes[view.Offset]) ??? 
-                                                      v.Offset + v.Count >= 0 &&
-                                                      v.Offset + v.Count <= UnderlyingCount &&                                                      
-                                                      // else if (view.endsentinel != nodes[view.Offset + view.size + 1]) ??? 
-                                                      v._views == _underlying._views &&
-                                                      v.Underlying == Underlying
-                                                      // ??? if (view.stamp != stamp)
-            ));
+            Invariant((_underlying ?? this)._views == null || ForAll((_underlying ?? this)._views, v =>
+                              v.Offset >= 0 &&
+                              // ??? v.IsValid &&                                                      
+                              //v._startSentinel == nodes[v.Offset] &&
+                              v.Offset + v.Count >= 0 &&
+                              v.Offset + v.Count <= UnderlyingCount &&
+                              //(v._endSentinel == nodes[v.Offset + v.Count + 1]) && 
+                              v._views == (_underlying ?? this)._views &&
+                              v._underlying == (_underlying ?? this)
+                          // ??? if (view.stamp != stamp)
+                      ));
+
+            // ??? if (view.stamp != stamp)
 
             #endregion
 
             // ReSharper restore InvocationIsSkipped
-        */}
+            /*        */
+        }
 
         #endregion
 

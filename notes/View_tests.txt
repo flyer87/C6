@@ -14,6 +14,13 @@ Quest:
 		- ??? if (view.stamp != stamp)
 		- ??? v.IsValid && 
 	- HLL.view.invariants - don't implement
+	- does Arrange replace [SetUp]
+	- C5 updates the underlying version even view.Slide would affect only the view's version;
+==========
+Fluctuating tests:
+	IListTest: Slide2_SlideDuringEnumerationOfView_ThrowsInvalidOperationException()
+			public void Slide_SlideDuringEnumerationOfView_ThrowsInvalidOperationException()
+			public void Sort_SortDuringEnumeration_ThrowsInvalidOperationException()
 =======
 TODO:	
 	//- C5.Check() -> into Invariants
@@ -48,6 +55,13 @@ Thesis notes:
 	- LL.Invariant(ForAll(_underlying._views, v => { ... })) includes many conditions. Otherwise it would be heavy	
 	- NUnit test: I found that in TrySlide(int, int) UpdateVersion was missing
 	- C5.LL int enumeratorstamp = underlying != null ? underlying.stamp : this.stamp; WRONG. It ate my whole day !!!!! Found by testing.
+	-  Code Contracts. Invariants helped me
+			var end = startIndex + count; // IT WAS: var end = Offset + count; Wrong!
+            for (var i = startIndex; i < end; i++)
+            {
+                var res = _itemIndex.Remove(_items[i]);
+                var res2 = res;
+            }
 	- Peter:
 		- Test strategy in the report - the photo - the effect on the other views, bla, bla
 		- Corner cases
@@ -55,7 +69,19 @@ Thesis notes:
 			- Modern testing approach (1 Assert, random views/collections) - here are they. Ok, but not enough. 
 			- Combine with other test methods: check the effect on the neighbouring views
 			- I couldn't cover all the test cases, but generally, yes
-			- "The art of ..." (and C6) recommend one assert per test. C5 does the opposite. Mine is in the middle. Closer to C5 when I check the effect of a modifying operation to the other views.			
+			- "The art of ..." (and C6) recommend one assert per test. C5 does the opposite. Mine is in the middle. Closer to C5 when I check the effect of a modifying operation to the other views.
+		- After executing a method on a view, many aspects of the data structure should be checked - the effect on the underlying list, the effect on the view, placed on a ?offset, and overlapping views. This makes the test more complicated. 
+			Multiples aserts are multiple tests (p.201), but not in our case. We check the correctness of other objects, possibli affected of the operation.
+			Avoiding testing multiple aspects of the same object(p.203), but we need to check not the aspects of one object, but the effect of the method on the other objects.
+		- Invariants - can't write too complicated ones
+			LL: Invariant((_underlying ?? this)._views == null || ForAll((_underlying ?? this)._views, v => ...
+			"The invariant methods must have no other code in it than a sequence of calls to Contract. Invariant"
+			may be bug: https://tutel.me/c/programming/questions/3597011/why+contract+is+malformed+when+using+defaulttype
+			
+		- C5 updates the underlying version even view.Slide should only affect the view's version;
+			list.Add() - affects the current view, list and some (overlapping?) views
+			view.Add() - affects the current view, list and some (overlapping?) views
+			view.Slide() - only the current view; neither the list, nor the other views
 =====
 Learn how it is done in C6:
 - custom reference equality comparer	

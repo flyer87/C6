@@ -57,9 +57,11 @@ namespace C6.Collections
             Invariant(Count != 0 || _startSentinel.Next == _endSentinel);
 
             // If Count is 0 then _endSentinel.Prev points to _startSentinel
-            Invariant(Count != 0 || _endSentinel.Prev == _startSentinel);
+            Invariant(Count != 0 || _endSentinel.Prev == _startSentinel); 
 
+            #region View
             /* View related part !!!!!!
+             
             // Bad startsentinel tag group
             var tg = _startSentinel.taggroup;
             Invariant(Underlying != null || tg.Count == 0 && tg.First == null && tg.Last == null && tg.Tag  == int.MinValue);
@@ -86,8 +88,9 @@ namespace C6.Collections
 
             Invariant(!(Underlying == null && Count > 0 && _endSentinel.Prev.taggroup != null) || _endSentinel.Prev.taggroup == taggroups);
             */
+            #endregion
 
-            // The underying list and the dictioonary have the same number of items
+            // The list and the dictioonary have the same number of items
             Invariant(Underlying != null || Count == _itemNode.Count);
 
             // Each list item is in the dictionary, the nodes are the same
@@ -95,7 +98,6 @@ namespace C6.Collections
             Invariant(Underlying != null || ForAll(0, Count, i => {                
                 var res = _itemNode.TryGetValue(node.item, out nodeOut) && nodeOut == node;
                 node = node.Next;
-
                 return res;
             }));            
         }
@@ -317,7 +319,7 @@ namespace C6.Collections
                 }
             }
 
-            // linkedlist
+            //clear linkedlist
             ClearPrivate();
 
             (_underlying ?? this).RaiseForClear(oldCount);
@@ -442,11 +444,23 @@ namespace C6.Collections
                 return false;
             }
 
+            // Optimize call, if no items should be retained
             if (items.IsEmpty())
-            {
-                // Optimize call, if no items should be retained
-                UpdateVersion();
+            {                                
                 var itemsRemoved = this; // for views ??? yes, this 
+                // clear dict
+                if (_underlying == null)
+                {
+                    _itemNode.Clear();
+                }
+                else
+                {
+                    foreach (var item in this)
+                    {
+                        _itemNode.Remove(item);
+                    }
+                }
+                // clear linkedlist
                 ClearPrivate();
                 RaiseForRemoveAllWhere(itemsRemoved);
                 return true;
@@ -951,11 +965,14 @@ namespace C6.Collections
 
         public virtual bool TrySlide(int offset, int count)
         {
-            if (Offset + offset < 0 || Offset + offset + count > UnderlyingCount)
+            var newOffset = Offset + offset;
+            if (newOffset < 0 || count < 0 || newOffset + count > UnderlyingCount)
             {
                 return false;
             }
-            // if (this.offset == null) in C5 offset is nullable ?? So what ?
+            // if (this.offset == null) in C5 offset is nullable ??? So what ?
+
+            UpdateVersion();
 
             var oldOffset = Offset;
             GetPairPrivate(offset - 1, offset + count, out _startSentinel, out _endSentinel,
@@ -1107,7 +1124,8 @@ namespace C6.Collections
 
         public SCG.IEnumerator<T> GetEnumerator() // overrides valuebase 
         {
-            var version = (_underlying ?? this)._version; // ??? underlying
+            // var version = (_underlying ?? this)._version; // ??? underlying !!!
+            var version = _version;
 
             var cursor = _startSentinel.Next;
             while (cursor != _endSentinel && CheckVersion(version))
@@ -1594,19 +1612,21 @@ namespace C6.Collections
         private void ClearPrivate()
         {
             // ??? Create a method for the first part ??? like FixView ...
+            // view part ?
             //TODO: mix with tag maintenance to only run through list once?
-            ViewHandler viewHandler = new ViewHandler(this);
+            var viewHandler = new ViewHandler(this);
             if (viewHandler.viewCount > 0)
             {
-                int removed = 0;
-                Node n = _startSentinel.Next;
-                viewHandler.skipEndpoints(0, n);
-                while (n != _endSentinel)
+                var removed = 0;
+                var node = _startSentinel.Next;
+                viewHandler.skipEndpoints(0, node);
+                while (node != _endSentinel)
                 {
                     removed++;
-                    n = n.Next;
-                    viewHandler.updateViewSizesAndCounts(removed, n);
+                    node = node.Next;
+                    viewHandler.updateViewSizesAndCounts(removed, node);
                 }
+
                 viewHandler.updateSentinels(_endSentinel, _startSentinel, _endSentinel);
                 if (_underlying != null)
                     viewHandler.updateViewSizesAndCounts(removed, _underlying._endSentinel);
@@ -1614,14 +1634,14 @@ namespace C6.Collections
 
             if (_underlying != null)
             {
-                Node n = _startSentinel.Next;
+                var node = _startSentinel.Next;
 
-                while (n != _endSentinel)
+                while (node != _endSentinel)
                 {
-                    n.Next.Prev = _startSentinel;
-                    _startSentinel.Next = n.Next;
-                    RemoveFromTagGroupPrivate(n);
-                    n = n.Next;
+                    node.Next.Prev = _startSentinel;
+                    _startSentinel.Next = node.Next;
+                    RemoveFromTagGroupPrivate(node);
+                    node = node.Next;
                 }
             }
             else
@@ -1640,7 +1660,22 @@ namespace C6.Collections
             Count = 0;
         }
 
-        private void UpdateVersion() => _version++;
+        private void UpdateVersion(bool updateUnderlying = true)
+        {
+            _version++;            
+        }
+
+        /*private void UpdateVersion(bool updateUnderlying = true)
+        {
+            _version++;
+            //if (updateUnderlying)
+            //{
+            //    if (_underlying != null)
+            //    {
+            //        _underlying._version++;
+            //    }
+            //}
+        }*/
 
         private void InsertNodeBeforePrivate(bool updateViews, Node succ, Node node) // ??? updateViews
         {

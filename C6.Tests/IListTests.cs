@@ -52,7 +52,7 @@ namespace C6.Tests
         private static IList<T> GetView<T>(IList<T> list)
         {
             // TODO: Requires
-            var index = Random.Next(0, list.Count - 1); // 
+            var index = Random.Next(0, list.Count - 1); // why Count - 1, but not Count. It is realted to: Random.Next(1,1);
             var count = Random.Next(1, list.Count - index);
             
             return list.View(index, count);
@@ -2256,14 +2256,14 @@ namespace C6.Tests
         }
         
         [Test]
-        public void Offset_EmptyView_IsNonZero()
+        public void Offset_EmptyView_IsNonNegative()
         {
             // Arrange
             var collection = GetStringList(Random);
             var view = GetEmptyView(collection);            
 
             // Act & Assert
-            Assert.That(view.Offset, Is.Not.Zero);
+            Assert.That(view.Offset, Is.Not.Negative);
         }
 
         [Test]
@@ -5153,8 +5153,8 @@ namespace C6.Tests
         {
             // Arrange
             var collection = GetEmptyList<string>();
-            var index = Random.Next(1, int.MaxValue);
-            var count = Random.Next(1, int.MaxValue);
+            var index = Random.Next(1, int.MaxValue / 2 - 1);
+            var count = Random.Next(1, int.MaxValue / 2 - 1);
 
             // Act & Assert
             Assert.That(() => collection.View(index, count), Violates.PreconditionSaying(ArgumentMustBeWithinBounds));
@@ -5345,14 +5345,16 @@ namespace C6.Tests
             // Arrange
             var collection = GetStringList(Random);
             var view = GetView(collection);
+            var orig_offset = view.Offset;
             var withOffset = GetOffset(view, Random);
 
             // Act
             var viewEnumerator = view.GetEnumerator(); // TODO: coll's or view's enumerator ?
             viewEnumerator.MoveNext();
-            view.TrySlide(withOffset);
+            var res = view.TrySlide(withOffset);
 
             // Assert
+            TestContext.WriteLine("TrySlide_TrySlideDuringEnumerationOfView, res = {0}, withOffset = {1}, Orig. offset = {2}", res, withOffset, orig_offset);
             Assert.That(() => viewEnumerator.MoveNext(), Throws.InvalidOperationException.Because(CollectionWasModified));
         }
 
@@ -5443,15 +5445,17 @@ namespace C6.Tests
             // Arrange
             var collection = GetStringList(Random);
             var view = GetView(collection);
+            var orig_offset = view.Offset;
             var withOffset = GetOffset(view, Random);
             var newCount = GetNewCount(view, withOffset, Random);
 
             // Act
             var viewEnumerator = view.GetEnumerator(); // TODO: coll's or view's enumerator ?
             viewEnumerator.MoveNext();
-            view.TrySlide(withOffset, newCount);
+            var res = view.TrySlide(withOffset, newCount);
 
             // Assert
+            TestContext.WriteLine("TrySlide2_TrySlideDuringEnumerationOfView, res = {0}, withOffset = {1}, Orig. offset = {2}", res, withOffset, orig_offset);            
             Assert.That(() => viewEnumerator.MoveNext(), Throws.InvalidOperationException.Because(CollectionWasModified));
         }
 
@@ -5591,7 +5595,8 @@ namespace C6.Tests
             var viewEnumerator = view.GetEnumerator();
             viewEnumerator.MoveNext();
             view.Slide(withOffset, newCount);
-
+            
+            
             // Assert
             Assert.That(() => viewEnumerator.MoveNext(), Throws.InvalidOperationException.Because(CollectionWasModified));
         }
@@ -5738,6 +5743,17 @@ namespace C6.Tests
         #region GeneralViewTests
 
         [Test]
+        public void ViewRemoveAt_NItemMultipleViewsInTheMiddle_LeftAuxViewAffected()
+        {
+            
+        }
+
+        [Test]
+        public void ViewRemoveAt_ZeroItemMultipleViewsInTheMiddle_LeftAuxViewAffected()
+        {
+        }
+
+        /*[Test]
         public void Case2ViewIntheMiddle_SCENARIO_BEHAVIOR()
         {
             // Arrange
@@ -5778,6 +5794,7 @@ namespace C6.Tests
                 Assert.That(auxView2.Offset, Is.EqualTo(offset2 - 1), "");
                 Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
 
+
                 // public T RemoveLast()
                 offset1 = auxView1.Offset;
                 offset2 = auxView2.Offset;
@@ -5786,6 +5803,7 @@ namespace C6.Tests
                 Assert.That(auxView2.Offset, Is.EqualTo(offset2 - 1), "");
                 Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
 
+
                 // public bool Add(T item)
                 offset1 = auxView1.Offset;
                 offset2 = auxView2.Offset;
@@ -5793,6 +5811,7 @@ namespace C6.Tests
                 Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
                 Assert.That(auxView2.Offset, Is.EqualTo(offset2 + 1), "");
                 Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
+
 
                 // public void InsertRange(int index, SCG.IEnumerable<T> items)
                 offset1 = auxView1.Offset;
@@ -5943,7 +5962,8 @@ namespace C6.Tests
                 //Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
             }
         }
-
+        */
+        
         #endregion
 
         #endregion
