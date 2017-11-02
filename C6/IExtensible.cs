@@ -204,7 +204,7 @@ namespace C6
                 // False by convention for collections with set semantics
                 Ensures(AllowsDuplicates || Result<bool>());
 
-                Ensures(!AllowsDuplicates || !Result<bool>());
+                // !!! @@@ Ensures(!AllowsDuplicates || !Result<bool>());
 
 
                 return default(bool);

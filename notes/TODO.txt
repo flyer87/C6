@@ -23,8 +23,8 @@
 - fix: Insert and this[] - they shoudl either throw an exception or require a precondition.
 
 //- implement Span
-- look at the test patterns of C6
-- look at the C5's view tests
+//- look at the test patterns of C6
+//- look at the C5's view tests
 - write tests for the views (of ArrayList; HashedArrayList; LinkedList; HashedLinkedList)
 	- test refernce list tests for
 		Peter's tests // View, ViewOf, LastViewOf, TrySlide x2, Slide x2	
@@ -34,10 +34,16 @@
 			LastViewOf			
 			Slide1, Slide2, 
 			TrySlide1, TrySlide2
-			Span - doesn't change anything
+	- Span - doesn't change anything
 	- IsValid tests	
+	
+
+//- edit the failing tests
+	//- 54 : 2
+	//- fluctuating tests
+- read for Test Driven ??? TDD
 - implemnt some missing tests in C6
-	those with suffix _fail, ...
+	those with suffix _fail, ...	
 - collect the "???" from the .cs files !!! Re-look at them
 =================
 - Code Contracts for private methods - look and do it the same way for the rest.

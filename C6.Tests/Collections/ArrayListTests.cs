@@ -403,7 +403,7 @@ namespace C6.Tests.Collections
         protected override bool AllowsNull => true;
         protected override bool AllowsDuplicates => true;
         protected override Speed ContainsSpeed => Speed.Linear;
-        protected override bool DuplicatesByCounting => false;
+        protected override bool DuplicatesByCounting => true;
         protected override Speed IndexingSpeed => Speed.Constant;
         protected override bool IsFixedSize => false;
         protected override bool IsReadOnly => false;
@@ -427,5 +427,16 @@ namespace C6.Tests.Collections
         protected override IStack<T> GetEmptyStack<T>(bool allowsNull = false) => new ArrayList<T>(allowsNull: allowsNull);
         // ??? GetStack
         protected override IStack<T> GetStack<T>(SCG.IEnumerable<T> enumerable, bool allowsNull = false) => new ArrayList<T>(enumerable, allowsNull: allowsNull);
+    }
+
+
+    [TestFixture]
+    public class ArrayListGeneralViewTets : GeneralViewTest
+    {
+        protected override IList<T> GetEmptyList<T>(SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
+            => new ArrayList<T>(equalityComparer: equalityComparer, allowsNull: allowsNull);
+
+        protected override IList<T> GetList<T>(SCG.IEnumerable<T> enumerable, SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
+            => new ArrayList<T>(enumerable, equalityComparer, allowsNull);
     }
 }

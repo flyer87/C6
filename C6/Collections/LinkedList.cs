@@ -700,7 +700,7 @@ namespace C6
                         continue;
                     }
 
-                    switch (viewPosition(view))
+                    switch (ViewPosition(view))
                     {
                         case MutualViewPosition.ContainedIn:
                             (positionsQueue ?? (positionsQueue = new SCG.Queue<Position>())).Enqueue(new Position(view, true));
@@ -1263,7 +1263,7 @@ namespace C6
             {
                 if (view == this) continue;
 
-                switch (viewPosition(view))
+                switch (ViewPosition(view))
                 {
                     case MutualViewPosition.ContainedIn:
                         if (reverse)
@@ -1599,7 +1599,7 @@ namespace C6
                     continue;
                 }
 
-                switch (viewPosition(view))
+                switch (ViewPosition(view))
                 {
                     case MutualViewPosition.ContainedIn:
                         if (reverse) { }
@@ -1621,7 +1621,7 @@ namespace C6
         /// </summary>
         /// <param name="otherView"></param>
         /// <returns>The position of View(otherOffset, otherSize) wrt. this view</returns>
-        private MutualViewPosition viewPosition(LinkedList<T> otherView)
+        private MutualViewPosition ViewPosition(LinkedList<T> otherView)
         {
             int end = Offset + Count, otherOffset = otherView.Offset, otherSize = otherView.Count, otherEnd = otherOffset + otherSize;
             if (otherOffset >= end || otherEnd <= Offset)
@@ -1738,7 +1738,7 @@ namespace C6
             throw new InvalidOperationException(CollectionWasModified);
         }
 
-        Node GetNodeAtPrivate(int index)
+        private Node GetNodeAtPrivate(int index)
         {
             #region Code Contracts                        
 

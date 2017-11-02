@@ -31,8 +31,13 @@ namespace C6.UserGuideExamples
             //var collection = new HashedLinkedList<string>(items, ec);                
 
             var items = new[] { "8", "Ab", "3", "4", "5", "6", "7", "8" };
-            var collection = new HashedArrayList<string>(items);
-            Console.WriteLine("under: {0}", collection.Underlying);
+            var collection = new LinkedList<string>(items);
+            var view = collection.View(2, 1);
+            var vE = view.GetEnumerator();
+            vE.MoveNext();
+            Console.WriteLine(view.TrySlide(0));
+            vE.MoveNext();
+
 
 
 

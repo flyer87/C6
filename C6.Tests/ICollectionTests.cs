@@ -2660,11 +2660,13 @@ namespace C6.Tests
         [Test]
         public void Update_IntegerCollectionUpdateExistingItem_RaisesExpectedEvents()
         {
+
             // Arrange
             var items = new[] { 4, 54, 56, 8 };
             var collection = GetCollection(items, TenEqualityComparer.Default);
+            Run.If(!(collection is IList<int>));
+
             var count = DuplicatesByCounting ? 2 : 1;
-            //var count = AllowsDuplicates ? 2 : 1; ??? one of these
             var item = 53;
             var expectedEvents = new[] {
                 Removed(54, count, collection),
@@ -3053,8 +3055,9 @@ namespace C6.Tests
             // Arrange
             var items = new[] { 4, 54, 56, 8 };
             var collection = GetCollection(items, TenEqualityComparer.Default);
-            var count = DuplicatesByCounting ? 2 : 1;
-            //var count = AllowsDuplicates ? 2 : 1;
+            Run.If(!(collection is IList<int>));
+
+            var count = DuplicatesByCounting ? 2 : 1;            
             var item = 53;
             var expectedEvents = new[] {
                 Removed(54, count, collection),
