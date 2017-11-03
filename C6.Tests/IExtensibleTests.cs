@@ -314,11 +314,18 @@ namespace C6.Tests
         }
 
         [Test]
-        [Category("Unfinished")]
-        [Ignore("Unfinished")]
-        public void Add_FixedSizeCollection_Fail()
+        //[Category("Unfinished")]
+        //[Ignore("Unfinished")]
+        public void Add_FixedSizeCollection_Fail_ViolatesPreconditionSayingCollectionMustBeNonFixedSize()
         {
-            Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
+            Run.If(IsFixedSize);
+
+            var collection = GetStringExtensible(Random);
+            var item = GetUppercaseString(Random);
+
+            // Act & Assert
+            Assert.That(() => collection.Add(item), Violates.PreconditionSaying(CollectionMustBeNonFixedSize));
+            //Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
         }
 
         [Test]
@@ -513,11 +520,18 @@ namespace C6.Tests
         }
 
         [Test]
-        [Category("Unfinished")]
-        [Ignore("Unfinished")]
-        public void AddRange_FixedSizeCollection_Fail()
+        //[Category("Unfinished")]
+        //[Ignore("Unfinished")]
+        public void AddRange_FixedSizeCollection_ViolatesPreconditionSayingCollectionMustBeNonFixedSize()
         {
-            Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
+            Run.If(IsFixedSize);
+
+            var collection = GetStringExtensible(Random);
+            var items = GetStrings(Random);            
+            
+            // Act & Assert
+            Assert.That(() => collection.AddRange(items), Violates.PreconditionSaying(CollectionMustBeNonFixedSize));
+            //Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
         }
 
         [Test]

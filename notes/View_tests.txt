@@ -24,7 +24,11 @@ Fluctuating tests:
 	LL:
 		public void TrySlide_TrySlideDuringEnumerationOfView_ThrowsInvalidOperationException()
 		TrySlide_TrySlideDuringEnumerationOfView, res = True, withOffset = 0, Orig. Offset = 12, view Count = 1, Underlying Count = 18
+		
 		TrySlide_TrySlideDuringEnumerationOfView, res = True, withOffset = 0, Orig. Offset = 8, view Count = 1, Underlying Count = 11
+		
+		TrySlide_TrySlideDuringEnumerationOfView, res = True, withOffset = 1, Orig. Offset = 15, view Count = 3, Underlying Count = 19
+
 
 		
 =======

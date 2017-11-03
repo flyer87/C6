@@ -176,11 +176,17 @@ namespace C6.Tests
         }
 
         [Test]
-        [Category("Unfinished")]
-        [Ignore("Unfinished")]
-        public void Clear_FixedSizeCollection_Fail()
+        //[Category("Unfinished")]
+        //[Ignore("Unfinished")]
+        public void Clear_FixedSizeCollection_Fail_ViolatesPreconditionSayingCollectionMustBeNonFixedSize()
         {
-            Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
+            Run.If(IsFixedSize);
+
+            var collection = GetStringCollection(Random);            
+
+            // Act & Assert
+            Assert.That(() => collection.Clear(), Violates.PreconditionSaying(CollectionMustBeNonFixedSize));
+            //Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
         }
 
         #endregion
@@ -1098,11 +1104,20 @@ namespace C6.Tests
         }
 
         [Test]
-        [Category("Unfinished")]
-        [Ignore("Unfinished")]
-        public void FindOrAdd_FixedSizeCollection_Fail()
+        //[Category("Unfinished")]
+        //[Ignore("Unfinished")]
+        public void FindOrAdd_FixedSizeCollection_Fail_ViolatesPreconditionSayingCollectionMustBeNonFixedSize()
         {
-            Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
+            Run.If(IsFixedSize);
+
+            var items = GetStrings(Random);
+            var collection = GetCollection(items);
+            var item = items.Choose(Random);
+            
+
+            // Act & Assert
+            Assert.That(() => collection.FindOrAdd(ref item), Violates.PreconditionSaying(CollectionMustBeNonFixedSize));
+            //Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
         }
 
         #endregion
@@ -1810,11 +1825,19 @@ namespace C6.Tests
         }
 
         [Test]
-        [Category("Unfinished")]
-        [Ignore("Unfinished")]
-        public void RemoveRange_FixedSizeCollection_Fail()
+        //[Category("Unfinished")]
+        //[Ignore("Unfinished")]
+        public void RemoveRange_FixedSizeCollection_ViolatesPreconditionSayingCollectionMustBeNonFixedSize()
         {
-            Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
+            Run.If(IsFixedSize);
+
+            // Arrange
+            var collection = GetStringCollection(Random);
+            var itemsToRemove = GetStrings(Random);
+
+            // Act & Assert
+            Assert.That(() => collection.RemoveRange(itemsToRemove), Violates.PreconditionSaying(CollectionMustBeNonFixedSize));
+            //Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
         }
 
         [Test]

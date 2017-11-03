@@ -1339,7 +1339,7 @@ namespace C6
 
             // Collection must be non-fixed-sized
             Requires(!IsFixedSize, CollectionMustBeNonFixedSize);
-
+            
             // Argument must be non-null
             Requires(items != null, ArgumentMustBeNonNull);
 

@@ -44,7 +44,7 @@
 //- read for Test Driven ??? TDD - links
 - implement some missing tests in C6
 	_ReadOnlyCollection_
-	_FixedSizeCollection_
+	_FixedSizeCollection_	
 	//_DuplicatesByCounting_ - will not be considered
 	_Set_ ???		
 - collect the "???" from the .cs files !!! Re-look at them

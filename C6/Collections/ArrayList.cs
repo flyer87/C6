@@ -264,7 +264,7 @@ namespace C6.Collections
         public override Speed CountSpeed => Constant;
 
         public virtual EnumerationDirection Direction => EnumerationDirection.Forwards;
-
+           
         public virtual bool DuplicatesByCounting => false;
 
         public virtual SCG.IEqualityComparer<T> EqualityComparer { get; }        
