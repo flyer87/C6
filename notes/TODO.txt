@@ -34,17 +34,22 @@
 			LastViewOf			
 			Slide1, Slide2, 
 			TrySlide1, TrySlide2
-	- Span - doesn't change anything
+	//- Span - implement tests
 	- IsValid tests	
 	
 
 //- edit the failing tests
 	//- 54 : 2
-	//- fluctuating tests
-- read for Test Driven ??? TDD
-- implemnt some missing tests in C6
-	those with suffix _fail, ...	
+	//- fluctuating tests still ???
+//- read for Test Driven ??? TDD - links
+- implement some missing tests in C6
+	_ReadOnlyCollection_
+	_FixedSizeCollection_
+	//_DuplicatesByCounting_ - will not be considered
+	_Set_ ???		
 - collect the "???" from the .cs files !!! Re-look at them
+- Think of General View tests
 =================
 - Code Contracts for private methods - look and do it the same way for the rest.
+	Code contracts warnmed me for that ???
 =========

@@ -3279,6 +3279,8 @@ namespace C6.Tests
             var collection = GetCollection(items, TenEqualityComparer.Default);
             var count = DuplicatesByCounting ? 2 : 1;
             //var count = AllowsDuplicates ? 2 : 1;
+            Run.If(!(collection is IList<int>));
+
             var item = 53;
             int oldItem;
             var expectedEvents = new[] {

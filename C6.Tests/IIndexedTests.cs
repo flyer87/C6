@@ -796,6 +796,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void RemoveAt_ReadOnlyCollection_Fail()
         {
             Assert.That(IsReadOnly, Is.False, "Tests have not been written yet");
@@ -803,6 +804,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void RemoveAt_DuplicatesByCounting_Fail()
         {
             // TODO: Only one item is replaced based on AllowsDuplicates/DuplicatesByCounting
@@ -1040,6 +1042,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void RemoveIndexRange_ReadOnlyCollection_Fail()
         {
             Assert.That(IsReadOnly, Is.False, "Tests have not been written yet");
@@ -1047,6 +1050,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void RemoveIndexRange_DuplicatesByCounting_Fail()
         {
             Assert.That(DuplicatesByCounting, Is.False, "Tests have not been written yet");

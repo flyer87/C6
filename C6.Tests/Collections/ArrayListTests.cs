@@ -403,7 +403,7 @@ namespace C6.Tests.Collections
         protected override bool AllowsNull => true;
         protected override bool AllowsDuplicates => true;
         protected override Speed ContainsSpeed => Speed.Linear;
-        protected override bool DuplicatesByCounting => true;
+        protected override bool DuplicatesByCounting => false;
         protected override Speed IndexingSpeed => Speed.Constant;
         protected override bool IsFixedSize => false;
         protected override bool IsReadOnly => false;

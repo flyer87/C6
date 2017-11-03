@@ -362,13 +362,20 @@ namespace C6.Tests
             return list.View(index, count);
         }
 
-        private static IList<T> GetView<T>(IList<T> list)
+        private static IList<T> GetView<T>(IList<T> list, int? minOffset = null, int? maxOffset = null)
         {
-            // TODO: Requires
-            var index = Random.Next(0, list.Count - 1); // why Count - 1, but not Count. It is realted to: Random.Next(1,1);
-            var count = Random.Next(1, list.Count - index);
+            // TODO: Requires            
+            var minValue = minOffset == null ? 0 : 
+                minOffset < 0 || minOffset > list.Count - 1 ? 0 : minOffset.Value;            
+            
+            var maxValue = maxOffset == null ? list.Count - 1 : 
+                maxOffset < minValue || maxOffset > list.Count - 1 ? list.Count - 1 : maxOffset.Value;
 
-            return list.View(index, count);
+            // OLD version: var offset = Random.Next(0, list.Count - 1);
+            var offset = Random.Next(minValue, maxValue); // why Count - 1, but not Count. It is realted to: Random.Next(1,1);
+            var count = Random.Next(1, list.Count - offset);
+
+            return list.View(offset, count);
         }
 
         private static int GetOffset<T>(IList<T> view, Random random)
@@ -855,6 +862,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void SCIListItemSet_ReadOnlyCollection_Fail()
         {
             Assert.That(IsReadOnly, Is.False, "Tests have not been written yet");
@@ -1003,6 +1011,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void SCIListAdd_ReadOnlyCollection_Fail()
         {
             Assert.That(IsReadOnly, Is.False, "Tests have not been written yet");
@@ -1010,6 +1019,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void SCIListAdd_FixedSizeCollection_Fail()
         {
             Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
@@ -1017,6 +1027,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void SCIListAdd_Set_Fail()
         {
             Assert.That(!AllowsDuplicates, Is.False, "Tests have not been written yet");
@@ -1190,6 +1201,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void SCIListContains_Set_Fail()
         {
             Assert.That(!AllowsDuplicates, Is.False, "Tests have not been written yet");
@@ -1556,6 +1568,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void SCIListInsert_ReadOnlyCollection_Fail()
         {
             Assert.That(IsReadOnly, Is.False, "Tests have not been written yet");
@@ -1563,6 +1576,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void SCIListInsert_FixedSizeCollection_Fail()
         {
             Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
@@ -1724,6 +1738,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void SCIListRemove_ReadOnlyList_Fail()
         {
             Assert.That(IsReadOnly, Is.False, "Tests have not been written yet");
@@ -1731,6 +1746,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void SCIListRemove_DuplicatesByCounting_Fail()
         {
             // TODO: Only one item is replaced based on AllowsDuplicates/DuplicatesByCounting
@@ -1739,6 +1755,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void SCIListRemove_Set_Fail()
         {
             Assert.That(!AllowsDuplicates, Is.False, "Tests have not been written yet");
@@ -1907,6 +1924,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void SCIListRemoveAt_ReadOnlyCollection_Fail()
         {
             Assert.That(IsReadOnly, Is.False, "Tests have not been written yet");
@@ -1914,6 +1932,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void SCIListRemoveAt_DuplicatesByCounting_Fail()
         {
             // TODO: Only one item is replaced based on AllowsDuplicates/DuplicatesByCounting
@@ -2213,6 +2232,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void SCGIListRemoveAt_ReadOnlyCollection_Fail()
         {
             Assert.That(IsReadOnly, Is.False, "Tests have not been written yet");
@@ -2220,6 +2240,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void SCGIListRemoveAt_DuplicatesByCounting_Fail()
         {
             // TODO: Only one item is replaced based on AllowsDuplicates/DuplicatesByCounting
@@ -2550,6 +2571,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void ItemSet_ReadOnlyCollection_Fail()
         {
             Assert.That(IsReadOnly, Is.False, "Tests have not been written yet");
@@ -2847,6 +2869,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void Insert_ReadOnlyCollection_Fail()
         {
             Assert.That(IsReadOnly, Is.False, "Tests have not been written yet");
@@ -2854,6 +2877,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void Insert_FixedSizeCollection_Fail()
         {
             Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
@@ -2982,6 +3006,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void InsertFirst_ReadOnlyCollection_Fail()
         {
             Assert.That(IsReadOnly, Is.False, "Tests have not been written yet");
@@ -2989,6 +3014,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void InsertFirst_FixedSizeCollection_Fail()
         {
             Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
@@ -3117,6 +3143,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void InsertLast_ReadOnlyCollection_Fail()
         {
             Assert.That(IsReadOnly, Is.False, "Tests have not been written yet");
@@ -3124,6 +3151,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void InsertLast_FixedSizeCollection_Fail()
         {
             Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
@@ -3435,6 +3463,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void InsertRange_ReadOnlyCollection_Fail()
         {
             Assert.That(IsReadOnly, Is.False, "Tests have not been written yet");
@@ -3442,6 +3471,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void InsertRange_FixedSizeCollection_Fail()
         {
             Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
@@ -4057,6 +4087,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void RemoveFirst_ReadOnlyCollection_Fail()
         {
             Assert.That(IsReadOnly, Is.False, "Tests have not been written yet");
@@ -4064,6 +4095,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void RemoveFirst_FixedSizeCollection_Fail()
         {
             Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
@@ -4163,6 +4195,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void RemoveLast_ReadOnlyCollection_Fail()
         {
             Assert.That(IsReadOnly, Is.False, "Tests have not been written yet");
@@ -4170,6 +4203,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void RemoveLast_FixedSizeCollection_Fail()
         {
             Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
@@ -4323,6 +4357,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void Reverse_ReadOnlyCollection_Fail()
         {
             Assert.That(IsReadOnly, Is.False, "Tests have not been written yet");
@@ -4450,6 +4485,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void Shuffle_ReadOnlyCollection_Fail()
         {
             Assert.That(IsReadOnly, Is.False, "Tests have not been written yet");
@@ -4605,6 +4641,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void ShuffleRandom_ReadOnlyCollection_Fail()
         {
             Assert.That(IsReadOnly, Is.False, "Tests have not been written yet");
@@ -4863,6 +4900,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void Sort_ReadOnlyCollection_Fail()
         {
             Assert.That(IsReadOnly, Is.False, "Tests have not been written yet");
@@ -5131,6 +5169,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void SortComparison_ReadOnlyCollection_Fail()
         {
             Assert.That(IsReadOnly, Is.False, "Tests have not been written yet");
@@ -5400,6 +5439,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void SortIComparer_ReadOnlyCollection_Fail()
         {
             Assert.That(IsReadOnly, Is.False, "Tests have not been written yet");
@@ -6058,6 +6098,166 @@ namespace C6.Tests
         }
 
         #endregion
+
+        #region Span(IList)
+
+        [Test]
+        public void Span_SpanDuringEnumeration_ThrowsNothing()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = GetView(collection);
+            var view2 = GetView(view); // so we quarantee to get a view not sitting to left ot the view
+
+            // Act
+            var viewEnumerator = view.GetEnumerator();
+            viewEnumerator.MoveNext();
+
+            view.Span(view2);
+
+            // Assert
+            Assert.That(() => viewEnumerator.MoveNext(), Throws.Nothing);
+        }
+
+        [Test]
+        public void Span_RaisesNoEvents()
+        {
+            // Arrange
+            var items = GetUppercaseStrings(Random);
+            var collection = GetList(items);            
+            var view = GetView(collection);
+            var view2 = GetView(view);
+
+            // Act & Assert
+            Assert.That(() => view.Span(view2), RaisesNoEventsFor(collection));
+        }
+        
+
+        // view is null
+        [Test]
+        public void Span_OtherViewIsNull_ViolatesPreconditionSayingArgumentMustBeNonNull()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = GetView(collection);            
+                        
+            // Act & Assert
+            Assert.That(() => view.Span(null), Violates.PreconditionSaying(ArgumentMustBeNonNull));
+        }
+
+        // list is given
+        [Test]
+        public void Span_OtherViewIsList_ViolatesPreconditionSayingNotAView()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = GetView(collection);
+
+            // Act & Assert
+            Assert.That(() => view.Span(collection), Violates.PreconditionSaying(NotAView));
+        }
+
+        // underlying is different
+        [Test]
+        public void Span_OtherViewHasDifferentUnderlyingList_ViolatesPreconditionSayingUnderlyingListMustBeTheSame()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = GetView(collection);
+
+            var collection2 = GetStringList(Random);
+            var view2 = GetView(collection2);
+
+            // Act & Assert
+            Assert.That(() => view.Span(view2), Violates.PreconditionSaying(UnderlyingListMustBeTheSame));
+        }
+        
+        [Test]
+        public void Span_ViewsDontOverlapViewOnLeft_Equals()
+        {
+            // Arrange            
+            var collection = GetStringList(Random);
+            var view = collection.View(1, 3);
+            var otherView = collection.View(5, 3);
+            var expectedView = collection.View(1, otherView.Offset + otherView.Count - view.Offset);
+
+            // Act
+            var spannedView = view.Span(otherView);
+
+            // Assert
+            Assert.That(spannedView, Is.EqualTo(expectedView).Using(ReferenceEqualityComparer));
+        }
+
+        [Test]
+        public void Span_ViewsDontOverlapOtherviewOnLeft_Null()
+        {
+            // Arrange            
+            var collection = GetStringList(Random);
+            var view = collection.View(5, 3);
+            var otherView = collection.View(1, 3);
+            
+            // Act
+            var spannedView = view.Span(otherView);
+
+            // Assert
+            Assert.That(spannedView, Is.Null);
+        }
+
+        [Test]
+        public void Span_OtherviewBeginsWhereViewEnds_Equals()
+        {
+            // Arrange            
+            var collection = GetStringList(Random);
+            var view = collection.View(1, 3);
+            var otherView = collection.View(4, 3);
+            var expectedView = collection.View(1, otherView.Offset + otherView.Count - view.Offset);
+
+            // Act
+            var spannedView = view.Span(otherView);
+
+            // Assert
+            Assert.That(spannedView, Is.EqualTo(expectedView).Using(ReferenceEqualityComparer));
+        }
+
+
+        // v1 < v2
+        [Test]
+        public void Span_ViewAndOtherViewOverlappingViewOnLeft_Equals()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = collection.View(1, 3);
+            var otherView = collection.View(2, 3);
+            var expectedView = collection.View(1, otherView.Offset + otherView.Count - view.Offset);            
+            //var view2 = GetView(collection, minOffset: view.Offset, maxOffset: view.Offset + view.Count);
+            
+            // Act
+            var spannedView = view.Span(otherView);
+
+            // Assert
+            Assert.That(spannedView, Is.EqualTo(expectedView).Using(ReferenceEqualityComparer));
+        }
+
+        // v2 < v1
+        [Test]
+        public void Span_ViewAndOtherviewOverlappingOtherviewOnLeft_Equals()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = collection.View(2, 3);
+            var otherView = collection.View(1, 3);
+            var expectedView = collection.View(2, otherView.Offset + otherView.Count - view.Offset);                    
+            //var view2 = GetView(collection, minOffset: view.Offset, maxOffset: view.Offset + view.Count);
+            // expectedView ?
+
+            // Act
+            var spannedView = view.Span(otherView);
+
+            // Assert
+            Assert.That(spannedView, Is.EqualTo(expectedView).Using(ReferenceEqualityComparer));
+        }
+        #endregion
+
 
         #region GeneralViewTests
 

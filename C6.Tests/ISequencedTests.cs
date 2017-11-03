@@ -495,6 +495,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void SequencedEquals_Set_Fail()
         {
             Assert.That(!AllowsDuplicates, Is.False, "Tests have not been written yet");

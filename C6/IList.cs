@@ -777,11 +777,15 @@ namespace C6
             return default(bool);
         }
 
-        public IList<T> Span(IList<T> other)
+        public IList<T> Span(IList<T> otherView)
         {
-            Requires(IsValid, ListOrViewMustBeValid);
-            Requires(other != null, ArgumentMustBeNonNull);
-            Requires((Underlying ?? this) == (other.Underlying ?? this), ""); // TODO Message
+            Requires(otherView != null, ArgumentMustBeNonNull);
+            Requires(otherView.Underlying != null, NotAView);
+            Requires(Underlying == otherView.Underlying, UnderlyingListMustBeTheSame);
+
+            //Requires(IsValid, ListOrViewMustBeValid);
+            //Requires(other != null, ArgumentMustBeNonNull);
+            //Requires((Underlying ?? this) == (other.Underlying ?? this), ""); // TODO Message
 
             return default(IList<T>);
         }
@@ -793,7 +797,6 @@ namespace C6
                 // Argument must be within bounds
                 Requires(0 <= index, ArgumentMustBeWithinBounds);
                 Requires(index < Count, ArgumentMustBeWithinBounds);
-
 
                 // Result is the same as skipping the first index items
                 Ensures(Result<T>().IsSameAs(this.ElementAt(index)));

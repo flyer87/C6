@@ -1108,8 +1108,8 @@ namespace C6.Collections
 
         public virtual IList<T> Span(IList<T> other)
         {
-            if (other.Offset + other.Count - Offset < 0)
-                return null;
+            if (other.Offset + other.Count - Offset < 0) return null;
+
 
             return (_underlying ?? this).View(Offset, other.Offset + other.Count - Offset);
         }
