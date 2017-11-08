@@ -1,6 +1,59 @@
 //updateversion
 //Code Contracts in the beginnig
 ====
+??? & TODOs from .cs
+	- private SCG.IDictionary<T, Node> _itemNode; // ??? initialize here or somewhere else
+	- public int Taggroups // ??? private 
+	- public virtual bool Add(T item)
+		- InsertNodeBeforePrivate(true, _endSentinel, node); // why true ???
+	- public virtual bool AddRange(SCG.IEnumerable<T> items)
+		// ??? C6.LinkedList: All this below is in a private method InsertRangePrivate 
+		- InsertNodeBeforePrivate(false, _endSentinel, node); // why false ???
+		- (_underlying ?? this).RaiseForAddRange(array); // wrong! Not array, only the added ones ???
+	- public virtual bool ContainsRange(SCG.IEnumerable<T> items)
+		- var array = items.ToArray(); // ??? to array(). Why ???
+	- public virtual bool Remove(T item, out T removedItem)
+		- if (Count <= 0) // ??? maybe remove it
+		- var index = 0; // ??? Not changed at all
+	- public virtual bool UnsequencedEquals(ICollection<T> otherCollection) // ??? version check
+	- public virtual void RemoveIndexRange(int startIndex, int count)
+		// clean the list; ??? lines down can be replaced with RemoveFromListPrivate()
+	- public virtual void Insert(int index, T item)
+		- if (FindOrAddToHashPrivate(item, node)) // ??? return, Update or throw and excpetion 
+		- InsertNodeBeforePrivate(true, succ, node); // why true ???
+	- public virtual void Reverse()
+		- UpdateVersion(); // ??? here or 
+		- if (_views != null) // the code down - in a private method ???
+	- public virtual bool TrySlide(int offset, int count)
+		- // if (this.offset == null) in C5 offset is nullable ??? So what ?
+	- public SCG.IEnumerator<T> GetEnumerator() // overrides valuebase 
+		- // var version = (_underlying ?? this)._version; // ??? underlying !!!
+	- void SC.ICollection.CopyTo(Array array, int index)
+		- try // why try ???
+	- private bool RemoveAllWhere(Func<T, bool> predicate)
+		- var canRemove = predicate(node.item); //updatecheck(); ??? replace with somthing
+		- RemoveFromListPrivate(node, 119); // ??? 119
+		- Assert(itemsRemoved == null); // why Assert ???
+	- private void MirrorViewSentinelsForReverse(Position[] positions, ref int poslow, ref int poshigh, 
+		- int? aindex = Offset + i, bindex = Offset + Count - 1 - i; // ??? int? aindex. Non of the vaues is nullable here
+		- pos.View.Offset = bindex.GetValueOrDefault();// ??? would this brake the logic of thr code?
+	- private bool FindNodeAndIndexByItemPrivate(T item, ref Node node, ref int index, EnumerationDirection direction) // FIFO style ???
+	- private bool TryRemoveFromHash(T item, out Node node) // ??? from Hash or Dict
+	- private bool ContainsItemPrivate(T item, out Node node)   // ??? remove: out Node node         
+    - private void ClearPrivate()
+		- // ??? Create a method for the first part ??? like FixView ...
+	- private void InsertNodeBeforePrivate(bool updateViews, Node succ, Node node) // ??? updateViews
+	- private void RaiseForInsertRange(int index, SCG.IEnumerable<T> items)
+		- OnItemInserted(item, index + i++); // View: ??? Offset
+	- private void RaiseForAddRange(SCG.IEnumerable<T> array) // ??? not correct; raise for really added ones.
+	- private class TagGroup
+		- internal int Tag, Count; // ??? Capital
+	- // ??? in Fields region or Private methods
+	- private void RedistributeTagGroupsPrivate(TagGroup taggroup)
+		- double limit = 1, bigt = Math.Pow(Taggroups, 1.0 / 30); //?????
+	- ItemSet
+		- public override int GetHashCode()
+==========
 - General: invariants from C5
 - Addrange() in the constructor with Code Contracts included, fails.
 - RaiseForAddRange(array) - not correct

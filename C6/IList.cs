@@ -710,7 +710,7 @@ namespace C6
         {
             get
             {
-                Requires(IsValid);
+                Requires(IsValid, ListOrViewMustBeValid);
                 return default(IList<T>);
             }
         }
@@ -718,7 +718,7 @@ namespace C6
         public IList<T> View(int index, int count)
         {
             // Argument must be within bounds
-            Requires(IsValid);
+            Requires(IsValid, ListOrViewMustBeValid);
             Requires(index >= 0, ArgumentMustBeWithinBounds);
             Requires(count >= 0, ArgumentMustBeWithinBounds);
             Requires(index + count <= Count, ArgumentMustBeWithinBounds); // Count == this.Count; this = view. || list.            
@@ -729,7 +729,7 @@ namespace C6
         public IList<T> ViewOf(T item)
         {
             Requires(AllowsNull || item != null, ItemMustBeNonNull);
-            Requires(IsValid);
+            Requires(IsValid, ListOrViewMustBeValid);
 
             return default(IList<T>);
             // What should it ensure?
@@ -738,7 +738,7 @@ namespace C6
         public IList<T> LastViewOf(T item)
         {
             Requires(AllowsNull || item != null, ItemMustBeNonNull);
-            Requires(IsValid);
+            Requires(IsValid, ListOrViewMustBeValid);
 
             return default(IList<T>);
             // What should it ensure?
@@ -746,7 +746,7 @@ namespace C6
 
         public IList<T> Slide(int offset)
         {            
-            Requires(IsValid);
+            Requires(IsValid, ListOrViewMustBeValid);
             Requires(Offset + offset >= 0, ArgumentMustBeWithinBounds); 
             Requires(Offset + offset + Count <= Underlying.Count, ArgumentMustBeWithinBounds);
             return default(IList<T>);
@@ -764,13 +764,13 @@ namespace C6
 
         public bool TrySlide(int offset)
         {
-            Requires(IsValid);
+            Requires(IsValid, ListOrViewMustBeValid);
             return default(bool);
         }
 
         public bool TrySlide(int offset, int count)
         {
-            Requires(IsValid); 
+            Requires(IsValid, ListOrViewMustBeValid); 
             Requires(!IsReadOnly);
             Requires(Underlying != null, NotAView); 
             
@@ -858,7 +858,7 @@ namespace C6
         public void Insert(int index, T item)
         {
             // is Valid, not disposed
-            Requires(IsValid);
+            Requires(IsValid, ListOrViewMustBeValid);
 
             // Collection must be non-read-only
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
@@ -897,7 +897,7 @@ namespace C6
             Requires(AllowsNull || item != null, ItemMustBeNonNull);
 
             // is Valid, not disposed
-            Requires(IsValid);
+            Requires(IsValid, ListOrViewMustBeValid);
 
             // Collection must not already contain item if collection disallows duplicate values
             Requires(AllowsDuplicates || !Contains(item), CollectionMustAllowDuplicates);
@@ -938,7 +938,7 @@ namespace C6
             Requires(AllowsNull || item != null, ItemMustBeNonNull);
 
             // is Valid, not disposed
-            Requires(IsValid);
+            Requires(IsValid, ListOrViewMustBeValid);
 
             // Collection must not already contain item if collection disallows duplicate values
             Requires(AllowsDuplicates || !Contains(item), CollectionMustAllowDuplicates);
@@ -968,7 +968,7 @@ namespace C6
         public void InsertRange(int index, SCG.IEnumerable<T> items)
         {
             // is Valid, not disposed
-            Requires(IsValid);
+            Requires(IsValid, ListOrViewMustBeValid);
 
             // Collection must be non-read-only
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
@@ -1003,7 +1003,7 @@ namespace C6
         {
             // No preconditions
             // is Valid, not disposed
-            Requires(IsValid);
+            Requires(IsValid, ListOrViewMustBeValid);
 
             // True if sorted
             Ensures(Result<bool>() == CollectionExtensions.IsSorted(this));
@@ -1015,7 +1015,7 @@ namespace C6
         public bool IsSorted(SCG.IComparer<T> comparer)
         {
             // No preconditions
-            Requires(IsValid);
+            Requires(IsValid, ListOrViewMustBeValid);
 
             // True if sorted
             Ensures(Result<bool>() == CollectionExtensions.IsSorted(this, comparer));
@@ -1026,7 +1026,7 @@ namespace C6
 
         public bool IsSorted(Comparison<T> comparison)
         {
-            Requires(IsValid);
+            Requires(IsValid, ListOrViewMustBeValid);
             // Argument must be non-null
             Requires(comparison != null, ArgumentMustBeNonNull);
 
@@ -1053,7 +1053,7 @@ namespace C6
         public T RemoveFirst()
         {
             // is Valid, not disposed
-            Requires(IsValid);
+            Requires(IsValid, ListOrViewMustBeValid);
 
             // Collection must be non-read-only
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
@@ -1083,7 +1083,7 @@ namespace C6
         public T RemoveLast()
         {
             // is Valid, not disposed
-            Requires(IsValid);
+            Requires(IsValid, ListOrViewMustBeValid);
 
             // Collection must be non-read-only
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
@@ -1114,7 +1114,7 @@ namespace C6
         public void Reverse()
         {
             // is Valid, not disposed
-            Requires(IsValid);
+            Requires(IsValid, ListOrViewMustBeValid);
 
             // Collection must be non-read-only
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
@@ -1128,7 +1128,7 @@ namespace C6
         public void Shuffle()
         {
             // is Valid, not disposed
-            Requires(IsValid);
+            Requires(IsValid, ListOrViewMustBeValid);
 
             // Collection must be non-read-only
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
@@ -1143,7 +1143,7 @@ namespace C6
 
         public void Shuffle(Random random)
         {
-            Requires(IsValid);
+            Requires(IsValid, ListOrViewMustBeValid);
 
             // Collection must be non-read-only
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
@@ -1163,7 +1163,7 @@ namespace C6
         public void Sort()
         {
             // is Valid, not disposed
-            Requires(IsValid);
+            Requires(IsValid, ListOrViewMustBeValid);
 
             // Collection must be non-read-only
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
@@ -1180,7 +1180,7 @@ namespace C6
 
         public void Sort(Comparison<T> comparison)
         {
-            Requires(IsValid);
+            Requires(IsValid, ListOrViewMustBeValid);
 
             // Collection must be non-read-only
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
@@ -1201,7 +1201,7 @@ namespace C6
 
         public void Sort(SCG.IComparer<T> comparer)
         {
-            Requires(IsValid);
+            Requires(IsValid, ListOrViewMustBeValid);
 
             // Collection must be non-read-only
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);

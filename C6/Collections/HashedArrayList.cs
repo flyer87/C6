@@ -138,7 +138,7 @@ namespace C6.Collections
 
             // allowsNull = false - by default !
             IsValid = true;
-            EqualityComparer = equalityComparer ?? SCG.EqualityComparer<T>.Default; // ??? Default
+            EqualityComparer = equalityComparer ?? SCG.EqualityComparer<T>.Default;
 
             //var collectionValues = items as ICollectionValue<T>;
             //var collection = items as SCG.ICollection<T>;
@@ -599,14 +599,13 @@ namespace C6.Collections
             {
                 return false;
             }
-
-            // TODO: Private method
+            
             // TODO: ???Replace ArrayList<T> with more efficient data structure like HashBag<T>
             //var itemsToContain = new ArrayList<T>(items, EqualityComparer);
             //bool containsRange = true;
             //foreach (var item in items)
             //{
-            //    containsRange = containsRange && _itemIndex.ContainsKey(item); // ??? &= 
+            //    containsRange = containsRange && _itemIndex.ContainsKey(item); 
             //}
             
             //return containsRange;
@@ -659,7 +658,7 @@ namespace C6.Collections
                 return false;
             }
 
-            item = _items[Offset + index]; // View: offset ???
+            item = _items[Offset + index];
             return true;
         }
 
@@ -743,7 +742,7 @@ namespace C6.Collections
 
                 UpdateVersion();
 
-                // View: index += offsetField;
+                // View: index += offsetField; ???
                 var oldItem = _items[index];
 
                 if (EqualityComparer.Equals(value, oldItem))
@@ -761,7 +760,7 @@ namespace C6.Collections
                 }
                 // Allready there: Exception; C5 throws, but why ???
 
-                RaiseForIndexSetter(oldItem, value, index); // View: (_underlying ?? this).
+                RaiseForIndexSetter(oldItem, value, index); // View: (_underlying ?? this). ???
             }
         }
 
@@ -866,7 +865,7 @@ namespace C6.Collections
 
         public virtual void InsertRange(int index, SCG.IEnumerable<T> items)
         {
-            // TODO: Use InsertPrivate()
+            // TODO: Use InsertPrivate() ??? 
 
             // TODO: Handle ICollectionValue<T> and ICollection<T>
             // TODO: Avoid creating an array? Requires a lot of extra code, since we need to properly handle items already added from a bad enumerable
@@ -1089,7 +1088,7 @@ namespace C6.Collections
             view.Count = count;
 
             view._underlying = _underlying ?? this;
-            view._myWeakReference = _views.Add(view); // ??? add this view (retval) to the list of my other views
+            view._myWeakReference = _views.Add(view);
             return view;
         }
 
@@ -1305,8 +1304,8 @@ namespace C6.Collections
 
             var shouldRememberItems = ActiveEvents.HasFlag(Removed); // ??? 
             IExtensible<T> itemsRemoved = null;
-            int cntRemoved = 0;
-            ViewHandler viewHandler = new ViewHandler(this);
+            var cntRemoved = 0;
+            var viewHandler = new ViewHandler(this);
 
             // TODO: Use bulk moves - consider using predicate(item) ^ something
             var j = Offset;

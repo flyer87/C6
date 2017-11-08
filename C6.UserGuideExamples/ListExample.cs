@@ -32,7 +32,10 @@ namespace C6.UserGuideExamples
 
             var items = new[] { "8", "Ab", "3", "4", "5", "6", "7", "8" };
             var collection = new ArrayList<string>(items);
-            ((SC.IList) collection).Insert(1, "sdfsfd");
+            var view = collection.View(1, 3);
+            
+            collection.Reverse();
+            Console.WriteLine(view.IsSorted());
 
 
 

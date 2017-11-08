@@ -87,11 +87,13 @@ Thesis notes:
 			LL: Invariant((_underlying ?? this)._views == null || ForAll((_underlying ?? this)._views, v => ...
 			"The invariant methods must have no other code in it than a sequence of calls to Contract. Invariant"
 			may be bug: https://tutel.me/c/programming/questions/3597011/why+contract+is+malformed+when+using+defaulttype
+		- added: public void ShuffleRandom_IsFixedSizedCollection_ThrowsNothing()
+			- IsFixedSized -> shuffles and throws nothing
+		- Tests added: for Reverse, Shuffle, Sort, Clear?
+			Any difference with C5 tests
+        
 			
 - C5 updates the underlying version even view.Slide should only affect the view's version;
 	list.Add() - affects the current view, list and some (overlapping?) views
 	view.Add() - affects the current view, list and some (overlapping?) views
 	view.Slide() - only the current view; neither the list, nor the other views
-=====
-Learn how it is done in C6:
-- custom reference equality comparer	

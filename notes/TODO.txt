@@ -35,7 +35,7 @@
 			Slide1, Slide2, 
 			TrySlide1, TrySlide2
 	//- Span - implement tests
-	- IsValid tests	
+	
 	
 
 //- edit the failing tests
@@ -45,9 +45,11 @@
 - implement some missing tests in C6
 	_ReadOnlyCollection_
 	_FixedSizeCollection_	
+		Added: public void ShuffleRandom_IsFixedSizedCollection_ThrowsNothing()
 	//_DuplicatesByCounting_ - will not be considered
-	_Set_ ???		
+	_Set_ what is that ???		
 - collect the "???" from the .cs files !!! Re-look at them
+- IsValid tests	
 - Think of General View tests
 =================
 - Code Contracts for private methods - look and do it the same way for the rest.

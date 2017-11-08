@@ -431,7 +431,7 @@ namespace C6.Tests.Collections
 
 
     [TestFixture]
-    public class ArrayListGeneralViewTets : GeneralViewTest
+    public class ArrayListGeneralViewTests : GeneralViewTest
     {
         protected override IList<T> GetEmptyList<T>(SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
             => new ArrayList<T>(equalityComparer: equalityComparer, allowsNull: allowsNull);

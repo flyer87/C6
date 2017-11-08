@@ -447,7 +447,7 @@ namespace C6.Collections
             // Optimize call, if no items should be retained
             if (items.IsEmpty())
             {                                
-                var itemsRemoved = this; // for views ??? yes, this 
+                var itemsRemoved = this;
                 // clear dict
                 if (_underlying == null)
                 {
@@ -717,7 +717,7 @@ namespace C6.Collections
 
             InsertRangePrivate(index, array);
             (_underlying ?? this).RaiseForInsertRange(index, array);
-            //  not corect should raise only for really inserted ???
+            //  not corect should raise only for really inserted
             // !!! it is correct, since we have a precondition checking that all the items are not in the list
         }
 
@@ -1262,7 +1262,7 @@ namespace C6.Collections
                 return false;
             }
 
-            UpdateVersion(); // once or countRemoved times in the while ?
+            UpdateVersion(); // once or countRemoved times in the while ???
 
             if (shouldRememberItems)
             {
@@ -1366,7 +1366,7 @@ namespace C6.Collections
                 {
                     var tmp = new Node(item, node, null);
 
-                    if (_itemNode.ContainsKey(item)) // No! ??? contains, but should we update the found key [with curr. item]
+                    if (_itemNode.ContainsKey(item)) // No! Contains, but should we update the found key [with curr. item]
                     {
                         continue;
                     }
@@ -1403,7 +1403,7 @@ namespace C6.Collections
                         _underlying.Count += count;
 
                      FixViewsAfterInsertPrivate(succ, pred, count, 0); //View:
-                    // maybe no ??? raiseForInsertAll(pred, i, count, insertion); it is moved up !
+                    // maybe no ?! raiseForInsertAll(pred, i, count, insertion); it is moved up !
                 }
             }
 
@@ -1902,7 +1902,7 @@ namespace C6.Collections
 
         private void RaiseForSort() => OnCollectionChanged();
 
-        private void RaiseForInsertRange(int index, SCG.IEnumerable<T> items) // ??? was T[] 
+        private void RaiseForInsertRange(int index, SCG.IEnumerable<T> items)
         {
             if (ActiveEvents.HasFlag(Inserted | Added))
             {
@@ -2660,8 +2660,7 @@ namespace C6.Collections
                 CheckVersion();
                 Set.CopyTo(array, arrayIndex);
             }
-
-            // ???? Equals comes from where. Ok - from Object class
+            
             public override bool Equals(object obj) => CheckVersion() & base.Equals(obj);
 
             // ? Why do we need it? Isn't that enough to overrire GetEnumerator()?

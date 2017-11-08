@@ -2,19 +2,41 @@ CHECK FOR VERSIONUPDATE() IN LinkedList
 	which methods?
 ArrL - (_under ?? this).RaiseFor - included or not?
 	indexes
-
-
+===========	
+??? from .cs
+	- Invarints
+		// Next pointers are not null ??? TODO: heavy
+		// views are correct ??? 
+	- Constructor
+		AddRange(items); // ??? do we need it; virtual method
+	- public virtual bool RetainRange(SCG.IEnumerable<T> items)
+		- ClearPrivate(); // Clear() was here! But tests passed, altough Clear() rasises its own events ???                    
+	- public virtual void InsertRange(int index, SCG.IEnumerable<T> items)
+		- InsertRangePrivate(index, items); // ??? C5.LinkedList has last bool parameter
+	- void SC.ICollection.CopyTo(Array array, int index)
+		- try // why try ???
+		- catch(InvalidCastException) //catch (ArrayTypeMismatchException) ???
+	- private void InsertRangePrivate(int index, SCG.IEnumerable<T> items)
+		- if (count == 0) // no need ??? The same reason as down!
+	- private void RaiseForUpdate(T item, T oldItem)
+		- // ActiveEvents check ???
+	- private sealed class Node // Why not Node<T> ??
+		- several ???
+	- public override bool Equals(object obj) => CheckVersion() & base.Equals(obj); // base. ???
+	- Range.public override int GetHashCode()
+		- return base.GetHashCode(); // ??? calls again Object.GetHashCode(); base.
+		- some other ???
+===========
 TODO:	
 	- Invalidate views
 	//!Check for Code contracts after implementation of IExtensible	
 	- public bool UnsequencedEquals(ICollection<T> otherCollection)        
 		Peter's is different
 	- private bool RemoveAllWhere(Func<T, bool> predicate)
-		- updateCheck == CheckVersion
-		
+		- updateCheck == CheckVersion		
 	- private sealed class ItemSet : CollectionValueBase<T>, ICollectionValue<T> // 
 		??? CollectionValues base
-	- ADD: ObjectInvariants
+	//- ADD: ObjectInvariants
 	- FindOrAdd_FindItemDuringEnumeration_ThrowsNothing()
 		throws Code Contratcs error if:
 		 in Find(ref T item)

@@ -3,11 +3,12 @@ Tests
 	- make interface hierarchy with tests
 	- how to write: Raises(expectedEvents).For(collection) in
 		Assert.That(() => ((SC.IList) collection)[index] = item, Raises(expectedEvents).For(collection));
-		
-		
+				
 	- how to write:  Violates.PreconditionSaying(NotAView)
 		Assert.That(() => view.Span(view2), Violates.PreconditionSaying(NotAView));
-	
+	- custom reference equality comparer	
+		ReferenceEqualityComparer
+		
 	- classes
 		- CollectionEvent
 		- CollectionEventConstraint

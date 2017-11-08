@@ -43,8 +43,7 @@ namespace C6.Collections
     [Serializable]
     [DebuggerTypeProxy(typeof(CollectionValueDebugView<>))]
     public class ArrayList<T> : CollectionValueBase<T>, IList<T>, IStack<T>
-    {
-        // Why ArrayBase is not extended like in C5???
+    {        
         #region Fields
 
         public static readonly T[] EmptyArray = new T[0];
@@ -307,8 +306,7 @@ namespace C6.Collections
         /// <summary>
         /// Null if this list is not a view.
         /// </summary>
-        /// <value>Underlying list for view.</value>
-        /// ???????? move to Property region
+        /// <value>Underlying list for view.</value>        
         public virtual IList<T> Underlying => _underlying;
                 
         #endregion
@@ -555,7 +553,7 @@ namespace C6.Collections
 
             if (item == null)
             {
-                for (var i = 0; i < this.Count; i++)
+                for (var i = 0; i < Count; i++)
                 {
                     // Explicitly check against null to avoid using the (slower) equality comparer
                     if (_items[_offsetField + i] == null)
@@ -566,7 +564,7 @@ namespace C6.Collections
             }
             else
             {
-                for (var i = 0; i < this.Count; i++)
+                for (var i = 0; i < Count; i++)
                 {
                     if (Equals(item, _items[_offsetField + i]))
                     {
@@ -1041,7 +1039,7 @@ namespace C6.Collections
             view._offsetField = _offsetField + index;
             view.Count = count;            
                         
-            view._myWeakReference = _views.Add(view);// ??? add this view (retval) to the list of my other views
+            view._myWeakReference = _views.Add(view);
             return view;
         }
 
@@ -1052,12 +1050,9 @@ namespace C6.Collections
         /// <param name="item">The item to find.</param>
         /// <returns>The new list view.</returns>
         public virtual IList<T> ViewOf(T item)
-        {                        
-            // nulls allowed  ???
-            int index = indexOf(item); // ??? IndexOf or indexOf
-            if (index < 0)
-                return null;
-            return View(index, 1);
+        {                                    
+            var index = IndexOf(item); // ??? IndexOf or indexOf
+            return index < 0 ? null : View(index, 1);
         }
 
         /// <summary>
@@ -1067,12 +1062,13 @@ namespace C6.Collections
         /// <param name="item">The item to find.</param>
         /// <returns>The new list view.</returns>
         public virtual IList<T> LastViewOf(T item)
-        {            
-            var index = lastIndexOf(item); // ??? calling private method
+        {
+            //var index = lastIndexOf(item); // ??? calling private method
+            var index = LastIndexOf(item); 
             return index < 0 ? null : View(index, 1);
         }
 
-        public virtual IList<T> Slide(int offset) // duplication ???;  => Slide(offset, Count); enough
+        public virtual IList<T> Slide(int offset)
         {
             TrySlide(offset, Count);
             return this;
@@ -1187,7 +1183,7 @@ namespace C6.Collections
             remove
             {
                 _itemInserted -= value;
-                if (_itemInserted == null) // ??? Why only when _itemInserted == null
+                if (_itemInserted == null)
                 {
                     ActiveEvents &= ~Inserted;
                 }
@@ -1801,7 +1797,7 @@ namespace C6.Collections
             var cntRemoved = 0;
             var viewHandler = new ViewHandler(this); 
 
-            // TODO: Use bulk moves - consider using predicate(item) ^ something
+            // TODO: Use bulk moves - consider using predicate(item) ^ something ???
             var j = _offsetField;
             for (var i = _offsetField; i < _offsetField + Count; i++)
             {
@@ -2294,7 +2290,7 @@ namespace C6.Collections
             // ???? Equals comes from where. Ok - from Object class
             public override bool Equals(object obj) => CheckVersion() & base.Equals(obj);
 
-            // ? Why do we need it? Isn't that enough to overrire GetEnumerator()?
+            // ??? Why do we need it? Isn't that enough to overrire GetEnumerator()?
             public override SCG.IEnumerator<T> GetEnumerator()
             {
                 // If a set already exists, enumerate that

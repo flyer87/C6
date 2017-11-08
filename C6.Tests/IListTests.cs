@@ -32,64 +32,12 @@ namespace C6.Tests
 
         protected abstract IList<T> GetList<T>(SCG.IEnumerable<T> enumerable, SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false);
 
-        /*private IList<string> GetStringList(Randomizer random, SCG.IEqualityComparer<string> equalityComparer = null, bool allowsNull = false)
-            => GetList(GetStrings(random, GetCount(random)), equalityComparer, allowsNull);
-
-        //private static NonComparable[] GetNonComparables(Random random) => GetNonComparables(random, GetCount(random));
-        //private static NonComparable[] GetNonComparables(Random random, int count) => Enumerable.Range(0, count).Select(i => new NonComparable(random.Next())).ToArray();
-
-        //private static Comparable[] GetComparables(Random random) => GetComparables(random, GetCount(random));
-        //private static Comparable[] GetComparables(Random random, int count) => Enumerable.Range(0, count).Select(i => new Comparable(random.Next())).ToArray();
-        
-        private static IList<T> GetEmptyView<T>(IList<T> list)
-        {
-            // TODO: Requires
-            var index = Random.Next(0, list.Count);
-            var count = 0;
-            return list.View(index, count);
-        }
-
-        private static IList<T> GetView<T>(IList<T> list)
-        {
-            // TODO: Requires
-            var index = Random.Next(0, list.Count - 1); // why Count - 1, but not Count. It is realted to: Random.Next(1,1);
-            var count = Random.Next(1, list.Count - index);
-
-            return list.View(index, count);
-        }
-
-        private static int GetOffset<T>(IList<T> view, Random random)
-        {
-            // TODO: Requires
-            var maxOffset = view.Underlying.Count - view.Count;
-            var withOffset = random.Next(0, maxOffset - view.Offset + 1);
-            return withOffset;
-        }
-
-        private static int GetNewCount<T>(IList<T> view, int withOffset, Random random)
-        {
-            // TODO: Requires
-            //var maxOffset = view.Underlying.Count - view.Count;
-            //var withOffset = Random.Next(0, maxOffset + 1);
-            //var newCount = Random.Next(0, view.Underlying.Count - (view.Offset + withOffset));
-
-            //var maxOffset = view.Underlying.Count - view.Count;
-            //var withOffset = Random.Next(0, maxOffset + 1);
-
-            // ! var newCount = Random.Next(0, view.Underlying.Count - view.Offset + 1);
-            var newOffset = view.Offset + withOffset;
-            var newCount = random.Next(0, view.Underlying.Count - newOffset + 1);
-
-            return newCount;
-        }
-        */
-
         // in the middle        
         private static IList<string>[] GetNItemViewsInTheMiddle(IList<string> coll)
         {
             var nItemViews = new IList<string>[5];
             const int count = 3;
-            var index = coll.Count / 2 - 1; // middel
+            var index = coll.Count / 2 - 1; // from the middel
 
             nItemViews[0] = coll.View(index, count); // View(int, int)
             nItemViews[1] = coll.View(index, count);
@@ -104,7 +52,7 @@ namespace C6.Tests
             return nItemViews;
         }
 
-        private static IList<string>[] Get1ItemViewInTheMiddle(IList<string> coll)
+        private static IList<string>[] GetOneItemViewsInTheMiddle(IList<string> coll)
         {
             var oneItemViews = new IList<string>[7];
             const int count = 1;
@@ -139,9 +87,7 @@ namespace C6.Tests
             zeroItemViews[3] = coll.View(index, count);
             zeroItemViews[3].TrySlide(-2); // TrySlide(int)
             zeroItemViews[4] = coll.View(index, count);
-            zeroItemViews[4].TrySlide(1, count); // TrySlide(int, int)
-            //zeroItemViews[5] = coll.ViewOf(middelItem).View(0, 0);
-            //zeroItemViews[6] = coll.LastViewOf(middelItem).View(0, 0); // LastViewOf
+            zeroItemViews[4].TrySlide(1, count); // TrySlide(int, int)            
 
             return zeroItemViews;
         }
@@ -151,7 +97,7 @@ namespace C6.Tests
         {
             var nItemViews = new IList<string>[5];
             const int index = 0;
-            const int count = 3;
+            const int count = 7; // enough long, min. 6
 
             nItemViews[0] = coll.View(index, count); // View(int, int)
             nItemViews[1] = coll.View(index, count);
@@ -161,14 +107,12 @@ namespace C6.Tests
             nItemViews[3] = coll.View(index, count);
             nItemViews[3].TrySlide(0); // TrySlide(int)
             nItemViews[4] = coll.View(index, count);
-            nItemViews[4].TrySlide(0, count); // TrySlide(int, int)
-            //nItemViews[5] = coll.ViewOf(middelItem); // ViewOF
-            //nItemViews[6] = coll.LastViewOf(middelItem); // LastViewOf
+            nItemViews[4].TrySlide(0, count); // TrySlide(int, int)            
 
             return nItemViews;
         }
 
-        private static IList<string>[] Get1ItemViewInTheBeginning(IList<string> coll)
+        private static IList<string>[] GetOneItemViewInTheBeginning(IList<string> coll)
         {
             var oneItemViews = new IList<string>[7];
             const int index = 0;
@@ -191,8 +135,7 @@ namespace C6.Tests
 
         private static IList<string>[] GetZeroItemViewsInTheBeginning(IList<string> coll)
         {
-            var zeroItemViews = new IList<string>[5];
-            var middelItem = coll[coll.Count / 2];
+            var zeroItemViews = new IList<string>[5];            
             const int index = 0;
             const int count = 0;
 
@@ -205,18 +148,16 @@ namespace C6.Tests
             zeroItemViews[3].TrySlide(0); // TrySlide(int)
             zeroItemViews[4] = coll.View(index, count);
             zeroItemViews[4].TrySlide(0, count); // TrySlide(int, int)
-            //zeroItemViews[5] = coll.ViewOf(middelItem).View(0, 0);
-            //zeroItemViews[6] = coll.LastViewOf(middelItem).View(0, 0); // LastViewOf
 
             return zeroItemViews;
         }
 
         // in the end        
-        private static IList<string>[] GetNItemViewsInTheEnd(IList<string> coll)
+        private static IList<string>[] GetNItemViewsAtTheEnd(IList<string> coll)
         {
             var nItemViews = new IList<string>[5];
-            var index = coll.Count - 3;
-            const int count = 3;
+            var index = coll.Count - 10; // need enough for RemoveAt
+            const int count = 10;
 
             nItemViews[0] = coll.View(index, count); // View(int, int)
             nItemViews[1] = coll.View(index, count);
@@ -226,14 +167,12 @@ namespace C6.Tests
             nItemViews[3] = coll.View(index, count);
             nItemViews[3].TrySlide(0); // TrySlide(int)
             nItemViews[4] = coll.View(index, count);
-            nItemViews[4].TrySlide(0, count); // TrySlide(int, int)
-            //nItemViews[5] = coll.ViewOf(middelItem); // ViewOF
-            //nItemViews[6] = coll.LastViewOf(middelItem); // LastViewOf
+            nItemViews[4].TrySlide(0, count); // TrySlide(int, int)            
 
             return nItemViews;
         }
 
-        private static IList<string>[] Get1ItemViewInTheEnd(IList<string> coll)
+        private static IList<string>[] Get1ItemViewAtTheEnd(IList<string> coll)
         {
             var oneItemViews = new IList<string>[7];
             var index = coll.Count - 1;
@@ -254,7 +193,7 @@ namespace C6.Tests
             return oneItemViews;
         }
 
-        private static IList<string>[] GetZeroItemViewsInTheEnd(IList<string> coll)
+        private static IList<string>[] GetZeroItemViewsAtTheEnd(IList<string> coll)
         {
             var zeroItemViews = new IList<string>[5];
             const int count = 0;
@@ -268,57 +207,49 @@ namespace C6.Tests
             zeroItemViews[3] = coll.View(index, count);
             zeroItemViews[3].TrySlide(0); // TrySlide(int)
             zeroItemViews[4] = coll.View(index, count);
-            zeroItemViews[4].TrySlide(0, count); // TrySlide(int, int)
-            //zeroItemViews[5] = coll.ViewOf(middelItem).View(0, 0);
-            //zeroItemViews[6] = coll.LastViewOf(middelItem).View(0, 0); // LastViewOf
+            zeroItemViews[4].TrySlide(0, count); // TrySlide(int, int)            
 
             return zeroItemViews;
         }
 
         #endregion
 
-        private IList<string> _list;
-
-        private IList<string>[] nItemViewsInTheBeginning, oneItemViewsInTheBeginning, zeroItemViewsInTheBeginning,
-            nItemViewsInTheMiddle, oneItemViewsInTheMiddle, zeroItemViewsInTheMiddle, nItemViewsInTheEnd, oneItemViewsInTheEnd,
-            zeroItemViewsInTheEnd;
-
-        private IList<string> auxViewRight, auxViewLeft;
+        private IList<string> list, auxViewRight, auxViewLeft;
 
         [SetUp]
         public void SetUp()
         {
             // Arrange
-            var list = new[] {
+            var array = new[] {
                 "aa", "bb", "cc", "dd", "ee", "ff", "gg", "hh", "ii", "jj", "kk", "ll",
-                "mm", "nn", "oo", "pp", "qq", "rr", "ss", "tt", "uu", "vv", "ww", "xx", "yy", "zz"
+                "mm", "nn", "oo", "pp", "qq", "rr", "ss", "tt", "uu", "vv", "ww", "xx", "yy", "zz",
+                "aaa", "bbb", "ccc", "ddd", "eee", "fff", "ggg", "hhh", "iii", "jjj", "kkk",
+                "lll", "mmm", "nnn", "ooo", "ppp", "qqq", "rrr", "sss", "ttt", "uuu", "vvv",
+                "www", "xxx", "yyy", "zzz"
             };
 
-            _list = GetList(list);
+            // Arrange the collection 
+            list = GetList(array);
 
-            // Arrange views from the beginning
-            nItemViewsInTheBeginning = GetNItemViewsInTheBeginning(_list);
-            oneItemViewsInTheBeginning = Get1ItemViewInTheBeginning(_list);
-            zeroItemViewsInTheBeginning = GetZeroItemViewsInTheBeginning(_list);
+            // Arrange auxilary views 
+            auxViewLeft = list.View(0, 2);
+            auxViewRight = list.View(list.Count - 10, 10); // > the # of view methods
+        }
 
-            // Arrange views from the middle
-            nItemViewsInTheMiddle = GetNItemViewsInTheMiddle(_list);
-            oneItemViewsInTheMiddle = Get1ItemViewInTheMiddle(_list);
-            zeroItemViewsInTheMiddle = GetZeroItemViewsInTheMiddle(_list);
-
-            // Arrange views in the end
-            nItemViewsInTheEnd = GetNItemViewsInTheEnd(_list);
-            oneItemViewsInTheEnd = Get1ItemViewInTheEnd(_list);
-            zeroItemViewsInTheEnd = GetZeroItemViewsInTheEnd(_list);
-
-            auxViewLeft = _list.View(0, 2);
-            auxViewRight = _list.View(_list.Count - 2, 2); // last 2 items, beginning from index: Count - 3
+        [TearDown]
+        public void TearDown()
+        {
+            list = null;
+            auxViewLeft = null;
+            auxViewRight = null;
         }
 
         [Test]
         public void ViewRemoveAt_NItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
         {
-            foreach (var view in nItemViewsInTheMiddle)
+            var index = 0;
+            var views = GetNItemViewsInTheMiddle(list);
+            foreach (var view in views)
             {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
@@ -328,13 +259,159 @@ namespace C6.Tests
                 view.RemoveAt(0);
 
                 // Assert                
-                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), "");
-                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), "");
-                Assert.That(view, Is.EqualTo(_list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), "");
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemoveAt_OneItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
+        {
+            var index = 0;
+            var views = GetOneItemViewsInTheMiddle(list);
+            foreach (var view in views)
+            {
+                if (view.IsEmpty) continue;
+
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+
+                // Act
+                view.RemoveAt(0);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemoveAt_ZeroItemViewsInTheMiddle_ViolatesPrecondition()
+        {
+            // Act & Assert
+            var views = GetZeroItemViewsInTheMiddle(list);
+            foreach (var view in views)
+            {
+                Assert.That(() => view.RemoveAt(0), Violates.PreconditionSaying(ArgumentMustBeWithinBounds));
+            }
+        }
+
+        [Test]
+        public void ViewRemoveAt_NItemViewsInTheBeginning_RightAuxViewsOffsetAffected()
+        {
+            var index = 0;
+            var views = GetNItemViewsInTheBeginning(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+
+                // Act
+                view.RemoveAt(0);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemoveAt_OneItemViewsInTheBeginning_RightAuxViewsOffsetAffectedAndAllViewsGetEmpty()
+        {
+            // Arrange 
+            var views = GetOneItemViewInTheBeginning(list);
+            var offsetLeft = auxViewLeft.Offset;
+            var offsetRight = auxViewRight.Offset;
+            var index = Random.Next(0, views.Length + 1);
+
+            // Act
+            // do it on one of the views; They all are one-item overlapping views            
+            var view = views[index];
+            view.RemoveAt(0);
+
+            // Assert    
+            Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+            Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+            foreach (var v in views)
+            {
+                Assert.That(v, Is.Empty, $"view {index}");
+            }
+        }
+
+        [Test]
+        public void ViewRemoveAt_ZeroItemViewsInTheBeginning_ViolatesPrecondition()
+        {
+            // Act & Assert
+            var views = GetZeroItemViewsInTheBeginning(list);
+            foreach (var view in views)
+            {
+                Assert.That(() => view.RemoveAt(0), Violates.Precondition);
+            }
+        }
+
+        [Test]
+        public void ViewRemoveAt_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetNItemViewsAtTheEnd(list);
+            foreach (var view in views)
+            {
+                // Arrange                       
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+
+                // Act
+                view.RemoveAt(view.Count - 1);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemoveAt_OneItemViewsAtTheEnd_AuxViewsOffsetNotAffectedAndAllViewsGetEmpty()
+        {
+            // Arrange 
+            var offsetLeft = auxViewLeft.Offset;
+            var offsetRight = auxViewRight.Offset;
+            var views = Get1ItemViewAtTheEnd(list);
+            var index = Random.Next(0, views.Length);
+
+            // Act // Do it on one of the views; They all are one-item overlapping views            
+            var view = views[index];
+            view.RemoveAt(view.Count - 1);
+
+            // Assert    
+            Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+            Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+            foreach (var v in views)
+            {
+                Assert.That(v.Count, Is.Zero, $"view {index}");
+            }
+        }
+
+        [Test]
+        public void ViewRemoveAt_ZeroItemViewsAtTheEnd_ViolatesPrecondition()
+        {
+            // Act & Assert
+            var views = GetZeroItemViewsAtTheEnd(list);
+            foreach (var view in views)
+            {
+                Assert.That(() => view.RemoveAt(0), Violates.Precondition);
             }
         }
     }
-
 
     [TestFixture]
     public abstract class IListTests : IIndexedTests
@@ -365,10 +442,10 @@ namespace C6.Tests
         private static IList<T> GetView<T>(IList<T> list, int? minOffset = null, int? maxOffset = null)
         {
             // TODO: Requires            
-            var minValue = minOffset == null ? 0 : 
-                minOffset < 0 || minOffset > list.Count - 1 ? 0 : minOffset.Value;            
-            
-            var maxValue = maxOffset == null ? list.Count - 1 : 
+            var minValue = minOffset == null ? 0 :
+                minOffset < 0 || minOffset > list.Count - 1 ? 0 : minOffset.Value;
+
+            var maxValue = maxOffset == null ? list.Count - 1 :
                 maxOffset < minValue || maxOffset > list.Count - 1 ? list.Count - 1 : maxOffset.Value;
 
             // OLD version: var offset = Random.Next(0, list.Count - 1);
@@ -1029,7 +1106,7 @@ namespace C6.Tests
             var item = GetUppercaseString(Random);
 
             // Act & Assert
-            Assert.That(() => ((SC.IList)collection).Add(item), Violates.Precondition);
+            Assert.That(() => ((SC.IList) collection).Add(item), Violates.Precondition);
             //Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
         }
 
@@ -1595,7 +1672,7 @@ namespace C6.Tests
             var index = GetIndex(collection, Random, true);
 
             // Act & Assert
-            Assert.That(() => ((SC.IList)collection).Insert(index, item), Violates.Precondition);
+            Assert.That(() => ((SC.IList) collection).Insert(index, item), Violates.Precondition);
             // Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
         }
 
@@ -3045,7 +3122,7 @@ namespace C6.Tests
             Run.If(IsFixedSize);
 
             // Arrange
-            var collection = GetStringList(Random);            
+            var collection = GetStringList(Random);
             var item = GetUppercaseString(Random);
 
             // Act & Assert
@@ -3520,7 +3597,7 @@ namespace C6.Tests
             var collection = GetStringList(Random);
             var index = GetIndex(collection, Random, true);
             var items = GetStrings(Random);
-            
+
             // Act & Assert
             Assert.That(() => collection.InsertRange(index, items), Violates.PreconditionSaying(CollectionMustBeNonFixedSize));
             //Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
@@ -4149,7 +4226,7 @@ namespace C6.Tests
         {
             Run.If(IsFixedSize);
 
-            var collection = GetStringList(Random);            
+            var collection = GetStringList(Random);
 
             // Act & Assert
             Assert.That(() => collection.RemoveFirst(), Violates.PreconditionSaying(CollectionMustBeNonFixedSize));
@@ -4265,7 +4342,7 @@ namespace C6.Tests
 
             // Arrange
             var collection = GetStringList(Random);
-            
+
             // Act & Assert
             Assert.That(() => collection.RemoveLast(), Violates.PreconditionSaying(CollectionMustBeNonFixedSize));
             //Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
@@ -4417,6 +4494,69 @@ namespace C6.Tests
             Assert.That(collection, Is.EqualTo(array).Using(ReferenceEqualityComparer));
         }
 
+        // coll.reverse - vs valid
+        [Test]
+        public void Reverse_RandomCollection_ViewIsValid()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view = GetView(collection);
+
+            // Act
+            collection.Reverse();   
+
+            // Assert
+            Assert.That(view.IsValid, Is.True);
+        }
+
+        // v.reverse(), v in w, w is valid
+        [Test]
+        public void Reverse_View1ContainedInView2_View2IsValid()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view2 = collection.View(2, 4); // longer
+            var view1 = collection.View(3, 2);
+
+            // Act
+            view1.Reverse();
+
+            // Assert
+            Assert.That(view2.IsValid, Is.True);
+        }
+
+        // v.reverse(), w in v, w is valid
+        [Test]
+        public void Reverse_View2ContainedInView1_View2IsValid()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view2 = collection.View(3, 2);
+            var view1 = collection.View(2, 4); // longer           
+
+            // Act
+            view1.Reverse();
+
+            // Assert
+            Assert.That(view2.IsValid, Is.True);
+        }
+
+        // v.reverse, v and w - overlaping - w no longer valid
+        [Test]
+        public void Reverse_View1AndView2Overlaping_View2NotValid()
+        {
+            // Arrange
+            var collection = GetStringList(Random);            
+            var view2 = collection.View(2, 4); // longer           
+            var view1 = collection.View(3, 4);
+
+            // Act
+            view1.Reverse();
+
+            // Assert
+            Assert.That(view2.IsValid, Is.False);
+        }
+        
         [Test]
         [Category("Unfinished")]
         [Ignore("Unfinished")]
@@ -4545,6 +4685,73 @@ namespace C6.Tests
             Assert.That(() => enumerator.MoveNext(), Throws.Nothing);
         }
 
+        // coll.shuffle(), view invalid
+        [Test]
+        public void Shuffle_RandomCollection_ViewsAreNotValid()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view1 = GetView(collection);
+            var view2 = GetView(collection);
+
+            // Act
+            collection.Shuffle();
+
+            // Assert
+            // TODO: Multiple
+            Assert.That(view1.IsValid, Is.False);
+            Assert.That(view2.IsValid, Is.False);
+        }
+
+        // v.shuffle(), v in w, w is valid
+        [Test]
+        public void Shuffle_View1ContainedInView2_View2IsValid()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view2 = collection.View(2, 4); // longer
+            var view1 = collection.View(3, 2);
+
+            // Act
+            view1.Shuffle();
+
+            // Assert
+            Assert.That(view2.IsValid, Is.True);
+        }
+
+        // v.reverse(), w in v, w is not valid
+        [Test]
+        public void Shuffle_View2ContainedInView1_View2IsNotValid()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view2 = collection.View(3, 2);
+            var view1 = collection.View(2, 4); // longer           
+
+            // Act
+            view1.Shuffle();
+
+            // Assert
+            Assert.That(view2.IsValid, Is.False);
+        }
+
+        // v.reverse, v and w - overlaping - w no longer valid
+        [Test]
+        public void Shuffle_View1AndView2Overlaping_View2NotValid()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view2 = collection.View(2, 4); // longer           
+            var view1 = collection.View(3, 4);
+
+            // Act
+            view1.Shuffle();
+
+            // Assert
+            Assert.That(view2.IsValid, Is.False);
+        }
+
+
         [Test]
         [Category("Unfinished")]
         [Ignore("Unfinished")]
@@ -4635,6 +4842,18 @@ namespace C6.Tests
             // Assert
             Assert.That(result1, Is.EquivalentTo(result2).And.EquivalentTo(result3));
             Assert.That(result1, Is.Not.EqualTo(result2).And.Not.EqualTo(result3), "If this test fails more than once, the Shuffle(Random) method likely contains an error");
+        }
+
+        [Test]
+        public void ShuffleRandom_IsFixedSizedCollection_ThrowsNothing()
+        {
+            Run.If(IsFixedSize);
+
+            // Arrange
+            var collection = GetStringList(Random);
+
+            // Act & Assert
+            Assert.That(() => collection.Shuffle(Random), Throws.Nothing);
         }
 
         [Test]
@@ -4958,6 +5177,72 @@ namespace C6.Tests
 
             // Assert
             Assert.That(() => enumerator.MoveNext(), Throws.InvalidOperationException.Because(CollectionWasModified));
+        }
+
+        // coll.shuffle(), views invalid
+        [Test]
+        public void Sort_RandomCollection_ViewsAreNotValid()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view1 = GetView(collection);
+            var view2 = GetView(collection);
+
+            // Act
+            collection.Sort();
+
+            // Assert
+            // TODO: Multiple
+            Assert.That(view1.IsValid, Is.False);
+            Assert.That(view2.IsValid, Is.False);
+        }
+
+        // v.shuffle(), v in w, w is valid
+        [Test]
+        public void Sort_View1ContainedInView2_View2IsValid()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view2 = collection.View(2, 4); // longer
+            var view1 = collection.View(3, 2);
+
+            // Act
+            view1.Sort();
+
+            // Assert
+            Assert.That(view2.IsValid, Is.True);
+        }
+
+        // v.reverse(), w in v, w is not valid
+        [Test]
+        public void Sort_View2ContainedInView1_View2IsNotValid()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view2 = collection.View(3, 2);
+            var view1 = collection.View(2, 4); // longer           
+
+            // Act
+            view1.Sort();
+
+            // Assert
+            Assert.That(view2.IsValid, Is.False);
+        }
+
+        // v.reverse, v and w - overlaping - w no longer valid
+        [Test]
+        public void Sort_View1AndView2Overlaping_View2NotValid()
+        {
+            // Arrange
+            var collection = GetStringList(Random);
+            var view2 = collection.View(2, 4); // longer           
+            var view1 = collection.View(3, 4);
+
+            // Act
+            view1.Shuffle();
+
+            // Assert
+            Assert.That(view2.IsValid, Is.False);
         }
 
         [Test]
@@ -5760,7 +6045,7 @@ namespace C6.Tests
         {
             // Arrange
             var collection = GetStringList(Random);
-            
+
             var view = GetView(collection);
             var uC = view.Underlying.Count;
             var vC = view.Count;
@@ -6186,14 +6471,14 @@ namespace C6.Tests
         {
             // Arrange
             var items = GetUppercaseStrings(Random);
-            var collection = GetList(items);            
+            var collection = GetList(items);
             var view = GetView(collection);
             var view2 = GetView(view);
 
             // Act & Assert
             Assert.That(() => view.Span(view2), RaisesNoEventsFor(collection));
         }
-        
+
 
         // view is null
         [Test]
@@ -6201,8 +6486,8 @@ namespace C6.Tests
         {
             // Arrange
             var collection = GetStringList(Random);
-            var view = GetView(collection);            
-                        
+            var view = GetView(collection);
+
             // Act & Assert
             Assert.That(() => view.Span(null), Violates.PreconditionSaying(ArgumentMustBeNonNull));
         }
@@ -6233,7 +6518,7 @@ namespace C6.Tests
             // Act & Assert
             Assert.That(() => view.Span(view2), Violates.PreconditionSaying(UnderlyingListMustBeTheSame));
         }
-        
+
         [Test]
         public void Span_ViewsDontOverlapViewOnLeft_Equals()
         {
@@ -6257,7 +6542,7 @@ namespace C6.Tests
             var collection = GetStringList(Random);
             var view = collection.View(5, 3);
             var otherView = collection.View(1, 3);
-            
+
             // Act
             var spannedView = view.Span(otherView);
 
@@ -6290,9 +6575,9 @@ namespace C6.Tests
             var collection = GetStringList(Random);
             var view = collection.View(1, 3);
             var otherView = collection.View(2, 3);
-            var expectedView = collection.View(1, otherView.Offset + otherView.Count - view.Offset);            
+            var expectedView = collection.View(1, otherView.Offset + otherView.Count - view.Offset);
             //var view2 = GetView(collection, minOffset: view.Offset, maxOffset: view.Offset + view.Count);
-            
+
             // Act
             var spannedView = view.Span(otherView);
 
@@ -6308,7 +6593,7 @@ namespace C6.Tests
             var collection = GetStringList(Random);
             var view = collection.View(2, 3);
             var otherView = collection.View(1, 3);
-            var expectedView = collection.View(2, otherView.Offset + otherView.Count - view.Offset);                    
+            var expectedView = collection.View(2, otherView.Offset + otherView.Count - view.Offset);
             //var view2 = GetView(collection, minOffset: view.Offset, maxOffset: view.Offset + view.Count);
             // expectedView ?
 
@@ -6318,6 +6603,7 @@ namespace C6.Tests
             // Assert
             Assert.That(spannedView, Is.EqualTo(expectedView).Using(ReferenceEqualityComparer));
         }
+
         #endregion
 
 

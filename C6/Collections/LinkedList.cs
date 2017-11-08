@@ -72,6 +72,8 @@ namespace C6
                 return result;
             }));
 
+
+
             // Next pointers are not null ??? TODO: heavy
             node = _startSentinel.Next;
             prev = _startSentinel;
@@ -1913,7 +1915,7 @@ namespace C6
 
         private void RaiseForUpdate(T item, T oldItem)
         {
-            Requires(Equals(item, oldItem));
+            Requires(Equals(item, oldItem)); // ???
             // ActiveEvents check ???
 
             OnItemsRemoved(oldItem, 1);
