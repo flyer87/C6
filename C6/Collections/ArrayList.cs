@@ -276,13 +276,13 @@ namespace C6.Collections
 
         public virtual bool IsReadOnly => false;
 
-        public virtual T Last => _items[ _offsetField + Count - 1];
+        public virtual T Last => _items[Offset + Count - 1];
 
         public virtual EventTypes ListenableEvents => All;
 
         public virtual T this[int index]
         {
-            get { return _items[_offsetField + index]; }
+            get { return _items[Offset + index]; }
             set {
                 #region Code Contracts
 
@@ -293,7 +293,7 @@ namespace C6.Collections
 
                 UpdateVersion();
 
-                index += _offsetField;
+                index += Offset;
                 var oldItem = _items[index];
                 _items[index] = value;
 
@@ -331,7 +331,7 @@ namespace C6.Collections
             #endregion
 
             InsertPrivate(Count, item);            
-            (_underlying ?? this).RaiseForAdd(item); //RaiseForAdd(item); // we raise the event on the proper list, ya?!
+            (_underlying ?? this).RaiseForAdd(item);
             // InvalidateCollectionValuesPrivate();
             return true;
         }
@@ -507,7 +507,7 @@ namespace C6.Collections
         }
 
         public virtual IDirectedCollectionValue<T> GetIndexRange(int startIndex, int count)
-        {            
+        {
             return new Range(this, startIndex, count, EnumerationDirection.Forwards);
         }
 
@@ -556,7 +556,7 @@ namespace C6.Collections
                 for (var i = 0; i < Count; i++)
                 {
                     // Explicitly check against null to avoid using the (slower) equality comparer
-                    if (_items[_offsetField + i] == null)
+                    if (_items[Offset + i] == null)
                     {
                         return i;
                     }
@@ -566,7 +566,7 @@ namespace C6.Collections
             {
                 for (var i = 0; i < Count; i++)
                 {
-                    if (Equals(item, _items[_offsetField + i]))
+                    if (Equals(item, _items[Offset + i]))
                     {
                         return i;
                     }
@@ -581,7 +581,7 @@ namespace C6.Collections
             #region Code Contracts            
 
             // If collection changes, the version is updated
-            //Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+            //!@? Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
             #endregion
 
@@ -743,12 +743,12 @@ namespace C6.Collections
             var item = RemoveAtPrivate(index);
             (_underlying ?? this).RaiseForRemovedAt(item, Offset + index);
             return item;
-        }
-
-        public void DoSomething() {}
+        }        
 
         // Explicitly check against null to avoid using the (slower) equality comparer
         public virtual bool RemoveDuplicates(T item) => item == null ? RemoveAllWhere(x => x == null) : RemoveAllWhere(x => Equals(item, x));
+
+        public void DoSomething() { }
 
         public virtual T RemoveFirst() => RemoveAt(0); 
 
@@ -871,7 +871,9 @@ namespace C6.Collections
         {
             #region Code Contracts            
             // If collection changes, the version is updated
+            // ReSharper disable InvocationIsSkipped
             Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+            // ReSharper enable InvocationIsSkipped
 
             #endregion
 
@@ -922,7 +924,7 @@ namespace C6.Collections
         public override string ToString()
         {
             #region Code Contracts
-            Requires(IsValid, ListOrViewMustBeValid);
+            Requires(IsValid, MustBeValid);
             #endregion            
 
             return ToString(null, null);
@@ -1051,7 +1053,7 @@ namespace C6.Collections
         /// <returns>The new list view.</returns>
         public virtual IList<T> ViewOf(T item)
         {                                    
-            var index = IndexOf(item); // ??? IndexOf or indexOf
+            var index = IndexOf(item); 
             return index < 0 ? null : View(index, 1);
         }
 
@@ -1062,8 +1064,7 @@ namespace C6.Collections
         /// <param name="item">The item to find.</param>
         /// <returns>The new list view.</returns>
         public virtual IList<T> LastViewOf(T item)
-        {
-            //var index = lastIndexOf(item); // ??? calling private method
+        {            
             var index = LastIndexOf(item); 
             return index < 0 ? null : View(index, 1);
         }
@@ -1095,7 +1096,7 @@ namespace C6.Collections
             }
 
             UpdateVersion();
-            
+                        
             _offsetField = newOffset;
             Count = count;
 
@@ -1105,7 +1106,6 @@ namespace C6.Collections
         public virtual IList<T> Span(IList<T> other)
         {
             if (other.Offset + other.Count - Offset < 0) return null;
-
 
             return (_underlying ?? this).View(Offset, other.Offset + other.Count - Offset);
         }
@@ -1357,7 +1357,7 @@ namespace C6.Collections
 
         /*private bool RequireValidity()
         {
-            Requires(IsValid, ListOrViewMustBeValid);
+            Requires(IsValid, MustBeValid);
             return true;
         }*/
 
@@ -1642,7 +1642,6 @@ namespace C6.Collections
             UpdateVersion();
                         
             var count = items.Length;                               
-
             (_underlying ?? this).EnsureCapacity(UnderlyingCount + count); // ??? old:EnsureCapacity(Count + count);
             
             index += _offsetField;            
@@ -1798,11 +1797,10 @@ namespace C6.Collections
             var viewHandler = new ViewHandler(this); 
 
             // TODO: Use bulk moves - consider using predicate(item) ^ something ???
-            var j = _offsetField;
-            for (var i = _offsetField; i < _offsetField + Count; i++)
+            var j = Offset;
+            for (var i = Offset; i < Offset + Count; i++)
             {
                 var item = _items[i];
-
                 if (predicate(item))
                 {                    
                     if (shouldRememberItems)

@@ -989,7 +989,7 @@ namespace C6.Collections
         {
             var view = (HashedLinkedList<T>) MemberwiseClone();
             view._underlying = _underlying ?? this;
-            view.Offset = index;
+            view.Offset = Offset + index;
             view.Count = count;
 
             GetPairPrivate(index - 1, index + count, out view._startSentinel, out view._endSentinel,
@@ -1880,6 +1880,7 @@ namespace C6.Collections
                     view._endSentinel = node.Next;
             }
         }
+
 
 
 

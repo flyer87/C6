@@ -174,7 +174,7 @@ namespace C6
         /// <param name="index"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        IList<T> View(int index, int count); // names?
+        IList<T> View(int index, int count); 
 
         /// <summary>
         /// 
@@ -701,7 +701,8 @@ namespace C6
         public int Offset
         {
             get
-            {                
+            {
+                Requires(IsValid, MustBeValid);
                 return default(int);
             }
         }
@@ -710,82 +711,532 @@ namespace C6
         {
             get
             {
-                Requires(IsValid, ListOrViewMustBeValid);
+                Requires(IsValid, MustBeValid);
                 return default(IList<T>);
             }
         }
 
         public IList<T> View(int index, int count)
         {
-            // Argument must be within bounds
-            Requires(IsValid, ListOrViewMustBeValid);
+            // this must be valid 
+            Requires(IsValid, MustBeValid);
+
+            // index must be non-negative
             Requires(index >= 0, ArgumentMustBeWithinBounds);
+
+            // count must be non-negative
             Requires(count >= 0, ArgumentMustBeWithinBounds);
-            Requires(index + count <= Count, ArgumentMustBeWithinBounds); // Count == this.Count; this = view. || list.            
+
+            // The end of the view must be less than or equal to Count
+            Requires(index + count <= Count, ArgumentMustBeWithinBounds);
+
+
+
+            // Result is not null
+            Ensures(Result<IList<T>>() != null);
+
+            // Result's underlying is the same as the underlying of this or this
+            Ensures(Result<IList<T>>().Underlying == (Underlying ?? this));
+
+            // Result's Offset is equal to index
+            Ensures(Result<IList<T>>().Offset == Offset + index);
+
+            // Result's Count is equal to count
+            Ensures(Result<IList<T>>().Count == count);
+
+            // Result's IsFixedSize is the same as this's
+            Ensures(Result<IList<T>>().IsFixedSize == IsFixedSize);
+
+            // Result's IsReadOnly is the same as this's
+            Ensures(Result<IList<T>>().IsReadOnly == IsReadOnly);
+
+            // Result's IndexingSpeed is the same as this's
+            Ensures(Result<IList<T>>().IndexingSpeed == IndexingSpeed);
+
+            // Result's ContainsSpeed is the same as this's
+            Ensures(Result<IList<T>>().ContainsSpeed == ContainsSpeed);
+
+            // Result's AllowsDuplicates is the same as this's
+            Ensures(Result<IList<T>>().AllowsDuplicates == AllowsDuplicates);
+
+            // Result's DuplicatesByCounting is the same as this's
+            Ensures(Result<IList<T>>().DuplicatesByCounting == DuplicatesByCounting);
+
+            // Result is empty if this is
+            Ensures(Result<IList<T>>().IsEmpty == (count == 0));
+
+            // Result's First is correct
+            Ensures(Result<IList<T>>().IsEmpty || Result<IList<T>>().First.Equals(this.Skip(index).Take(count).First()));
+
+            // Result's Last is correct
+            Ensures(Result<IList<T>>().IsEmpty || Result<IList<T>>().Last.Equals(this.Skip(index).Take(count).Last()));            
+
+            // Result's direction is the same as this's 
+            Ensures(Result<IList<T>>().Direction == this.Direction);
+
+            //Result is coorect
+            Ensures(Result<IList<T>>().IsSameSequenceAs(this.Skip(index).Take(count)));            
 
             return default(IList<T>);
         }
 
         public IList<T> ViewOf(T item)
         {
+            // this must be valid 
+            Requires(IsValid, MustBeValid);
+
+            // Item must be non-null, If the list doesn't allow nulls
             Requires(AllowsNull || item != null, ItemMustBeNonNull);
-            Requires(IsValid, ListOrViewMustBeValid);
+
+
+
+            // Result is not null
+            //no need Ensures(Result<IList<T>>() != null);
+
+            // Result's underlying is the same as the underlying of this or this
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().Underlying == (Underlying ?? this));
+
+            // Result's Offset is equal to index
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().Offset == Offset + this.TakeWhile(x => !x.Equals(item)).Count());
+
+            // Result's Count is equal to count
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().Count == 1);
+
+            // Result's IsFixedSize is the same as this's
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().IsFixedSize == IsFixedSize);
+
+            // Result's IsReadOnly is the same as this's
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().IsReadOnly == IsReadOnly);
+
+            // Result's IndexingSpeed is the same as this's
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().IndexingSpeed == IndexingSpeed);
+
+            // Result's ContainsSpeed is the same as this's
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().ContainsSpeed == ContainsSpeed);
+
+            // Result's AllowsDuplicates is the same as this's
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().AllowsDuplicates == AllowsDuplicates);
+
+            // Result's DuplicatesByCounting is the same as this's
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().DuplicatesByCounting == DuplicatesByCounting);
+
+            // Result is empty if this is
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().IsEmpty == (Result<IList<T>>().Count == 0));
+
+            // Result's First is correct
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().IsEmpty || Result<IList<T>>().First.Equals(this.First(x => x.Equals(item))));
+
+            // Result's Last is correct
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().IsEmpty || Result<IList<T>>().Last.Equals(this.Last(x => x.Equals(item))));
+
+            // Result's direction is the same as this's 
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().Direction == Direction);
+
+            // Result is correct
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().First().IsSameAs(this.First(x => x.Equals(item)))); // ??? is it fine  
+            //Ensures(Result<IList<T>>().IsSameAs(this.First(x => x.Equals(item)).ToList())); // ??? or what ?? 
 
             return default(IList<T>);
-            // What should it ensure?
         }
 
         public IList<T> LastViewOf(T item)
         {
-            Requires(AllowsNull || item != null, ItemMustBeNonNull);
-            Requires(IsValid, ListOrViewMustBeValid);
+            // this must be valid 
+            Requires(IsValid, MustBeValid);
 
-            return default(IList<T>);
-            // What should it ensure?
+            // Item must be non-null, If the list doesn't allow nulls
+            Requires(AllowsNull || item != null, ItemMustBeNonNull);
+
+
+
+            // Result is not null
+            //Ensures(Result<IList<T>>() != null);
+
+            // Result's underlying is the same as the underlying of this or this
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().Underlying == (Underlying ?? this));
+
+            // Result's Offset is equal to index
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().Offset == Offset + this.ToList().LastIndexOf(item)); // ???
+
+            // Result's Count is equal to count
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().Count == 1);
+
+            // Result's IsFixedSize is the same as this's
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().IsFixedSize == IsFixedSize);
+
+            // Result's IsReadOnly is the same as this's
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().IsReadOnly == IsReadOnly);
+
+            // Result's IndexingSpeed is the same as this's
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().IndexingSpeed == IndexingSpeed);
+
+            // Result's ContainsSpeed is the same as this's
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().ContainsSpeed == ContainsSpeed);
+
+            // Result's AllowsDuplicates is the same as this's
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().AllowsDuplicates == AllowsDuplicates);
+
+            // Result's DuplicatesByCounting is the same as this's
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().DuplicatesByCounting == DuplicatesByCounting);
+
+            // Result is empty if this is
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().IsEmpty == (Result<IList<T>>().Count == 0));
+
+            // Result's First is correct
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().First.Equals(this.First(x => x.Equals(item)))); 
+
+            // Result's Last is correct
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().Last.Equals(this.Last(x => x.Equals(item))));
+
+            // Result's direction is the same as this's 
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().Direction == this.Direction);
+
+            // Result is correct
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().First().IsSameAs(this.Last(x => x.Equals(item)) ));
+
+            return default(IList<T>);            
         }
 
         public IList<T> Slide(int offset)
-        {            
-            Requires(IsValid, ListOrViewMustBeValid);
-            Requires(Offset + offset >= 0, ArgumentMustBeWithinBounds); 
+        {
+            // this must be valid 
+            Requires(IsValid, MustBeValid);
+
+            // The new offset must be non-negative
+            Requires(Offset + offset >= 0, ArgumentMustBeWithinBounds);
+
+            // The new end of the view must be less than or equal to the underlying count
             Requires(Offset + offset + Count <= Underlying.Count, ArgumentMustBeWithinBounds);
+
+
+
+            // Result is not null
+            Ensures(Result<IList<T>>() != null);
+
+            // Result is the same as this
+            Ensures(Result<IList<T>>() == this);
+
+            // Result's underlying is the same as the underlying of this or this
+            //Ensures(Result<IList<T>>().Underlying == Underlying);
+
+            // Result's Offset is equal to index
+            Ensures(Result<IList<T>>().Offset == OldValue(Offset) + offset);
+
+            // Result's Count is equal to Count
+            Ensures(Result<IList<T>>().Count == Count);
+
+            // Result's IsFixedSize is the same as this's
+            //Ensures(Result<IList<T>>().IsFixedSize == IsFixedSize);
+
+            // Result's IsReadOnly is the same as this's
+            //Ensures(Result<IList<T>>().IsReadOnly == IsReadOnly);
+
+            // Result's IndexingSpeed is the same as this's
+            //Ensures(Result<IList<T>>().IndexingSpeed == IndexingSpeed);
+
+            // Result's ContainsSpeed is the same as this's
+            //Ensures(Result<IList<T>>().ContainsSpeed == ContainsSpeed);
+
+            // Result's AllowsDuplicates is the same as this's
+            //Ensures(Result<IList<T>>().AllowsDuplicates == AllowsDuplicates);
+
+            // Result's DuplicatesByCounting is the same as this's
+            //Ensures(Result<IList<T>>().DuplicatesByCounting == DuplicatesByCounting);
+
+            // Result is empty if this is
+            Ensures(Result<IList<T>>().IsEmpty == (Count == 0));
+
+            // Result's First is correct
+            Ensures(Result<IList<T>>().IsEmpty || Result<IList<T>>().First.Equals(Underlying.Skip(OldValue(Offset) + offset).Take(Count).First()));
+
+            // Result's Last is correct
+            Ensures(Result<IList<T>>().IsEmpty || Result<IList<T>>().Last.Equals(Underlying.Skip(OldValue(Offset) + offset).Take(Count).Last()));
+
+            // Result's direction is the same as this's 
+            //Ensures(Result<IList<T>>().Direction == Direction);
+            
+            //Result is correct
+            Ensures(Result<IList<T>>().IsSameSequenceAs(Underlying.Skip( OldValue(Offset) + offset).Take(Count)));
+
+
             return default(IList<T>);
         }
 
         public IList<T> Slide(int offset, int count)
         {
-            Requires(IsValid, ListOrViewMustBeValid);
+            // this must be valid 
+            Requires(IsValid, MustBeValid);
+
+            // count parameter must be non-negative
             Requires(count >= 0, ArgumentMustBeWithinBounds);
+            
+            // The new offset must be non-negative
             Requires(Offset + offset >= 0, ArgumentMustBeWithinBounds);
+
+            // The end of the view must be less than or equal to the underlying count
             Requires(Offset + offset + count <= Underlying.Count, ArgumentMustBeWithinBounds);
+
+            
+
+            // Result is not null
+            Ensures(Result<IList<T>>() != null);
+
+            // Result is the same as this
+            Ensures(Result<IList<T>>() == this);
+
+            // Result's underlying is the same as the underlying of this or this
+            //Ensures(Result<IList<T>>().Underlying == Underlying);
+
+            // Result's Offset is equal to index
+            Ensures(Result<IList<T>>().Offset == OldValue(Offset) + offset);
+
+            // Result's Count is equal to count
+            Ensures(Result<IList<T>>().Count == count);
+
+            // Result's IsFixedSize is the same as this's
+            //Ensures(Result<IList<T>>().IsFixedSize == IsFixedSize);
+
+            // Result's IsReadOnly is the same as this's
+            //Ensures(Result<IList<T>>().IsReadOnly == IsReadOnly);
+
+            // Result's IndexingSpeed is the same as this's
+            //Ensures(Result<IList<T>>().IndexingSpeed == IndexingSpeed);
+
+            // Result's ContainsSpeed is the same as this's
+            //Ensures(Result<IList<T>>().ContainsSpeed == ContainsSpeed);
+
+            // Result's AllowsDuplicates is the same as this's
+            //Ensures(Result<IList<T>>().AllowsDuplicates == AllowsDuplicates);
+
+            // Result's DuplicatesByCounting is the same as this's
+            // Ensures(Result<IList<T>>().DuplicatesByCounting == DuplicatesByCounting);
+
+            // Result is empty if this is
+            Ensures(Result<IList<T>>().IsEmpty == (count == 0));
+
+            // Result's First is correct
+            Ensures(Result<IList<T>>().IsEmpty || Result<IList<T>>().First.Equals(Underlying.Skip(OldValue(Offset) + offset).Take(count).First()));
+
+            // Result's Last is correct
+            Ensures(Result<IList<T>>().IsEmpty || Result<IList<T>>().Last.Equals(Underlying.Skip(OldValue(Offset) + offset).Take(count).Last()));
+
+            // Result's direction is the same as this's 
+            //Ensures(Result<IList<T>>().Direction == Direction);
+
+            //Result is correct
+            Ensures(Result<IList<T>>().IsSameSequenceAs(Underlying.Skip(OldValue(Offset) + offset).Take(count)));
+
+
 
             return default(IList<T>);
         }
 
         public bool TrySlide(int offset)
         {
-            Requires(IsValid, ListOrViewMustBeValid);
+            // this must be a view
+            Requires(Underlying != null, NotAView);
+
+            // this must be valid
+            Requires(IsValid, MustBeValid);
+
+
+
+            // Underlying is the same as the underlying of this or this
+            Ensures(Underlying == OldValue(Underlying));
+
+            // Offset is equal to old ofset + Ofset, if the Result is true            
+            Ensures(!Result<bool>() || Offset == OldValue(Offset) + offset);
+
+            // Offset is equal to the old Ofset, if the Result is false
+            Ensures(Result<bool>() || Offset == OldValue(Offset));
+            
+            // Count is equal to the old Count
+            Ensures(Result<bool>() || Count == OldValue(Count));
+
+            // IsFixedSize is the same as this's IsFixedSize
+            Ensures(IsFixedSize == OldValue(IsFixedSize));
+
+            //IsReadOnly is the same as this's IsReadOnly
+            Ensures(IsReadOnly == OldValue(IsReadOnly));
+
+            //IndexingSpeed is the same as this's
+            Ensures(IndexingSpeed == OldValue(IndexingSpeed));
+
+            // Result's ContainsSpeed is the same as this's
+            Ensures(ContainsSpeed == OldValue(ContainsSpeed));
+
+            // Result's AllowsDuplicates is the same as this's
+            Ensures(AllowsDuplicates == OldValue(AllowsDuplicates));
+
+            // Result's DuplicatesByCounting is the same as this's
+            Ensures(DuplicatesByCounting == OldValue(DuplicatesByCounting));
+
+            // Result's direction is the same as this's 
+            Ensures(Direction == OldValue(Direction));
+
+            // this is empty, if Count is zero
+            Ensures(!Result<bool>() || IsEmpty == (Count == 0));            
+
+            // First is correct, if Result is true                        
+            Ensures(!Result<bool>() || IsEmpty || First.IsSameAs(Underlying.Skip(OldValue(Offset) + offset).Take(Count).First()));
+
+            // First is unchanged, if Result is false
+            Ensures(Result<bool>() || First.IsSameAs(OldValue(First)));
+
+            // Last is correct, if Result is true                                  
+            Ensures(!Result<bool>() || IsEmpty || Last.IsSameAs(Underlying.Skip(OldValue(Offset) + offset).Take(Count).Last()));
+
+            // Last is unchanged, if Result is false
+            Ensures(Result<bool>() || Last.IsSameAs(OldValue(Last)));
+
+            // The sliding is correct, if Result is true
+            Ensures(!Result<bool>() || this.IsSameSequenceAs(Underlying.Skip(OldValue(Offset) + offset).Take(Count)));
+
+            // this is unchanged, if Result is false
+            Ensures(Result<bool>() || this.IsSameSequenceAs(OldValue(ToArray())));
+
+
+
             return default(bool);
         }
 
         public bool TrySlide(int offset, int count)
         {
-            Requires(IsValid, ListOrViewMustBeValid); 
-            Requires(!IsReadOnly);
-            Requires(Underlying != null, NotAView); 
+            // this must be a view
+            Requires(Underlying != null, NotAView);
+
+            // this must be valid
+            Requires(IsValid, MustBeValid);
             
+
+
+            // Underlying is the same as the underlying of this or this
+            Ensures(Underlying == OldValue(Underlying));
+
+            // Offset is equal to old ofset + Ofset, if the Result is true            
+            Ensures(!Result<bool>() || Offset == OldValue(Offset) + offset);
+
+            // Offset is equal to the old Ofset, if the Result is false
+            Ensures( Result<bool>() || Offset == OldValue(Offset));
+
+            // Count is equal to count, if the Result is true                        
+            Ensures(!Result<bool>() || Count == count);
+
+            // Count is equal to the old Count, if the Result is false            
+            Ensures( Result<bool>() || Count == OldValue(Count));
+
+            // IsFixedSize is the same as this's IsFixedSize
+            Ensures(IsFixedSize == OldValue(IsFixedSize));
+
+            //IsReadOnly is the same as this's IsReadOnly
+            Ensures(IsReadOnly == OldValue(IsReadOnly));
+
+            //IndexingSpeed is the same as this's
+            Ensures(IndexingSpeed == OldValue(IndexingSpeed));
+
+            // Result's ContainsSpeed is the same as this's
+            Ensures(ContainsSpeed == OldValue(ContainsSpeed));
+
+            // Result's AllowsDuplicates is the same as this's
+            Ensures(AllowsDuplicates == OldValue(AllowsDuplicates));
+
+            // Result's DuplicatesByCounting is the same as this's
+            Ensures(DuplicatesByCounting == OldValue(DuplicatesByCounting));
+
+            // Result's direction is the same as this's 
+            Ensures(Direction == OldValue(Direction));
+
+            // this is empty, if Result is true
+            Ensures(!Result<bool>() || IsEmpty == (count == 0));
+
+            // IsEmpty is unchanged, if Result is false
+            Ensures(Result<bool>() || IsEmpty == OldValue(IsEmpty));
+
+            // First is correct, if Result is true                        
+            Ensures(!Result<bool>() || IsEmpty || First.IsSameAs(Underlying.Skip(OldValue(Offset) + offset).Take(count).First()));
+
+            // First is unchanged, if Result is false
+            Ensures( Result<bool>() || First.IsSameAs(OldValue(First)));
+
+            // Last is correct, if Result is true                                  
+            Ensures(!Result<bool>() || IsEmpty || Last.IsSameAs(Underlying.Skip(OldValue(Offset) + offset).Take(count).Last()));
+
+            // Last is unchanged, if Result is false
+            Ensures( Result<bool>() || Last.IsSameAs(OldValue(Last)));
+
+            // The sliding is correct, if Result is true
+            Ensures(!Result<bool>() || this.IsSameSequenceAs(Underlying.Skip(OldValue(Offset) + offset).Take(count)));
+
+            // this is unchanged, if Result is false
+            Ensures( Result<bool>() || this.IsSameSequenceAs(OldValue(ToArray())));
+
             return default(bool);
         }
 
         public IList<T> Span(IList<T> otherView)
         {
+            // otherView must be non-null
             Requires(otherView != null, ArgumentMustBeNonNull);
+
+            // this must be a view
+            Requires(Underlying != null, NotAView);
+
+            // otherView must be a view
             Requires(otherView.Underlying != null, NotAView);
+
+            // this must be valid        
+            Requires(IsValid, MustBeValid);
+
+            // otherView must be valid
+            Requires(otherView.IsValid, MustBeValid);         
+
+            // Both views must have the same underlying list
             Requires(Underlying == otherView.Underlying, UnderlyingListMustBeTheSame);
 
-            //Requires(IsValid, ListOrViewMustBeValid);
-            //Requires(other != null, ArgumentMustBeNonNull);
-            //Requires((Underlying ?? this) == (other.Underlying ?? this), ""); // TODO Message
+            
+
+            // Result's underlying is the same as the underlying of this or this
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().Underlying == Underlying);
+
+            // Result's Offset is the same as this's Offset
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().Offset == Offset);
+
+            // Result's Count is equal to the end of the other view minus this's Offset
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().Count == otherView.Offset + otherView.Count - Offset);
+
+            // Result's IsFixedSize is the same as this's
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().IsFixedSize == IsFixedSize);
+
+            // Result's IsReadOnly is the same as this's
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().IsReadOnly == IsReadOnly);
+
+            // Result's IndexingSpeed is the same as this's
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().IndexingSpeed == IndexingSpeed);
+
+            // Result's ContainsSpeed is the same as this's
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().ContainsSpeed == ContainsSpeed);
+
+            // Result's AllowsDuplicates is the same as this's
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().AllowsDuplicates == AllowsDuplicates);
+
+            // Result's DuplicatesByCounting is the same as this's
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().DuplicatesByCounting == DuplicatesByCounting);
+
+            // Result is empty if this is
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().IsEmpty == (Result<IList<T>>().Count == 0));
+            
+            // Result's First is the same as this's First
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().First.IsSameAs(First));
+
+            // Result's Last is the same as otherView's Last
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().IsEmpty || Result<IList<T>>().Last.IsSameAs(otherView.Last));
+            
+            // Result's direction is the same as this's 
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().Direction == this.Direction);
+
+            //Result is correct
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().IsSameSequenceAs(Underlying.Skip(Offset).Take(otherView.Offset + otherView.Count - Offset)));
+
 
             return default(IList<T>);
         }
@@ -858,7 +1309,7 @@ namespace C6
         public void Insert(int index, T item)
         {
             // is Valid, not disposed
-            Requires(IsValid, ListOrViewMustBeValid);
+            Requires(IsValid, MustBeValid);
 
             // Collection must be non-read-only
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
@@ -880,7 +1331,7 @@ namespace C6
             Ensures(item.IsSameAs(this[index]));
 
             // The item is inserted into the list without replacing other items            
-            //Ensures(this.IsSameSequenceAs(OldValue(this.Take(index).Append(item).Concat(this.Skip(index)).ToList())));
+            //!@ Ensures(this.IsSameSequenceAs(OldValue(this.Take(index).Append(item).Concat(this.Skip(index)).ToList())));
 
             return;
         }
@@ -897,7 +1348,7 @@ namespace C6
             Requires(AllowsNull || item != null, ItemMustBeNonNull);
 
             // is Valid, not disposed
-            Requires(IsValid, ListOrViewMustBeValid);
+            Requires(IsValid, MustBeValid);
 
             // Collection must not already contain item if collection disallows duplicate values
             Requires(AllowsDuplicates || !Contains(item), CollectionMustAllowDuplicates);
@@ -918,9 +1369,8 @@ namespace C6
             // The number of same items increase by one
             Ensures(this.CountSame(item) == OldValue(this.CountSame(item)) + 1);
 
-            // The item is added to the beginning
-            // !@ 
-            Ensures(item.IsSameAs(this.First));
+            // The item is added to the beginning            
+            Ensures(item.IsSameAs(First));
 
 
             return;
@@ -938,7 +1388,7 @@ namespace C6
             Requires(AllowsNull || item != null, ItemMustBeNonNull);
 
             // is Valid, not disposed
-            Requires(IsValid, ListOrViewMustBeValid);
+            Requires(IsValid, MustBeValid);
 
             // Collection must not already contain item if collection disallows duplicate values
             Requires(AllowsDuplicates || !Contains(item), CollectionMustAllowDuplicates);
@@ -968,7 +1418,7 @@ namespace C6
         public void InsertRange(int index, SCG.IEnumerable<T> items)
         {
             // is Valid, not disposed
-            Requires(IsValid, ListOrViewMustBeValid);
+            Requires(IsValid, MustBeValid);
 
             // Collection must be non-read-only
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
@@ -1003,7 +1453,7 @@ namespace C6
         {
             // No preconditions
             // is Valid, not disposed
-            Requires(IsValid, ListOrViewMustBeValid);
+            Requires(IsValid, MustBeValid);
 
             // True if sorted
             Ensures(Result<bool>() == CollectionExtensions.IsSorted(this));
@@ -1015,7 +1465,7 @@ namespace C6
         public bool IsSorted(SCG.IComparer<T> comparer)
         {
             // No preconditions
-            Requires(IsValid, ListOrViewMustBeValid);
+            Requires(IsValid, MustBeValid);
 
             // True if sorted
             Ensures(Result<bool>() == CollectionExtensions.IsSorted(this, comparer));
@@ -1026,7 +1476,7 @@ namespace C6
 
         public bool IsSorted(Comparison<T> comparison)
         {
-            Requires(IsValid, ListOrViewMustBeValid);
+            Requires(IsValid, MustBeValid);
             // Argument must be non-null
             Requires(comparison != null, ArgumentMustBeNonNull);
 
@@ -1053,7 +1503,7 @@ namespace C6
         public T RemoveFirst()
         {
             // is Valid, not disposed
-            Requires(IsValid, ListOrViewMustBeValid);
+            Requires(IsValid, MustBeValid);
 
             // Collection must be non-read-only
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
@@ -1083,7 +1533,7 @@ namespace C6
         public T RemoveLast()
         {
             // is Valid, not disposed
-            Requires(IsValid, ListOrViewMustBeValid);
+            Requires(IsValid, MustBeValid);
 
             // Collection must be non-read-only
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
@@ -1114,12 +1564,12 @@ namespace C6
         public void Reverse()
         {
             // is Valid, not disposed
-            Requires(IsValid, ListOrViewMustBeValid);
+            Requires(IsValid, MustBeValid);
 
             // Collection must be non-read-only
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
 
-            // The collection is reversed            
+            // The collection is reversed                        
             Ensures(this.IsSameSequenceAs(OldValue(Enumerable.Reverse(this).ToList())));
 
             return;
@@ -1128,13 +1578,12 @@ namespace C6
         public void Shuffle()
         {
             // is Valid, not disposed
-            Requires(IsValid, ListOrViewMustBeValid);
+            Requires(IsValid, MustBeValid);
 
             // Collection must be non-read-only
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
 
-            // The collection remains the same
-            // !@ 
+            // The collection remains the same            
             Ensures(this.HasSameAs(OldValue(ToArray())));
 
 
@@ -1143,7 +1592,7 @@ namespace C6
 
         public void Shuffle(Random random)
         {
-            Requires(IsValid, ListOrViewMustBeValid);
+            Requires(IsValid, MustBeValid);
 
             // Collection must be non-read-only
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
@@ -1163,7 +1612,7 @@ namespace C6
         public void Sort()
         {
             // is Valid, not disposed
-            Requires(IsValid, ListOrViewMustBeValid);
+            Requires(IsValid, MustBeValid);
 
             // Collection must be non-read-only
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
@@ -1180,7 +1629,7 @@ namespace C6
 
         public void Sort(Comparison<T> comparison)
         {
-            Requires(IsValid, ListOrViewMustBeValid);
+            Requires(IsValid, MustBeValid);
 
             // Collection must be non-read-only
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
@@ -1201,7 +1650,7 @@ namespace C6
 
         public void Sort(SCG.IComparer<T> comparer)
         {
-            Requires(IsValid, ListOrViewMustBeValid);
+            Requires(IsValid, MustBeValid);
 
             // Collection must be non-read-only
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
@@ -1212,7 +1661,6 @@ namespace C6
 
             // The collection remains the same
             Ensures(this.HasSameAs(OldValue(ToArray())));
-
 
             return;
         }

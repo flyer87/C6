@@ -185,7 +185,7 @@ namespace C6
         {
             get {
                 // No preconditions
-                Requires(IsValid, ListOrViewMustBeValid);
+                Requires(IsValid, MustBeValid);
 
 
                 // Returns true if Count is zero, otherwise false
@@ -242,7 +242,7 @@ namespace C6
         public T[] ToArray()
         {
             // No preconditions
-            Requires(IsValid, ListOrViewMustBeValid);
+            Requires(IsValid, MustBeValid);
 
 
             // Result is non-null

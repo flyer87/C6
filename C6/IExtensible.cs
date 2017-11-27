@@ -331,7 +331,6 @@ namespace C6
 
             // TODO: Make more exact check of added items - especially for sets
 
-
             return default(bool);
         }
 

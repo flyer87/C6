@@ -2,6 +2,7 @@
 - HashSet<T> itemIndex:
 	- !!class HashSet<T> : CollectionBase<T>, ICollection<T>
 
+	
 Q:	
 - "maintains a hash table so that it can quickly find the position of a given item in the array list."
 - "does not allow duplicates"
@@ -13,10 +14,10 @@ Q:
 	- restrcuture???
 	
 !- HashSet<KeyValuePair<T>> - UnitTests, Code Contracts
-	- class restructure???
+	- NO! class restructure???
 	- itemIndex.Find(), itemIndex.FindorAdd(), itemIndex.Remove(), itemIndex.UpdateOrAdd(),
 		itemIndex.Update(), itemIndex.Clear()
-		- I should re-write that class as well or not ?	
+		- NO! - I should re-write that class as well or not ?	
 
 
 - DuplicatesByCounting:

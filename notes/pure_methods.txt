@@ -1,0 +1,40 @@
+Ensures(Result<IList<T>>());
+
+Ilist:
+new int Count { get; }
+T First { get; }
+T Last { get; }        
+new bool IsFixedSize { get; }
+new bool IsReadOnly { get; }
+?new int IndexOf(T item);
+?bool IsSorted(); +2
+===================
+IIndexed:
+Speed IndexingSpeed { get; }
+?T this[int index] { get; }
+=================
+ISequenced:
+int GetSequencedHashCode()?;
+==============
+ICollection:
+Speed ContainsSpeed { get; }
+?Contains(T item)
+?bool ContainsRange(SCG.IEnumerable<T> items);
+?int CountDuplicates(T item);
+?bool Find(ref T item);
+?ICollectionValue<T> FindDuplicates(T item);
+?int GetUnsequencedHashCode();
+?ICollectionValue<KeyValuePair<T, int>> ItemMultiplicities();
+???ICollectionValue<T> UniqueItems();
+=================
+IExtensible:
+bool AllowsDuplicates { get; }
+bool DuplicatesByCounting { get; }
+?SCG.IEqualityComparer<T> EqualityComparer { get; }
+===============
+IListenable:
+EventTypes ActiveEvents { get; }
+EventTypes ListenableEvents { get; }
+===============
+ICollectionValue:
+copy-paste

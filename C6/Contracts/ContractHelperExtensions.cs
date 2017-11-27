@@ -38,7 +38,8 @@ namespace C6.Contracts
         ///     This is only intended for code contracts, and is not optimal in any sense.
         /// </remarks>
         [Pure]
-        public static SCG.IEnumerable<T> SkipIndex<T>(this SCG.IEnumerable<T> enumerable, int index) => enumerable.SkipRange(index, 1);
+        public static SCG.IEnumerable<T> SkipIndex<T>(this SCG.IEnumerable<T> enumerable, int index) 
+            => enumerable.SkipRange(index, 1);
 
         /// <summary>
         ///     Returns a specified number of contiguous elements from the start of a sequence until index
@@ -310,7 +311,8 @@ namespace C6.Contracts
 
 
         [Pure]
-        public static SCG.IEqualityComparer<T> CreateStructComparer<T>() => ComparerFactory.CreateEqualityComparer<T>(StructEquals, type => type.GetHashCode());
+        public static SCG.IEqualityComparer<T> CreateStructComparer<T>() 
+            => ComparerFactory.CreateEqualityComparer<T>(StructEquals, type => type.GetHashCode());
 
         [Pure]
         private static bool StructEquals<T>(T x, T y)

@@ -1,0 +1,83 @@
+version
+TDD, TFD
+===============
+08.11
+view slideing affects underlying stamp
+	insert -> both viwe, views and underlying
+	view.slide -> only the view
+//report - deadline - 14,15.12
+======================
+// 27.10
+- Multiples View test in C5
+	Test strategy - corner cases, effect on the other views	
+	Something about the Random collections, duplications, using SetUp method ...
+- enumeratorstamp = underlying != null ? underlying.stamp : this.stamp
+	yessss
+=========================
+11.10
+//LinkedList: (underlying ?? this).raiseForSetThis(index, value, item);
+	index, not offset + index
+//LinkedList:  CircularQueue -> SCG.Queue; a new instance
+- Insert, [index] := item; in HashedLL: throw and expetion or just return from the method;
+	- keep it like that, throw an exception
+
+//- C5.void InsertAll(int i, SCG.IEnumerable<T> items, bool insertion) - 
+	//- if (!dict.FindOrAdd(item, ref tmp)) - does it update the key ?
+- Remove(...), 119 - why 119?
+	- it is not used at all.
+C5.void splittaggroup(TagGroup taggroup)
+	- taggroup1.tags U taggroup2.tags = {1,2,3} Can we have same number in the low level ???
+		- find it!
+=======================
+27.09
+- properties should have IsValid or not ? 
+	According to framework design - no exceptions can be thrown
+	Mikkel has, though.
+- Re-use the same code?	
+		- linkedlist sorting
+			- reuse; chainge if code contracts require that.		
+- VS slow building. Any suggestions?
+			Mikel's thesis, page 17
+			write to Mikkel
+==========================
+19.09
+UniqueItems() - 
+	public virtual ICollectionValue<T> UniqueItems()
+		return this; // it has stamp checking => fine
+Slide returns the same view after sliding. Do we need it to return "this"
+	chaining; xs.
+	Effective Java, Bloch, second edition!!!
+		changing + side effect ?!
+Code and notes - fine, do it.
+
+=======================
+- Can I be able to finish all?
+	- HashArrayList requires Hashset to be implemented. use it from .Net
+	- HashLinkedList requires HashDictionary. Rearrange IDictionary hierarchy ? use it from .Net
+				
+- The things you don't like and you know that they should be chnaged
+- Sources:
+	Best design practices
+	Programming Pearls, Jon Bentley
+	Effective Java, Joshua 
+	Simula BEGIN, Graham, Ole, ...
+	Smalltalk 80, Adele Goldberg David Robson
+	
+	
+	
+- "Re-write" the code (new design: C# 6.0 + Framework) + Code C. + Test U.
+- Suggestion: 
+		AL + V - fix;
+		HAL + V
+		LL + V
+		(probably)HLL % V
+================
+Old:
+- LinkedList
+	design goals?
+	
+		- C6
+		- re-build, re-structure
+		- implement views?
+		- adopt the Mikkel's code (classes and interfaces), if I think the code is good.
+		The goals is to extend the work on ArrayList		

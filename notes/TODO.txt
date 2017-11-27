@@ -1,28 +1,21 @@
-- .Net Framework design guidelines
-- Patterns - p.149
-	- C#6.0 additions
----Prelez---
-====
+- RESTS:
+	- Code Contracts - only in the private methods ???
+		- look at private methods and try to add pre-conditions			
+		additional postconditions: look at Mikkel's implementations.
+		- Properties: no Code Contracts for set {}
+	- documentation
+	- Tests:
+		- failing IsValid tests
+		- failing Violate tests
+	- RaiseFor - only those that are not already in the list
 - try to get how the tag staff in the views work	
-	
-- Double, triplle check C6.ArrayList with the view extensions I did.
-	//- remove RequierValidity
-		//- put isValid
-	//- fixViews... - on their places
-		Where: look C5
-	//- Offset+, where:
-		index, i, count
-		// GetHashCode never used ?
-				
-	//- implement private void Dipose()
-	//- run the tests
-	- private indexOf, lastIndexOf
-	============
-	- invalidate
+
+================================================		
+- invalidate
 	
 - fix: Insert and this[] - they shoudl either throw an exception or require a precondition.
 
-//- implement Span
+
 //- look at the test patterns of C6
 //- look at the C5's view tests
 - write tests for the views (of ArrayList; HashedArrayList; LinkedList; HashedLinkedList)
@@ -38,19 +31,16 @@
 	
 	
 
-//- edit the failing tests
-	//- 54 : 2
-	//- fluctuating tests still ???
-//- read for Test Driven ??? TDD - links
+- edit the failing tests
+	- fluctuating tests still ???
+- read for Test Driven ??? TDD - links
 - implement some missing tests in C6
 	_ReadOnlyCollection_
 	_FixedSizeCollection_	
 		Added: public void ShuffleRandom_IsFixedSizedCollection_ThrowsNothing()
 	//_DuplicatesByCounting_ - will not be considered
 	_Set_ what is that ???		
-- collect the "???" from the .cs files !!! Re-look at them
 - IsValid tests	
-- Think of General View tests
 =================
 - Code Contracts for private methods - look and do it the same way for the rest.
 	Code contracts warnmed me for that ???

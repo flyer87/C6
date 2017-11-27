@@ -46,14 +46,14 @@ Q:
 	- from SCG and ICollection<T> - I put virtual, since they have the same signature. Is it fine?
 		
 - Test:
-	- What is the properties in HALTests for? Cos when we create HAL, it already has the values
+	//- What is the properties in HALTests for? Cos when we create HAL, it already has the values
 	
 Tips:
 	Clear()
-		prop. list -> Clear(); 
-		view -> RemoveIndexRange(0, Count);
+		if prop. list -> Clear(); 
+		if view -> RemoveIndexRange(0, v.Count);
 	Add() -> InsertPrivate
-		AddRange -> InsertRange
+		AddRange -> InsertRange()
 	Remove() -> RemoveAt
 =======================
 TODO:
@@ -65,7 +65,7 @@ TODO:
 		additional postconditions: look at Mikkel's implementations.
 	- Properties: no Code Contracts for set {}
 	- Some methods are the same as in ArrayList: Dispose() and others. Re-use them?
-	- in Dispose(), else{} section, added: _views = null; Otherwise Clear(), calling 					FixViewsBeforeRemovePrivate() throws isValid should be true for the views. Is it fine?
+	- in Dispose(), else{} section, added: _views = null; Otherwise Clear(), calling 					FixViewsBeforeRemovePrivate(), throws: isValid should be true for the views. Is it fine?
 		Code to reproduce:
 		var collection = new HashedArrayList<string> { "1", "2", "3", "4" };
 		var v = collection.View(1, 2);

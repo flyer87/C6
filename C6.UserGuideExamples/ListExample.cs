@@ -30,12 +30,26 @@ namespace C6.UserGuideExamples
             //var items = new[] { "8", "Ab", "3", "4", "5", "6", "7" };            
             //var collection = new HashedLinkedList<string>(items, ec);                
 
-            var items = new[] { "8", "Ab", "3", "4", "5", "6", "7", "8" };
+            // ==============================
+            //var items = new[] { "8", "Ab", "3", "4", "5", "6", "7", "9" };
+            //var collection = new HashedArrayList<string>(items);
+
+            //var view1 = collection.View(3, 4); // longer
+            //var view2 = view1.View(1, 1);            
+
+
+            var items = new[] { "8", "Ab", "3", "4", "5", "6", "7", "9" };
             var collection = new ArrayList<string>(items);
-            var view = collection.View(1, 3);
-            
-            collection.Reverse();
-            Console.WriteLine(view.IsSorted());
+            var v = collection.View(3, 2);
+            //var v = collection.LastViewOf("4");
+            //IList<string> v2 = collection.View(4, 2);
+            //Console.WriteLine(v);
+           
+            Console.WriteLine(v.Slide(-1,2));
+
+
+            //Console.WriteLine(view1.IsValid);            
+
 
 
 

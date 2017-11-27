@@ -86,6 +86,7 @@
 - General: set doesn't have Code Contracts preconditions in its Interface hierarchy
 ===========
 Thesis notes:
+	- RemoveAllWhere, ...
 	- void C5.AddNode() => bool C6.AddNode()
 	- object initializer used in:
 		private  void SplitTagGroupPrivate(TagGroup taggroup) {
@@ -95,20 +96,23 @@ Thesis notes:
 		
 	- private methods renamed:
 		- contains => containsItem
-	- LINQ for ContainsRange()
+	-+ LINQ for ContainsRange()
 	- public static bool UnsequencedEquals<T>(this ICollection<T> first, ICollection<T> second, SCG.IEqualityComparer<T> equalityComparer = null)
 		updated; C5 re-used. BUT DO WE NEED it?
 		C6.4.3.6 Sequenced and Unsequenced Equality
 			4.1.1 Order-Indifferent Equality
 	- C5.HLL new Range()
 		- field: endNode - needless
-	- InsertRangePrivate:
+	-+ InsertRangePrivate:
 		else C5.HLL: throw new DuplicateNotAllowedException("Item already in indexed list"); removed()
 	- C5.Shuffle: count <= 0; now: C5.Shuffle: count <= 1
 	- inconsistency: C6.Sort() accepts null for comparer; but Shuffle() doesn't accept Random as null
-	- in Reverse:
+	-+ in Reverse:
 		Sorting.IntroSort<Position>(positions, 0, positions.Length, PositionComparer.Default);
 		change with Array.Sort()
 	- Tests, improvements: C6.ArrayList doesn't contain tests for thring an expcetion when 
+	- HLL.View(i,c) was not correct
+		was: view.index = index;
+		should be: view.index = Offset + index
 AllowsDuplicate is false. Even if set AllowsDuplicate to false in ArrayList. Write test with AllowsDuplicate = true and expexted behvaior, which fails.
 	- General: Code Contracts (which are implemented on inerface level) keeps us far from repeating the precondtions (in terms of check-throw-expcetion) in the concrete implementations.

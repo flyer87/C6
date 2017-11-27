@@ -232,6 +232,8 @@ namespace C6
             // is Valid, not disposed
             Requires(IsValid);
 
+
+
             // Result is non-null
             Ensures(Result<IDirectedCollectionValue<T>>() != null);
 
@@ -253,8 +255,7 @@ namespace C6
             // Result is empty if this is
             Ensures(Result<IDirectedCollectionValue<T>>().IsEmpty == (count == 0));
 
-            // Result array is backwards            
-            // !@            
+            // Result array is backwards                        
             Ensures(Result<IDirectedCollectionValue<T>>().ToArray().IsSameSequenceAs(this.Skip(startIndex).Take(count)));
 
 

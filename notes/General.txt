@@ -1,2 +1,0 @@
-Code Contracts
-	look at private methods and try to add -conditions
