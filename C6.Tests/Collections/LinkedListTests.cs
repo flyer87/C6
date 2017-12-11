@@ -17,6 +17,17 @@ namespace C6.Tests.Collections
 
 
     [TestFixture]
+    public class LinkedListViewTests : GeneralViewTest
+    {
+        protected override IList<T> GetEmptyList<T>(IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
+            => new LinkedList<T>(equalityComparer, allowsNull);
+
+        protected override IList<T> GetList<T>(IEnumerable<T> enumerable, IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
+            => new ArrayList<T>(enumerable, equalityComparer, allowsNull);
+    }
+
+
+    [TestFixture]
     public class LinkedListListTests : IListTests
     {
         protected override bool AllowsNull => true;

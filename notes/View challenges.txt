@@ -1,12 +1,12 @@
-Slide should have Ensure's although it re-uses TrySlide's code
+//Slide should have Ensure's although it re-uses TrySlide's code
 
 1.//- All return IList<T> - a lot of Ensures
 - Postconditions mainly for properties, but not for the methods - they are left to the tests
 2.//- Span, ViewOf and LastViewOf might return null unlike GetIndexRange()
 	//- more complicated implications: for Result<IList<T>> is null
-- Slide() has side effect
-	Result<IList<T>>'s members should be equal to the this
-	implications with OldValue(...)	
+//- Slide() has side effect
+	//Result<IList<T>>'s members should be equal to the this
+	???implications with OldValue(...)	
 ==
 All view method except the two overloads of TrySlide return an instance of the interface(correct???) IList<T>. An instance of IList<T> has many memebers (both from the interface itself and higher in the hierarchy) and each of them should be verified before the method exits. This requires a lot of extra work though.
 
@@ -22,10 +22,13 @@ As we can see, any method with the behaviour similar to the TrySlide methods wou
 
 
 2.Unlike the method View(), where the resulting view can be empty, but never null, the methods Span(), ViewOf() and LastViewOf() might return null. 
-		 // Result's underlying is the same as the underlying of this or this
-		Ensures(Result<IList<T>>().Underlying == Underlying);           
+		         
 		
-In code (??? Span) there is a postcondition describing that the property Underlying should be equal to this's Underlying after the method finishes. However, it might throw an NullReferenceException, when we call Underlying on a null reference. To deal with this case an implication should be added to the postcondition, as shown in the code (???)
+In code (??? Span) there is a postcondition describing that the property Underlying should be equal to this's Underlying after the method finishes. 
+// Result's underlying is the same as the underlying of this or this
+		Ensures(Result<IList<T>>().Underlying == Underlying);  
+
+However, it might throw an NullReferenceException, when we call Underlying on a null reference. To deal with this case an implication should be added to the postcondition, as shown in the code (???)
 
 		Ensures(Result<IList<T>>() == null || Result<IList<T>>().Underlying == Underlying);
 
@@ -42,10 +45,10 @@ In some more complicated cases we might need to chain two or more implications (
             Ensures(Result<IList<T>>() == null || Result<IList<T>>().Last.Equals(this.Last(x => x.Equals(item))));
 			
 The properties First and Last returns accordingly the first and the last item of a view or a proper list. An empty view has neiter first, nor last item. If Span() returns an empty view the above postconditions would fail with "Precondition failed: !IsEmpty  Collection must be non-empty". This can be fixed by adding another ??part in the implication, checking if the view is empty or not, see the code below. 
-            Ensures(Result<IList<T>>() == null || Result<IList<T>>().IsEmpty || Result<IList<T>>().First.Equals(this.First(x => x.Equals(item))));
-			
-			// Result's Last is correct
-            Ensures(Result<IList<T>>() == null || Result<IList<T>>().IsEmpty || Result<IList<T>>().Last.Equals(this.Last(x => x.Equals(item))));
+Ensures(Result<IList<T>>() == null || Result<IList<T>>().IsEmpty || Result<IList<T>>().First.Equals(this.First(x => x.Equals(item))));
+
+// Result's Last is correct
+Ensures(Result<IList<T>>() == null || Result<IList<T>>().IsEmpty || Result<IList<T>>().Last.Equals(this.Last(x => x.Equals(item))));
 			
 The final result of the postcondition now will be equal to the last part of the implication, when the first two parts evaluate to false (i.e. when the result is non-null and non-empty.) This code successfully deals with the case with empty view, but the postconditions get longer and a bit hard to grap at firs glimp compared with most postconditions. Therefore adding comments before the postconditions becomes necessary to make them more understandable.
 

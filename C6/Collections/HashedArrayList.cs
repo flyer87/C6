@@ -32,7 +32,6 @@ using static C6.Speed;
 using SC = System.Collections;
 using SCG = System.Collections.Generic;
 
-
 namespace C6.Collections
 {
     public class HashedArrayList<T> : IList<T>
@@ -45,7 +44,7 @@ namespace C6.Collections
 
 
         public T[] _items;
-        public SCG.Dictionary<T, int> _itemIndex;
+        public SCG.Dictionary<T, int> _itemIndex; // TODO: use C6.Hashset, when implemented
         private WeakViewList<HashedArrayList<T>> _views;
         private WeakViewList<HashedArrayList<T>>.Node _myWeakReference;
         private HashedArrayList<T> _underlying;
@@ -93,21 +92,24 @@ namespace C6.Collections
             // The number of items is equal to the number of items in the dictionary 
             Invariant(UnderlyingCount == _itemIndex.Count);
 
-            // _itemIndex contains the items of _items and the each item is in the right position 
+            // _itemIndex contains the items of the backing array and each item is in the right index 
             Invariant(ForAll(0, Count, i => {
                 int value;
                 return _itemIndex.TryGetValue(_items[i], out value) && value == i;
-            })); // TODO: Heavy?
+            }));
 
             #region View invariants             
 
             // Offset is non-negative
             Invariant(Offset >= 0);
 
+            // The list end is less than or equal to the count of the underlying list
             Invariant(Offset + Count <= UnderlyingCount);
 
-            // TODO: If there are views all should the same underlying(???) _items 
-            Invariant((_underlying ?? this)._views == null || ForAll((_underlying ?? this)._views, view => view._items == (_underlying ?? this)._items));            
+            // Views have the same backing _items array
+            Invariant((_underlying ?? this)._views == null ||
+                      ForAll((_underlying ?? this)._views, view => view._items == (_underlying ?? this)._items)
+            );            
 
             #endregion
 
@@ -206,7 +208,13 @@ namespace C6.Collections
                         return;
                     }
 
-                    Array.Resize(ref _items, value);
+                    Array.Resize(ref (_underlying ?? this)._items, value);
+
+                    if (_views == null) return;
+                    foreach (var v in _views)
+                    {
+                        v._items = (_underlying ?? this)._items;
+                    }
                 }
                 else
                 {
@@ -322,13 +330,13 @@ namespace C6.Collections
         public T[] ToArray() // to_base(virtual)
         {
             var array = new T[Count];
-            this.CopyTo(array, 0);
+            CopyTo(array, 0);
             return array;
         }
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            Array.Copy(_items, 0, array, arrayIndex, Count);
+            Array.Copy(_items, Offset, array, arrayIndex, Count);
         } //to_base
 
         #endregion
@@ -341,14 +349,13 @@ namespace C6.Collections
 
             #endregion
 
-            if (FindOrAddToHashPrivate(item, Count))
-            {
-                // ???                
+            if (FindOrAddToHashPrivate(item, Offset + Count))
+            {                 
                 return false;
             }
 
             InsertUnderlyingArrayPrivate(Count, item);
-            ReindexPrivate(Offset + Count + 1);
+            ReindexPrivate(Offset + Count);
             (_underlying ?? this).RaiseForAdd(item); //*View: 
             return true;
         }
@@ -714,12 +721,13 @@ namespace C6.Collections
 
         public int GetSequencedHashCode()
         {
-            if (_sequencedHashCodeVersion != _version)
+            if (_sequencedHashCodeVersion == _version)
             {
-                _sequencedHashCodeVersion = _version;
-                _sequencedHashCode = this.GetSequencedHashCode(EqualityComparer);
+                return _sequencedHashCode;
             }
 
+            _sequencedHashCodeVersion = _version;
+            _sequencedHashCode = this.GetSequencedHashCode(EqualityComparer);
             return _sequencedHashCode;
         }
 
@@ -845,19 +853,16 @@ namespace C6.Collections
         public virtual void Insert(int index, T item)
         {
             #region Code Contracts
-
-            //RequireValidity();
+            
             // If collection changes, the version is updated
             Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
             #endregion
 
-            // ???? Check for duplicates
-
+            FindOrAddToHashPrivate(item, Offset + index);
             InsertUnderlyingArrayPrivate(index, item);
-
-            _itemIndex[item] = index;
-            ReindexPrivate(Offset + index + 1);
+            
+            ReindexPrivate(Offset + index);
             (_underlying ?? this).RaiseForInsert(index, item); // View:
         }
 
@@ -1094,7 +1099,6 @@ namespace C6.Collections
 
             view.Offset += index;
             view.Count = count;
-
             view._underlying = _underlying ?? this;
             view._myWeakReference = _views.Add(view);
             return view;
@@ -1363,8 +1367,7 @@ namespace C6.Collections
             UpdateVersion();
 
             // Clean up            
-            Array.Clear(_items, UnderlyingCount, cntRemoved); // underlyingCount != j !!!
-            //Count = j;
+            Array.Clear(_items, UnderlyingCount, cntRemoved); // underlyingCount != j !!!            
 
             RaiseForRemoveAllWhere(itemsRemoved);
 
@@ -1436,6 +1439,7 @@ namespace C6.Collections
                 Array.Copy(_items, index, _items, index + 1, UnderlyingCount - index); // View:
             }
             _items[index] = item;
+
             Count++; 
             if (_underlying != null)
             {

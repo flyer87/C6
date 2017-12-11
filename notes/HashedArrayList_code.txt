@@ -63,8 +63,8 @@ TODO:
 	- Add Code contracts to:
 		private methods
 		additional postconditions: look at Mikkel's implementations.
-	- Properties: no Code Contracts for set {}
-	- Some methods are the same as in ArrayList: Dispose() and others. Re-use them?
+	- Properties: no Requires for set {}
+	- Some methods are the same as in ArrayList: Dispose() and others. Re-use them? N
 	- in Dispose(), else{} section, added: _views = null; Otherwise Clear(), calling 					FixViewsBeforeRemovePrivate(), throws: isValid should be true for the views. Is it fine?
 		Code to reproduce:
 		var collection = new HashedArrayList<string> { "1", "2", "3", "4" };

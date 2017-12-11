@@ -43,12 +43,14 @@ namespace C6.Collections
 
         [ContractInvariantMethod]
         private void ObjectInvariant()
-        {             
+        {
             // Equality comparer is non-null
             Invariant(EqualityComparer != null);
 
+            // startsentil is not null
             Invariant(_startSentinel != null);
 
+            // end sentil is not null
             Invariant(_endSentinel != null);
 
             // if (underlying == null ??? corectly transfered
@@ -57,49 +59,57 @@ namespace C6.Collections
             Invariant(Count != 0 || _startSentinel.Next == _endSentinel);
 
             // If Count is 0 then _endSentinel.Prev points to _startSentinel
-            Invariant(Count != 0 || _endSentinel.Prev == _startSentinel); 
-
-            #region View
-            /* View related part !!!!!!
-             
-            // Bad startsentinel tag group
-            var tg = _startSentinel.taggroup;
-            Invariant(Underlying != null || tg.Count == 0 && tg.First == null && tg.Last == null && tg.Tag  == int.MinValue);
-
-            // Bad endsentinel tag group
-            tg = _endSentinel.taggroup;
-            Invariant(Underlying != null || tg.Count == 0 && tg.First == null && tg.Last == null && tg.Tag == int.MaxValue);
-
-
-            Node node = _startSentinel.Next, prev = _startSentinel;
-            Invariant(ForAll(0, Count, i => {
-                var res = node.Prev == prev &&
-                          node != null &&
-                          true;
-
-
-                prev = node;
-                node = node.Next;
-                return res;
-            })); // TODO: to complete the rest check elements
-            
-            // For empty proper list -> taggroups == 0 ??? Check
-            Invariant(!(Underlying == null && Count == 0 ) || Taggroups == 0 );
-
-            Invariant(!(Underlying == null && Count > 0 && _endSentinel.Prev.taggroup != null) || _endSentinel.Prev.taggroup == taggroups);
-            */
-            #endregion
+            Invariant(Count != 0 || _endSentinel.Prev == _startSentinel);
 
             // The list and the dictioonary have the same number of items
             Invariant(Underlying != null || Count == _itemNode.Count);
 
-            // Each list item is in the dictionary, the nodes are the same
+            // Each list item is in the dictionary; the nodes are the same
             Node node = _startSentinel.Next, nodeOut;
-            Invariant(Underlying != null || ForAll(0, Count, i => {                
+            Invariant(Underlying != null || ForAll(0, Count, i => {
                 var res = _itemNode.TryGetValue(node.item, out nodeOut) && nodeOut == node;
                 node = node.Next;
                 return res;
-            }));            
+            }));
+
+            #region View
+            // Offset and Count of each view is within bounds
+            Invariant((_underlying ?? this)._views == null ||
+                      ForAll((_underlying ?? this)._views, v =>
+                          v.Offset >= 0 &&
+                          // ??? v.IsValid &&                                                                                    
+                          v.Offset + v.Count >= 0 &&
+                          v.Offset + v.Count <= UnderlyingCount
+                      ));
+
+            // Each view points to the same _views as the underlying; 
+            // Each view have the correct underlying list
+            Invariant((_underlying ?? this)._views == null ||
+                      ForAll((_underlying ?? this)._views, v =>
+                              // ??? v.IsValid &&                                                                                
+                              v._views == (_underlying ?? this)._views &&
+                              v._underlying == (_underlying ?? this)
+            ));
+
+            // TODO: Find better way for doing that 
+            /* var nodes = new Node[UnderlyingCount];  
+            var index = 0;            
+            var cursor = _startSentinel.Next;
+            while (cursor != _endSentinel)
+            {
+                nodes[index++] = cursor;                
+                cursor = cursor.Next;
+            }
+
+            Invariant((_underlying ?? this)._views == null ||
+                      ForAll((_underlying ?? this)._views, v => true
+                          // v._startSentinel == nodes[v.Offset] &&                              
+                          // (v._endSentinel == nodes[v.Offset + v.Count + 1]) &&                           
+
+                      )); 
+            */
+
+            #endregion
         }
 
         #endregion
@@ -120,6 +130,7 @@ namespace C6.Collections
                 Tag = int.MinValue,
                 Count = 0
             };
+
             _endSentinel.taggroup = new TagGroup {
                 Tag = int.MaxValue,
                 Count = 0
@@ -416,7 +427,7 @@ namespace C6.Collections
             return Remove(item, out removedItem);
         }
 
-        public virtual bool RemoveDuplicates(T item) => RemoveAllWhere(x => Equals(x, item));
+        public virtual bool RemoveDuplicates(T item) => RemoveAllWherePrivate(x => Equals(x, item));
 
         public virtual bool RemoveRange(SCG.IEnumerable<T> items)
         {
@@ -427,7 +438,7 @@ namespace C6.Collections
             #endregion
 
             var list = new HashedLinkedList<T>(items, EqualityComparer);
-            return RemoveAllWhere(x => !list.IsEmpty && list.Remove(x));
+            return RemoveAllWherePrivate(x => !list.IsEmpty && list.Remove(x));
         }
 
         public virtual bool RetainRange(SCG.IEnumerable<T> items)
@@ -469,7 +480,7 @@ namespace C6.Collections
             //using (var list = new HashedLinkedList<T>(items, EqualityComparer))
             {
                 var list = new HashedLinkedList<T>(items, EqualityComparer);
-                return RemoveAllWhere(x => !list.Remove(x));
+                return RemoveAllWherePrivate(x => !list.Remove(x));
             }
         }
 
@@ -749,7 +760,7 @@ namespace C6.Collections
 
         public virtual bool IsSorted() => IsSorted(SCG.Comparer<T>.Default.Compare);
 
-        public virtual IList<T> LastViewOf(T item) => ViewOf(item);
+        public virtual IList<T> LastViewOf(T item) => ViewOf(item); // ??? wrong 
 
         public virtual T RemoveFirst() => RemoveAt(0);
 
@@ -757,7 +768,7 @@ namespace C6.Collections
 
         public virtual void Reverse()
         {            
-            if (Count <= 1) return;
+            if (Count <= 1) return;            
 
             UpdateVersion(); // ??? here or 
 
@@ -987,6 +998,7 @@ namespace C6.Collections
 
         public virtual IList<T> View(int index, int count)
         {
+            _views = _views ?? (_views = new WeakViewList<HashedLinkedList<T>>());
             var view = (HashedLinkedList<T>) MemberwiseClone();
             view._underlying = _underlying ?? this;
             view.Offset = Offset + index;
@@ -994,8 +1006,7 @@ namespace C6.Collections
 
             GetPairPrivate(index - 1, index + count, out view._startSentinel, out view._endSentinel,
                 new [] { -1, Count }, new [] { _startSentinel, _endSentinel });
-
-            _myWeakReference = (_views ?? (_views = new WeakViewList<HashedLinkedList<T>>())).Add(view);
+            view._myWeakReference = _views.Add(view);
 
             return view;
         }
@@ -1021,6 +1032,7 @@ namespace C6.Collections
                 _collectionChanged += value;
                 ActiveEvents |= Changed;
             }
+
             remove
             {
                 _collectionChanged -= value;
@@ -1230,7 +1242,7 @@ namespace C6.Collections
 
         #region Private methods
 
-        private bool RemoveAllWhere(Func<T, bool> predicate)
+        private bool RemoveAllWherePrivate(Func<T, bool> predicate)
         {
             if (Count <= 0)
                 return false;
@@ -1350,11 +1362,11 @@ namespace C6.Collections
             }
         }
 
-        private void InsertRangePrivate(int i, SCG.IEnumerable<T> items)
+        private void InsertRangePrivate(int index, SCG.IEnumerable<T> items)
         {
             Node node;
             var count = 0;
-            var succ = i == Count ? _endSentinel : GetNodeByIndexPrivate(i);
+            var succ = index == Count ? _endSentinel : GetNodeByIndexPrivate(index);
             var pred = node = succ.Prev;
             TagGroup taggroup = null;
             int taglimit = 0, thetag = 0;
@@ -1880,8 +1892,6 @@ namespace C6.Collections
                     view._endSentinel = node.Next;
             }
         }
-
-
 
 
 
@@ -2527,7 +2537,7 @@ namespace C6.Collections
         /// </summary>
         /// <typeparam name="V"></typeparam>
         [Serializable]
-        private sealed class WeakViewList<V> where V : class
+        private sealed class WeakViewList<V> : SCG.IEnumerable<V> where V : class
         {
             Node start;
 
@@ -2569,6 +2579,8 @@ namespace C6.Collections
                     n = n.next;
                 }
             }
+
+            SC.IEnumerator SC.IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
         [Serializable]

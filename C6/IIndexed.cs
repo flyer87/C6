@@ -258,7 +258,6 @@ namespace C6
             // Result array is backwards                        
             Ensures(Result<IDirectedCollectionValue<T>>().ToArray().IsSameSequenceAs(this.Skip(startIndex).Take(count)));
 
-
             return default(IDirectedCollectionValue<T>);
         }
 

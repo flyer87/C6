@@ -1,0 +1,7 @@
+When a method returns a view, we are supposed to check all its members, which adds alot of extra work. This is commented in the section 3.5.Rest is not touched except few ??? Which are they ??
+
+https://github.com/Microsoft/CodeContracts/issues/331
+
+// cite some of the Mikkel's text - which texts
+
+// Inheriting from Multiple methods - read again, didn't get it.

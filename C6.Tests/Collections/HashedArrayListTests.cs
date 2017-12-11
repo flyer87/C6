@@ -13,9 +13,17 @@ namespace C6.Tests.Collections
     [TestFixture]
     public class HashedArrayListTests :TestBase
     {
-
     }
 
+    [TestFixture]
+    public class HashedArrayListGeneralViewTests : GeneralViewTest
+    {
+        protected override IList<T> GetEmptyList<T>(IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
+            => new HashedArrayList<T>(equalityComparer);
+
+        protected override IList<T> GetList<T>(IEnumerable<T> enumerable, IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
+            => new HashedArrayList<T>(enumerable, equalityComparer);
+    }
 
     [TestFixture]
     public class HashedArrayListListTests : IListTests

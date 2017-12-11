@@ -98,15 +98,19 @@ namespace C6.Collections
 
             #region View invarints 
 
-            Invariant(UnderlyingCount <= Capacity);
-
-            Invariant(Offset + Count <= UnderlyingCount);
-
             // Offset is non-negative
             Invariant(Offset >= 0);
 
-            // TODO: If there are views all should the same underlying(???) _items             
-            Invariant((_underlying ?? this)._views == null || ForAll((_underlying ?? this)._views, view => view._items == (_underlying ?? this)._items));
+            // The end of the list is less than or equal to the count of the underlying list
+            Invariant(Offset + Count <= UnderlyingCount);
+
+            // The Count of the underlying list is less than the Capacity
+            Invariant(UnderlyingCount <= Capacity);
+
+            // Views have the same backing _items array
+            Invariant((_underlying ?? this)._views == null || 
+                ForAll((_underlying ?? this)._views, view => view._items == (_underlying ?? this)._items)
+            );            
 
             #endregion
 
@@ -268,7 +272,7 @@ namespace C6.Collections
 
         public virtual SCG.IEqualityComparer<T> EqualityComparer { get; }        
 
-        public virtual T First => _items[_offsetField];
+        public virtual T First => _items[Offset];
 
         public virtual Speed IndexingSpeed => Constant;
 
@@ -439,7 +443,7 @@ namespace C6.Collections
         
         public override void CopyTo(T[] array, int arrayIndex)
         {
-            Array.Copy(_items, _offsetField, array, arrayIndex, Count);
+            Array.Copy(_items, Offset, array, arrayIndex, Count);
         }
 
         // Explicitly check against null to avoid using the (slower) equality comparer
@@ -581,7 +585,7 @@ namespace C6.Collections
             #region Code Contracts            
 
             // If collection changes, the version is updated
-            //!@? Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
             #endregion
 
@@ -658,7 +662,7 @@ namespace C6.Collections
                 : ~Result<int>() == Count);
 
             // Item at index is the first equal to item
-            // !@ Ensures(Result<int>() < 0 || !this.Skip(Result<int>() + 1).Contains(item, EqualityComparer) && EqualityComparer.Equals(item, this.ElementAt(Result<int>())));
+            Ensures(Result<int>() < 0 || !this.Skip(Result<int>() + 1).Contains(item, EqualityComparer) && EqualityComparer.Equals(item, this.ElementAt(Result<int>())));
 
             #endregion
 
@@ -1918,6 +1922,7 @@ namespace C6.Collections
                     OnItemsAdded(item, 1);
                 }
             }
+
             OnCollectionChanged();
         }
 
@@ -1979,8 +1984,11 @@ namespace C6.Collections
 
         private void RaiseForRemoveIndexRange(int startIndex, int count)
         {
-            OnCollectionCleared(false, count, startIndex);
-            OnCollectionChanged();
+            if (ActiveEvents.HasFlag(Cleared))            
+                OnCollectionCleared(false, count, startIndex);
+            
+            if (ActiveEvents.HasFlag(Changed))
+                OnCollectionChanged();
         }
 
         private void RaiseForRemoveAllWhere(SCG.IEnumerable<T> items)

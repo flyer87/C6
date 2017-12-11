@@ -118,7 +118,7 @@ namespace C6
 
         // View
         /// <summary>
-        /// TODO
+        /// 
         /// </summary>
         [Pure]
         bool IsValid { get; }
@@ -128,6 +128,16 @@ namespace C6
     internal abstract class ICollectionValueContract<T> : ICollectionValue<T>
     {
         // ReSharper disable InvocationIsSkipped
+        public bool IsValid
+        {
+            get
+            {
+                // No preconditions
+
+                return default(bool);
+            }
+        }
+
         public bool AllowsNull
         {
             get {
@@ -139,18 +149,7 @@ namespace C6
                 return default(bool);
             }
         }
-        public bool IsValid
-        {
-            get
-            {
-                // No preconditions
 
-                // TODO 
-                //Ensures(Result<bool>());
-
-                return default(bool);
-            }
-        }
         public int Count
         {
             get {
@@ -168,6 +167,7 @@ namespace C6
                 return default(int);
             }
         }
+
         public Speed CountSpeed
         {
             get {
@@ -181,6 +181,7 @@ namespace C6
                 return default(Speed);
             }
         }
+
         public bool IsEmpty
         {
             get {

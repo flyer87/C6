@@ -38,22 +38,36 @@ namespace C6.UserGuideExamples
             //var view2 = view1.View(1, 1);            
 
 
-            var items = new[] { "8", "Ab", "3", "4", "5", "6", "7", "9" };
-            var collection = new ArrayList<string>(items);
-            var v = collection.View(3, 2);
-            //var v = collection.LastViewOf("4");
-            //IList<string> v2 = collection.View(4, 2);
-            //Console.WriteLine(v);
-           
-            Console.WriteLine(v.Slide(-1,2));
+            //var items = new[] { "8", "Ab", "3", "4", "5", "6", "7", "9" };     
+            // HLL.Reverse        
+            /* var items = new[] { "a", "b", "c", "d", "e" };
+            var linkedList = new HashedLinkedList<string>(items);            
+            var v1 = linkedList.View(0, linkedList.Count);
+            var v2 = linkedList.View(0, 2);
+            v1.Reverse();
+            v1.Reverse();
+            Console.WriteLine(v2); */
+
+            // HLL.Sort 
+            //var items = new[] { "b", "a", "c", "e", "d" };
+            //var linkedList = new HashedLinkedList<string>(items);
+            //var v1 = linkedList.View(0, 3);
+            //var v2 = linkedList.View(3, 2);
+            //v1.Sort();
+            //Console.WriteLine(v1);
+            //Console.WriteLine(v2);
+
+            // HAL.Add()
+            var items = new[] { "8", "Ab", "3", "4", "5", "6", "7", "9" };                             
+            var arrayList = new HashedArrayList<string>(items);
+            var v1 = arrayList.View(0, 7);
+            var v2 = arrayList.View(0, 7);
+            v1.Add("333333333");
+            Console.WriteLine(v1);
+            Console.WriteLine(v2);
 
 
             //Console.WriteLine(view1.IsValid);            
-
-
-
-
-
             //Console.WriteLine(view);
             //Console.WriteLine(collection);
 

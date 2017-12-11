@@ -54,10 +54,10 @@ TODO:
 		- index or Offset + index
 		P.S. I also have in ArrayList
 	//- remove Print() from IList
-	- Slide returns the same view after sliding. Do we need it to return "this"
+	- General: Slide returns the same view after sliding. Do we need it to return "this"
 	chaining; xs.
-	Effective Java, Bloch, second edition!!!
-		changing + side effect ?!
+		Effective Java, Bloch, second edition!!!
+			changing + side effect ?!
 	- RemoveIndexRange's Code Contracts in IIndexed
 		Do I need to add: Requires(IsEmpty, CollectionMustBeNonReadOnly); or what ???
 	- RemoweAllWhere looks ugly
@@ -88,29 +88,27 @@ Complex methods:
 
 ================
 Thesis notes:	
-	it was: private void raiseForInsertAll(Node node, int i, int added, bool insertion)
-	now: private void RaiseForAddRange(SCG.IEnumerable<T> items)
-	- get -> getNodeAtPrivate
-	find() and dnif - were combined with usage of Eumeration direction as paramter
-	- raiseFor: index mismatches
-	- redundant else's in C5.LinkedList
+	//it was: private void raiseForInsertAll(Node node, int i, int added, bool insertion)
+	//	now: private void RaiseForAddRange(SCG.IEnumerable<T> items)
+	//- get -> getNodeAtPrivate
+	//- common: find() and dnif - were combined with usage of Eumeration direction as paramter
+	//- raiseFor: index mismatches
+	//- redundant else's in C5.LinkedList
 		public virtual bool IsSorted(SCG.IComparer<T> c)
-	- public virtual bool IsSorted(Comparison<T> comparison) - new method, not exisitn in C5. Is it in C6's documentaion?
-	- Properties' getters can't throw an exception, BUT we throw. Reflect on it.	
-	- private void RaiseForIndexSetter(T oldItem, T newItem, int index)
-	 was: 
-		raiseItemsRemoved(item, 1);
-		raiseItemRemovedAt(item, index);
-	 now: 
-		OnItemRemovedAt(oldItem, index);
-		OnItemsRemoved(oldItem, 1);
-	- C5's private methods was renamed
-		- Capital letter; ...Private suffix; var instead of a specific type.
-	- Reverse
-		- PositionComparer: fields became private; expression-bobies added
-		- CircularQueue -> Queue; a new instance
-		- Sorting.IntroSort<Position>(positions, 0, positions.Length, PositionComparer.Default)
-			-> Array.Sort(positions, PositionComparer.Default);
-		
-
-          
+	//- public virtual bool IsSorted(Comparison<T> comparison) 
+		- new method, not existing in C5. Is it in C6's documentaion?
+	//- General, code impl., common: Properties' getters can't throw an exception, BUT we throw. Reflect on it.	
+	//- private void RaiseForIndexSetter(T oldItem, T newItem, int index)
+		was: 
+			raiseItemsRemoved(item, 1);
+			raiseItemRemovedAt(item, index);
+		now: 
+			OnItemRemovedAt(oldItem, index);
+			OnItemsRemoved(oldItem, 1);
+	//- C5's private methods was renamed
+		//- General, minor: Capital letter; ...Private suffix; var instead of a specific type.
+	//- Reverse
+		//no - PositionComparer: fields became private; expression-bobies added
+		//- CircularQueue -> Queue; a new instance
+		//no- Sorting.IntroSort<Position>(positions, 0, positions.Length, PositionComparer.Default)
+			-> Array.Sort(positions, PositionComparer.Default);		        

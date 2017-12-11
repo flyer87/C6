@@ -1,7 +1,5 @@
-=============
 - HashSet<T> itemIndex:
 	- !!class HashSet<T> : CollectionBase<T>, ICollection<T>
-
 	
 Q:	
 - "maintains a hash table so that it can quickly find the position of a given item in the array list."

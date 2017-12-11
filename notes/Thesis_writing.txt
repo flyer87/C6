@@ -1,0 +1,44 @@
+1. Introduction
+	...
+2. Code Contracts (3) 
+	was: Ensures(AllowsDuplicates ? Result<bool>() : OldValue(!this.Contains(item, EqualityComparer)));
+	now: Ensures(AllowsDuplicates ? Result<bool>() : OldValue(this.Contains(item, EqualityComparer)));
+	Still missing parts...
+	
+	2.4  Pluses and Minuses
+	2.5  Readability and usability
+		2.5.1  Static import
+		2.5.2  Regions
+		2.5.3  Split the conditions in many
+		2.5.4  Ordering
+	2.6  Comments and user messages
+	2.7  Pitfalls
+		2.7.1  OldValue
+	
+3. From C6 to C6 Continued 
+	some "???"
+	Interface hierarchy
+	
+4. Implementing the data structures (2)				
+	- Common changes		
+		---- inconsistency: C6.Sort() accepts null for comparer; but Shuffle() doesn't accept Random as  null
+		---- object initializer used in; where to put:
+			private  void SplitTagGroupPrivate(TagGroup taggroup) {
+				...
+				var newtaggroup = new TagGroup { ... }
+			}
+		---- C5's Hashed C5.HLL + HAL: 
+			throw new DuplicateNotAllowedException("Item already in indexed list") -> in precondition???
+	- LinkedList - what else?
+		---- LinkedList's node extends IEnumerable ???			
+	- Constrcutors?
+	- HashedArrayList - what else		
+	- HashedLinkedList - what else
+		
+		
+5. Unit testing (1)
+	...
+	
+7. Discussion
+
+8. Conclusion

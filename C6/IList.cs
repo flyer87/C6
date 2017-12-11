@@ -153,10 +153,7 @@ namespace C6
         /// </remarks>
         new void Clear();
 
-        // View part
-        /// <summary>
-        /// 
-        /// </summary>        
+        // View part     
 
         /// <summary>
         /// 
@@ -181,9 +178,14 @@ namespace C6
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        IList<T> ViewOf(T item); // names???
+        IList<T> ViewOf(T item); 
 
-        IList<T> LastViewOf(T item); // names?
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        IList<T> LastViewOf(T item); 
 
         /// <summary>
         /// 
@@ -644,11 +646,9 @@ namespace C6
                 // Collection must be non-empty
                 Requires(!IsEmpty, CollectionMustBeNonEmpty);
 
-
                 // Equals first item
                 Ensures(Result<T>().IsSameAs(this[0]));
                 Ensures(Result<T>().IsSameAs(this.First()));
-
 
                 return default(T);
             }
@@ -697,21 +697,36 @@ namespace C6
         }
 
         // View
-
         public int Offset
         {
-            get
-            {
+            get {
+                // this is Valid
                 Requires(IsValid, MustBeValid);
+
+                // If view, First is the same as skipping the first Result() items from Underlying and taking the first item.
+                // If this is Empty, skip the postcondition
+                Ensures(IsEmpty || Underlying == null || First.IsSameAs(Underlying.Skip(Result<int>()).First()));
+
+                // If proper list, First is the same as skipping the first Result() items from this and taking the first item.
+                // If this is Empty, skip the postcondition
+                Ensures(IsEmpty || Underlying != null || First.IsSameAs(this.Skip(Result<int>()).First()));
+
+                // If view, this is the same as skipping the first Result() items from Underlying and then taking Count items.
+                Ensures(Underlying == null || this.IsSameSequenceAs(Underlying.Skip(Result<int>()).Take(Count)));                
+
                 return default(int);
             }
         }
 
         public IList<T> Underlying
         {
-            get
-            {
+            get {
+                // this is Valid
                 Requires(IsValid, MustBeValid);
+
+                // if this is proper list then result is null, otherwise result's underlying is null
+                Ensures(Result<IList<T>>() == null || Result<IList<T>>().Underlying == null);
+
                 return default(IList<T>);
             }
         }
@@ -774,7 +789,7 @@ namespace C6
             // Result's direction is the same as this's 
             Ensures(Result<IList<T>>().Direction == this.Direction);
 
-            //Result is coorect
+            //Result is correct
             Ensures(Result<IList<T>>().IsSameSequenceAs(this.Skip(index).Take(count)));            
 
             return default(IList<T>);
@@ -848,7 +863,6 @@ namespace C6
             Requires(AllowsNull || item != null, ItemMustBeNonNull);
 
 
-
             // Result is not null
             //Ensures(Result<IList<T>>() != null);
 
@@ -916,7 +930,7 @@ namespace C6
             // Result is the same as this
             Ensures(Result<IList<T>>() == this);
 
-            // Result's underlying is the same as the underlying of this or this
+            // Result's underlying is the same as the underlying of this
             //Ensures(Result<IList<T>>().Underlying == Underlying);
 
             // Result's Offset is equal to index
@@ -984,7 +998,7 @@ namespace C6
             // Result is the same as this
             Ensures(Result<IList<T>>() == this);
 
-            // Result's underlying is the same as the underlying of this or this
+            // Result's underlying is the same as the underlying of this 
             //Ensures(Result<IList<T>>().Underlying == Underlying);
 
             // Result's Offset is equal to index
@@ -1113,10 +1127,10 @@ namespace C6
             // Underlying is the same as the underlying of this or this
             Ensures(Underlying == OldValue(Underlying));
 
-            // Offset is equal to old ofset + Ofset, if the Result is true            
+            // Offset is equal to old offset + Offset, if the Result is true            
             Ensures(!Result<bool>() || Offset == OldValue(Offset) + offset);
 
-            // Offset is equal to the old Ofset, if the Result is false
+            // Offset is equal to the old Offset, if the Result is false
             Ensures( Result<bool>() || Offset == OldValue(Offset));
 
             // Count is equal to count, if the Result is true                        
@@ -1195,7 +1209,7 @@ namespace C6
 
             
 
-            // Result's underlying is the same as the underlying of this or this
+            // Result's underlying is the same as the underlying of this
             Ensures(Result<IList<T>>() == null || Result<IList<T>>().Underlying == Underlying);
 
             // Result's Offset is the same as this's Offset
@@ -1252,9 +1266,9 @@ namespace C6
                 // Result is the same as skipping the first index items
                 Ensures(Result<T>().IsSameAs(this.ElementAt(index)));
 
-
                 return default(T);
             }
+
             set {
                 // Collection must be non-read-only
                 Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
@@ -1269,10 +1283,8 @@ namespace C6
                 // Collection must not already contain item if collection disallows duplicate values
                 Requires(AllowsDuplicates || !Contains(value), CollectionMustAllowDuplicates);
 
-
                 // Value is the same as skipping the first index items
                 Ensures(value.IsSameAs(this[index]));
-
 
                 return;
             }
@@ -1622,7 +1634,7 @@ namespace C6
             Ensures(IsSorted());
 
             // The collection remains the same
-            Ensures(this.HasSameAs(OldValue(ToArray())));
+            Ensures(this.HasSameAs(OldValue(this.ToArray())));
 
             return;
         }
@@ -1660,7 +1672,7 @@ namespace C6
             Ensures(IsSorted(comparer));
 
             // The collection remains the same
-            Ensures(this.HasSameAs(OldValue(ToArray())));
+            Ensures(this.HasSameAs(OldValue(this.ToArray())));
 
             return;
         }
@@ -1933,10 +1945,7 @@ namespace C6
 
         #region IIndexed<T>
 
-        public abstract Speed IndexingSpeed { get; }
-
-        // public abstract bool IsValid { get; }
-
+        public abstract Speed IndexingSpeed { get; }        
         public abstract IDirectedCollectionValue<T> GetIndexRange(int startIndex, int count);
         public abstract void RemoveIndexRange(int startIndex, int count);
 

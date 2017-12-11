@@ -415,7 +415,6 @@ namespace C6.Tests.Collections
             => new ArrayList<T>(enumerable, equalityComparer, allowsNull);        
     }
 
-
     [TestFixture]
     public class ArrayListStackTests : IStackTests
     {
@@ -428,7 +427,6 @@ namespace C6.Tests.Collections
         // ??? GetStack
         protected override IStack<T> GetStack<T>(SCG.IEnumerable<T> enumerable, bool allowsNull = false) => new ArrayList<T>(enumerable, allowsNull: allowsNull);
     }
-
 
     [TestFixture]
     public class ArrayListGeneralViewTests : GeneralViewTest

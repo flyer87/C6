@@ -1,20 +1,35 @@
-- RESTS:
-	- Code Contracts - only in the private methods ???
+- RESTS:	
+	- C6 -> C6 Cont
+	- ??? Stack and Queues - do and write it in "Implementation of data structure"
+	- in Unit test I mettion that I check for toArray() or whatever ???
+	- version question, Peter
+	- Assert.Multiple() !!!!!!!!11
+	- ArrayList: _offseField -> Offset
+	- The rest of the tests for views
+	- Code Contracts 
+		- only in the private methods ???
 		- look at private methods and try to add pre-conditions			
-		additional postconditions: look at Mikkel's implementations.
+			- additional postconditions: look at Mikkel's implementations.
 		- Properties: no Code Contracts for set {}
+		//- Invariants - check them again
+		- C. contracts warned me for what?
+		- HLL: tag invarinats
+		"offers guarantees regarding the state of an object"
 	- documentation
-	- Tests:
+	- Tests
+		- iExtensible for HAL, HLL: Ensures(AllowsDuplicates ? Result<bool>() : OldValue(!this.Contains(item, EqualityComparer)));
 		- failing IsValid tests
-		- failing Violate tests
+		- failing volatile tests
+		- Implement the test for the remaining methods for views
+		- fluctuating tests still
 	- RaiseFor - only those that are not already in the list
+	
+- Al+HAL in array; LL + HLL in linkedlists???	
 - try to get how the tag staff in the views work	
 
 ================================================		
-- invalidate
-	
-- fix: Insert and this[] - they shoudl either throw an exception or require a precondition.
-
+- invalidate	
+- fix: Insert and this[] - they should either throw an exception or require a precondition.
 
 //- look at the test patterns of C6
 //- look at the C5's view tests
@@ -30,9 +45,7 @@
 	//- Span - implement tests
 	
 	
-
-- edit the failing tests
-	- fluctuating tests still ???
+	
 - read for Test Driven ??? TDD - links
 - implement some missing tests in C6
 	_ReadOnlyCollection_
@@ -40,8 +53,4 @@
 		Added: public void ShuffleRandom_IsFixedSizedCollection_ThrowsNothing()
 	//_DuplicatesByCounting_ - will not be considered
 	_Set_ what is that ???		
-- IsValid tests	
 =================
-- Code Contracts for private methods - look and do it the same way for the rest.
-	Code contracts warnmed me for that ???
-=========

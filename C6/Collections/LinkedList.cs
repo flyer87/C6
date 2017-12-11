@@ -46,8 +46,10 @@ namespace C6
         {
             // ReSharper disable InvocationIsSkipped            
 
+            // Start sentil is not null
             Invariant(_startSentinel != null);
 
+            // End sentil is not null
             Invariant(_endSentinel != null);
 
             // All items must be non-null if collection disallows null values
@@ -62,19 +64,16 @@ namespace C6
             // If Count is 0 then _endSentinel.Prev points to _startSentinel
             Invariant(!(Count == 0 && _endSentinel != null) || _endSentinel.Prev == _startSentinel);
 
-            // Each .Prev points to the correct node TODO: heavy && count++ in C5.Check()            
+            // Each .Prev points to the correct node
             Node node = _startSentinel.Next, prev = _startSentinel;
             Invariant(ForAll(0, Count, i => {
                 var result = node.Prev == prev;
-
                 prev = node;
                 node = node.Next;
                 return result;
             }));
 
-
-
-            // Next pointers are not null ??? TODO: heavy
+            // Next pointers are not null
             node = _startSentinel.Next;
             prev = _startSentinel;
             Invariant(ForAll(0, Count, i => {
@@ -87,34 +86,47 @@ namespace C6
 
             #region Views
 
-            /* var nodes = new Node[UnderlyingCount];
-            var index = 0;
+            // TODO: Find better way for doing that 
+            /* var nodes = new Node[UnderlyingCount];  
+            var index = 0;            
             var cursor = _startSentinel.Next;
             while (cursor != _endSentinel)
             {
-                nodes[index++] = cursor;
+                nodes[index++] = cursor;                
                 cursor = cursor.Next;
-            } */
+            }
 
-            // views are correct ??? 
-            Invariant((_underlying ?? this)._views == null || ForAll((_underlying ?? this)._views, v =>
-                              v.Offset >= 0 &&
-                              // ??? v.IsValid &&                                                      
-                              //v._startSentinel == nodes[v.Offset] &&
-                              v.Offset + v.Count >= 0 &&
-                              v.Offset + v.Count <= UnderlyingCount &&
-                              //(v._endSentinel == nodes[v.Offset + v.Count + 1]) && 
-                              v._views == (_underlying ?? this)._views &&
-                              v._underlying == (_underlying ?? this)
-                          // ??? if (view.stamp != stamp)
+            Invariant((_underlying ?? this)._views == null ||
+                      ForAll((_underlying ?? this)._views, v => true
+                          // v._startSentinel == nodes[v.Offset] &&                              
+                          // (v._endSentinel == nodes[v.Offset + v.Count + 1]) &&                           
+
+                      )); 
+            */
+
+            // Offset and Count of each view is within bounds
+            Invariant((_underlying ?? this)._views == null ||
+                      ForAll((_underlying ?? this)._views, v =>
+                          v.Offset >= 0 &&
+                          // ??? v.IsValid &&                                                                                    
+                          v.Offset + v.Count >= 0 &&
+                          v.Offset + v.Count <= UnderlyingCount
                       ));
+
+            // Each view points to the same _views as the underlying; 
+            // Each view have the correct underlying list
+            Invariant((_underlying ?? this)._views == null ||
+                      ForAll((_underlying ?? this)._views, v =>
+                          // ??? v.IsValid &&                                                                                
+                              v._views == (_underlying ?? this)._views &&
+                              v._underlying == (_underlying ?? this))
+            );
 
             // ??? if (view.stamp != stamp)
 
             #endregion
 
-            // ReSharper restore InvocationIsSkipped
-            /*        */
+            // ReSharper restore InvocationIsSkipped            
         }
 
         #endregion
@@ -665,8 +677,8 @@ namespace C6
             return true;
         }
 
-        public virtual bool IsSorted(SCG.IComparer<T> comparer)
-            => IsSorted((comparer ?? SCG.Comparer<T>.Default).Compare);
+        public virtual bool IsSorted(SCG.IComparer<T> comparer) => 
+            IsSorted((comparer ?? SCG.Comparer<T>.Default).Compare);
 
         public virtual bool IsSorted() => IsSorted(SCG.Comparer<T>.Default.Compare);
 
@@ -694,6 +706,7 @@ namespace C6
             int poslow = 0, poshigh = 0;
             if (_views != null)
             {
+                // TODO: SCG.Queue<T> should be replaced with C6.CircularQueue<T> when implemented
                 SCG.Queue<Position> positionsQueue = null;
                 foreach (var view in _views)
                 {
@@ -719,8 +732,7 @@ namespace C6
 
                 if (positionsQueue != null)
                 {
-                    positions = positionsQueue.ToArray();
-                    //Sorting.IntroSort<Position>(positions, 0, positions.Length, PositionComparer.Default);
+                    positions = positionsQueue.ToArray();                   
                     Array.Sort(positions, PositionComparer.Default);
 
                     poshigh = positions.Length - 1;
@@ -2001,7 +2013,6 @@ namespace C6
         {
             Node start;
 
-
             [Serializable]
             internal class Node
             {
@@ -2624,7 +2635,7 @@ namespace C6
         private class PositionComparer : SCG.IComparer<Position>
         {
             private static PositionComparer _default;
-            public PositionComparer() { }
+            //public PositionComparer() { }
 
             public static PositionComparer Default => _default ?? (_default = new PositionComparer());
 
