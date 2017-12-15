@@ -1,9 +1,12 @@
+Introduction
+Code Contracts
+
 1. Introduction
 	...
 2. Code Contracts (3) 
 	was: Ensures(AllowsDuplicates ? Result<bool>() : OldValue(!this.Contains(item, EqualityComparer)));
 	now: Ensures(AllowsDuplicates ? Result<bool>() : OldValue(this.Contains(item, EqualityComparer)));
-	Still missing parts...
+	Still missing parts... 
 	
 	2.4  Pluses and Minuses
 	2.5  Readability and usability
@@ -36,9 +39,12 @@
 	- HashedLinkedList - what else
 		
 		
-5. Unit testing (1)
+5. Unit testing 
 	...
 	
 7. Discussion
-
+	
+	
+	
 8. Conclusion
+	

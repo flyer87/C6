@@ -1397,6 +1397,7 @@ namespace C6
                     {
                         (itemsRemoved ?? (itemsRemoved = new ArrayList<T>(allowsNull: AllowsNull))).Add(node.item);                        
                     }
+
                     countRemoved++;
                     node = node.Next;
                     index++;

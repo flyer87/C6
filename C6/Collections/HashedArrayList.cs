@@ -236,7 +236,7 @@ namespace C6.Collections
 
         public bool IsEmpty => Count == 0; // to base:virtual
 
-        public T Choose() => _items[0]; //to_base: virtual // Count - 1
+        public T Choose() => _items[Offset]; //to_base: virtual // Count - 1
 
         #endregion
         
@@ -473,7 +473,7 @@ namespace C6.Collections
 
             // TODO: Replace ArrayList<T> with more efficient data structure like HashBag<T>
             var itemsToRemove = new ArrayList<T>(items, EqualityComparer, AllowsNull);
-            return RemoveAllWhere(item => !itemsToRemove.Remove(item));
+            return RemoveAllWherePrivate(item => !itemsToRemove.Remove(item));
         }
 
         public ICollectionValue<T> UniqueItems() => new ItemSet(this);
@@ -572,7 +572,7 @@ namespace C6.Collections
             return true;
         }
 
-        public virtual bool RemoveDuplicates(T item) => item == null ? RemoveAllWhere(x => x == null) : RemoveAllWhere(x => Equals(item, x));
+        public virtual bool RemoveDuplicates(T item) => item == null ? RemoveAllWherePrivate(x => x == null) : RemoveAllWherePrivate(x => Equals(item, x));
 
         public virtual bool RemoveRange(SCG.IEnumerable<T> items)
         {
@@ -588,7 +588,7 @@ namespace C6.Collections
             // TODO: Replace ArrayList<T> with more efficient data structure like HashBag<T>
             //var itemsToRemove = new ArrayList<T>(items, EqualityComparer, AllowsNull); // ???
             var itemsToRemove = new SCG.HashSet<T>(items, EqualityComparer);
-            return RemoveAllWhere(item => itemsToRemove.Remove(item));
+            return RemoveAllWherePrivate(item => itemsToRemove.Remove(item));
         }        
 
         public bool ContainsRange(SCG.IEnumerable<T> items)
@@ -1305,7 +1305,7 @@ namespace C6.Collections
         #endregion
 
         #region Private
-        private bool RemoveAllWhere(Func<T, bool> predicate)
+        private bool RemoveAllWherePrivate(Func<T, bool> predicate)
         {
             // If result is false, the collection remains unchanged
             #region Code Contract            
@@ -1324,17 +1324,9 @@ namespace C6.Collections
             for (var i = Offset; i < Offset + Count; i++)
             {
                 var item = _items[i];
-                if (predicate(item))
-                {
-                    if (shouldRememberItems)
-                    {
-                        (itemsRemoved ?? (itemsRemoved = new ArrayList<T>(allowsNull: AllowsNull))).Add(item); // TODO: Test allows null
-                    }
-                    cntRemoved++;
-                    _itemIndex.Remove(item);
-                    viewHandler.updateViewSizesAndCounts(cntRemoved, i + 1);
-                }
-                else
+                var predResult = predicate(item);
+
+                if (!predResult)
                 {
                     // Avoid overriding an item with itself
                     if (j != i)
@@ -1343,7 +1335,20 @@ namespace C6.Collections
                     }
                     _itemIndex[item] = j;
                     j++; // next "free" place 
-                    viewHandler.skipEndpoints(cntRemoved, i + 1); // TODO: not effective
+                    //viewHandler.skipEndpoints(cntRemoved, i + 1); // TODO: not effective
+                }
+
+                viewHandler.skipEndpoints(cntRemoved, i); // TODO: not effective
+
+                if (predResult)
+                {
+                    if (shouldRememberItems)
+                    {
+                        (itemsRemoved ?? (itemsRemoved = new ArrayList<T>(allowsNull: AllowsNull))).Add(item); // TODO: Test allows null
+                    }
+                    cntRemoved++;
+                    _itemIndex.Remove(item);
+                    viewHandler.updateViewSizesAndCounts(cntRemoved, i + 1);
                 }
             }
 
@@ -1357,6 +1362,7 @@ namespace C6.Collections
             viewHandler.updateViewSizesAndCounts(cntRemoved, UnderlyingCount);
             // shrink the freed space
             Array.Copy(_items, Offset + Count, _items, j, UnderlyingCount - Offset - Count);
+
             Count -= cntRemoved;
             if (_underlying != null)
             {
@@ -1369,8 +1375,7 @@ namespace C6.Collections
             // Clean up            
             Array.Clear(_items, UnderlyingCount, cntRemoved); // underlyingCount != j !!!            
 
-            RaiseForRemoveAllWhere(itemsRemoved);
-
+            (_underlying ?? this).RaiseForRemoveAllWhere(itemsRemoved);
             return true;
         }
 

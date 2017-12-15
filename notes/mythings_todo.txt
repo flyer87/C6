@@ -15,4 +15,6 @@ Tests
 		- CollectionEventHolder
 		- EqualConstraint
 	
+	- existing C# patterns (like IEnumerable<T>, the foreach statement, and events)
+	
 Documentation

@@ -1757,6 +1757,7 @@ namespace C6.Collections
                     }
                 }
             }
+
             internal void updateViewSizesAndCounts(int removed, int realindex)
             {
                 if (viewCount > 0)
@@ -1769,6 +1770,7 @@ namespace C6.Collections
                         view.Count += removed;
                         leftEndIndex++;
                     }
+
                     while (rightEndIndex < viewCount && (endpoint = rightEnds[rightEndIndex]).index < realindex)
                     {
                         endpoint.view.Count -= removed;
@@ -1805,16 +1807,9 @@ namespace C6.Collections
             for (var i = Offset; i < Offset + Count; i++)
             {
                 var item = _items[i];
-                if (predicate(item))
-                {                    
-                    if (shouldRememberItems)
-                    {
-                        (itemsRemoved ?? (itemsRemoved = new ArrayList<T>(allowsNull: AllowsNull))).Add(item); // TODO: Test allows null
-                    }
-                    cntRemoved++;
-                    viewHandler.updateViewSizesAndCounts(cntRemoved, i+1);
-                }
-                else
+                var predicateResult = predicate(item);
+
+                if (!predicateResult)
                 {
                     // Avoid overriding an item with itself
                     if (j != i)
@@ -1822,10 +1817,21 @@ namespace C6.Collections
                         _items[j] = item;
                     }
                     j++;
-                    viewHandler.skipEndpoints(cntRemoved, i+1); // not effective ???
+                    //viewHandler.skipEndpoints(cntRemoved, i + 1); // not effective ???
+                }
+
+                viewHandler.skipEndpoints(cntRemoved, i);
+
+                if (predicateResult)
+                {
+                    if (shouldRememberItems)
+                    {
+                        (itemsRemoved ?? (itemsRemoved = new ArrayList<T>(allowsNull: AllowsNull))).Add(item); // TODO: Test allows null
+                    }
+                    cntRemoved++;
+                    viewHandler.updateViewSizesAndCounts(cntRemoved, i + 1);
                 }
             }
-
             // No items were removed
             if (cntRemoved == 0)// (Count == j) 
             {

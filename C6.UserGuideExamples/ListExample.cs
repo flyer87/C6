@@ -18,7 +18,7 @@ using SC = System.Collections;
 
 
 namespace C6.UserGuideExamples
-{    
+{
     public class ListExample
     {
         public static void Main()
@@ -31,22 +31,26 @@ namespace C6.UserGuideExamples
             //var collection = new HashedLinkedList<string>(items, ec);                
 
             // ==============================
-            //var items = new[] { "8", "Ab", "3", "4", "5", "6", "7", "9" };
-            //var collection = new HashedArrayList<string>(items);
+            var items = new[] { "8", "Ab", "3", "4", "5", "6", "7", "9" };
+            var collection = new ArrayList<string>(items);
+            var view1 = collection.View(0, 1); // longer
+            var view2 = collection.View(0, 2);
+            var item = view1.Choose();
+            var itms = new ArrayList<string>(new[] { item });
 
-            //var view1 = collection.View(3, 4); // longer
-            //var view2 = view1.View(1, 1);            
+            view1.RemoveRange(itms);
+            Console.WriteLine(view2);
 
 
             //var items = new[] { "8", "Ab", "3", "4", "5", "6", "7", "9" };     
             // HLL.Reverse        
-            /* var items = new[] { "a", "b", "c", "d", "e" };
-            var linkedList = new HashedLinkedList<string>(items);            
-            var v1 = linkedList.View(0, linkedList.Count);
-            var v2 = linkedList.View(0, 2);
-            v1.Reverse();
-            v1.Reverse();
-            Console.WriteLine(v2); */
+            //var items = new[] { "a", "b", "c", "d", "e" };
+            //var linkedList = new ArrayList<string>(items);            
+            //var v1 = linkedList.View(0, linkedList.Count);
+            //var v2 = linkedList.View(0, 2);
+            //v1.Reverse();
+            //v1.Reverse();
+            //Console.WriteLine(v2); 
 
             // HLL.Sort 
             //var items = new[] { "b", "a", "c", "e", "d" };
@@ -58,13 +62,13 @@ namespace C6.UserGuideExamples
             //Console.WriteLine(v2);
 
             // HAL.Add()
-            var items = new[] { "8", "Ab", "3", "4", "5", "6", "7", "9" };                             
-            var arrayList = new HashedArrayList<string>(items);
-            var v1 = arrayList.View(0, 7);
-            var v2 = arrayList.View(0, 7);
-            v1.Add("333333333");
-            Console.WriteLine(v1);
-            Console.WriteLine(v2);
+            //var items = new[] { "8", "Ab", "3", "4", "5", "6", "7", "9" };                             
+            //var arrayList = new LinkedList<string>(items);
+            //var v1 = arrayList.View(0, 7);
+            //var v2 = arrayList.View(0, 7);
+            //v1.Add("333333333");
+            //Console.WriteLine(v1);
+            //Console.WriteLine(v2);
 
 
             //Console.WriteLine(view1.IsValid);            
@@ -77,9 +81,9 @@ namespace C6.UserGuideExamples
             return;
             // Construct list using collection initializer
             //var list = new ArrayList<int>() { 2, 3, 5, 5, 7, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33};
-            var list = new ArrayList<int>() { 2, 3};
+            var list = new ArrayList<int>() { 2, 3 };
             var backList = list.Backwards();
-            backList.ToList().ForEach(x => Console.Write(x + ", ") );
+            backList.ToList().ForEach(x => Console.Write(x + ", "));
             Console.WriteLine(backList.IsValid);
 
             list.Add(10);
@@ -93,8 +97,8 @@ namespace C6.UserGuideExamples
             //var items = new ArrayList<int>() { 3, 13, 7, 17};
             //Console.WriteLine(ArrayList<int>.EmptyArray);           
 
-            
-            
+
+
             var dupl = list.FindDuplicates(5);
             Console.WriteLine(dupl);
             list.Add(-100);
@@ -172,7 +176,8 @@ namespace C6.UserGuideExamples
             list.Shuffle(random);
 
             // Print list using indexer
-            for (var i = 0; i < list.Count; i++) {
+            for (var i = 0; i < list.Count; i++)
+            {
                 Console.WriteLine($"{i,2}: {list[i],2}");
             }
 
@@ -202,6 +207,7 @@ namespace C6.UserGuideExamples
             return;
         }
     }
+
 
     public class CaseInsensitiveStringComparer : SCG.IEqualityComparer<string>, SCG.IComparer<string>
     {

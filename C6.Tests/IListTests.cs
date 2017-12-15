@@ -1567,7 +1567,7 @@ namespace C6.Tests
             var views = GetOneItemViewsInTheBeginning(list);
             var offsetLeft = auxViewLeft.Offset;
             var offsetRight = auxViewRight.Offset;
-            var index = Random.Next(0, views.Length + 1);
+            var index = 0;
 
             // Act
             // do it on one of the views; They all are one-item overlapping views            
@@ -1737,7 +1737,7 @@ namespace C6.Tests
             var views = GetOneItemViewsInTheBeginning(list);
             var offsetLeft = auxViewLeft.Offset;
             var offsetRight = auxViewRight.Offset;
-            var index = Random.Next(0, views.Length + 1);
+            var index = 0;
 
             // Act
             // do it on one of the views; They all are one-item overlapping views            
@@ -2233,7 +2233,7 @@ namespace C6.Tests
 
         #endregion
 
-        #region Shuffle()
+        #region Sort()
         [Test]
         public void ViewSort_NItemViewsInTheMiddle_BothViewsOffsetNotChanged()
         {
@@ -2428,6 +2428,1690 @@ namespace C6.Tests
 
                 // Act
                 view.Sort();
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        #endregion
+
+        #region RemoveIndexRange(int, int)
+        [Test]
+        public void ViewRemoveIndexRange_NItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
+        {
+            var index = 0;
+            var views = GetNItemViewsInTheMiddle(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+
+                // Act
+                view.RemoveIndexRange(0, 1);                
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemoveIndexRange_OneItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
+        {
+            var index = 0;
+            var views = GetOneItemViewsInTheMiddle(list);
+            foreach (var view in views)
+            {
+                if (view.IsEmpty) continue;
+
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+
+                // Act
+                view.RemoveIndexRange(0, 1);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemoveIndexRange_ZeroItemViewsInTheMiddle_ViolatesPrecondition()
+        {
+            // Act & Assert
+            var views = GetZeroItemViewsInTheMiddle(list);
+            foreach (var view in views)
+            {
+                Assert.That(() => view.RemoveIndexRange(0,1), Violates.PreconditionSaying(ArgumentMustBeWithinBounds));
+            }
+        }
+
+        [Test] // right aux view has 2 item -> after 2 removeAt(0) right aux view's offset would not chnage ???
+        public void ViewRemoveIndexRange_NItemViewsInTheBeginning_RightAuxViewsOffsetAffected()
+        {
+            var index = 0;
+            var views = GetNItemViewsInTheBeginning(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+
+                // Act
+                view.RemoveIndexRange(0, 1);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemoveIndexRange_OneItemViewsInTheBeginning_RightAuxViewsOffsetAffectedAndAllViewsGetEmpty()
+        {
+            // Arrange 
+            var views = GetOneItemViewsInTheBeginning(list);
+            var offsetLeft = auxViewLeft.Offset;
+            var offsetRight = auxViewRight.Offset;
+            var index = 0;
+
+            // Act
+            // do it on one of the views; They all are one-item overlapping views            
+            var view = views[index];
+            view.RemoveIndexRange(0,1);
+
+            // Assert    
+            Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+            Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+            foreach (var v in views)
+            {
+                Assert.That(v, Is.Empty, $"view {index}");
+            }
+        }
+
+        [Test]
+        public void ViewRemoveIndexRange_ZeroItemViewsInTheBeginning_ViolatesPrecondition()
+        {
+            // Act & Assert
+            var views = GetZeroItemViewsInTheBeginning(list);
+            foreach (var view in views)
+            {
+                Assert.That(() => view.RemoveIndexRange(0,2), Violates.Precondition);
+            }
+        }
+
+        [Test]
+        public void ViewRemoveIndexRange_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetNItemViewsAtTheEnd(list);
+            foreach (var view in views)
+            {
+                // Arrange                       
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+
+                // Act
+                view.RemoveIndexRange(0,1);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemoveIndexRange_OneItemViewsAtTheEnd_AuxViewsOffsetNotAffectedAndAllViewsGetEmpty()
+        {
+            // Arrange 
+            var offsetLeft = auxViewLeft.Offset;
+            var offsetRight = auxViewRight.Offset;
+            var views = GetOneItemViewsAtTheEnd(list);
+            var index = Random.Next(0, views.Length);
+
+            // Act // Do it on one of the views; They all are one-item overlapping views            
+            var view = views[index];
+            view.RemoveIndexRange(0,1);
+
+            // Assert    
+            Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+            Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+            foreach (var v in views)
+            {
+                Assert.That(v.Count, Is.Zero, $"view {index}");
+            }
+        }
+
+        [Test]
+        public void ViewRemoveIndexRange_ZeroItemViewsAtTheEnd_ViolatesPrecondition()
+        {
+            // Act & Assert
+            var views = GetZeroItemViewsAtTheEnd(list);
+            foreach (var view in views)
+            {
+                Assert.That(() => view.RemoveIndexRange(0,2), Violates.Precondition);
+            }
+        }
+
+
+        #endregion
+
+        #region Update(T, out T)
+        [Test]
+        public void ViewUpdateOut_NItemViewsInTheMiddle_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetNItemViewsInTheMiddle(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = list.Choose();
+                string outItem;
+
+                // Act
+                view.Update(item, out outItem);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewUpdateOut_OneItemViewsInTheMiddle_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetOneItemViewsInTheMiddle(list);
+            foreach (var view in views)
+            {                
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = list.Choose();
+                string outItem;
+
+                // Act
+                view.Update(item, out outItem);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewUpdateOut_ZeroItemViewsInTheMiddle_BothViewsOffsetNotChanged()
+        {         
+            var views = GetZeroItemViewsInTheMiddle(list);
+            var index = 0;
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = list.Choose();
+                string outItem;
+
+                // Act
+                view.Update(item, out outItem);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewUpdateOut_NItemViewsInTheBeginning_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetNItemViewsInTheBeginning(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var i = Random.Next(0, view.Count);
+                var item = list.Choose();
+                string outItem;
+
+                // Act
+                view.Update(item, out outItem);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewUpdateOut_OneItemViewsInTheBeginning_BothViewsOffsetNotChanged()
+        {
+            // Arrange 
+            var views = GetOneItemViewsInTheBeginning(list);
+            var index = 0;
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var i = Random.Next(0, view.Count);
+                var item = list.Choose();
+                string outItem;
+
+                // Act
+                view.Update(item, out outItem);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewUpdateOut_ZeroItemViewsInTheBeginning_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetZeroItemViewsInTheBeginning(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = list.Choose();
+                string outItem;
+
+                // Act
+                view.Update(item, out outItem);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewUpdateOut_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetNItemViewsAtTheEnd(list);
+            foreach (var view in views)
+            {
+                // Arrange                       
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var i = Random.Next(0, view.Count);
+                var item = list.Choose();
+                string outItem;
+
+                // Act
+                view.Update(item, out outItem);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewUpdateOut_OneItemViewsAtTheEnd_BothViewsOffsetNotChanged()
+        {
+            // Arrange 
+            var views = GetOneItemViewsAtTheEnd(list);
+            var index = 0;
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var i = Random.Next(0, view.Count);
+                var item = list.Choose();
+                string outItem;
+
+                // Act
+                view.Update(item, out outItem);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+
+        }
+
+        [Test]
+        public void ViewUpdateOut_ZeroItemViewsAtTheEnd_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetZeroItemViewsAtTheEnd(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;                
+                var item = list.Choose();
+                string outItem;
+
+                // Act
+                view.Update(item, out outItem);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        #endregion
+
+        #region Update(T)
+        [Test]
+        public void ViewUpdate_NItemViewsInTheMiddle_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetNItemViewsInTheMiddle(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = list.Choose();                
+
+                // Act
+                view.Update(item);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewUpdate_OneItemViewsInTheMiddle_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetOneItemViewsInTheMiddle(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = list.Choose();                
+
+                // Act
+                view.Update(item);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewUpdate_ZeroItemViewsInTheMiddle_BothViewsOffsetNotChanged()
+        {
+            var views = GetZeroItemViewsInTheMiddle(list);
+            var index = 0;
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = list.Choose();                
+
+                // Act
+                view.Update(item);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewUpdate_NItemViewsInTheBeginning_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetNItemViewsInTheBeginning(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var i = Random.Next(0, view.Count);
+                var item = list.Choose();                
+
+                // Act
+                view.Update(item);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewUpdate_OneItemViewsInTheBeginning_BothViewsOffsetNotChanged()
+        {
+            // Arrange 
+            var views = GetOneItemViewsInTheBeginning(list);
+            var index = 0;
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var i = Random.Next(0, view.Count);
+                var item = list.Choose();                
+
+                // Act
+                view.Update(item);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewUpdate_ZeroItemViewsInTheBeginning_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetZeroItemViewsInTheBeginning(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = list.Choose();                
+
+                // Act
+                view.Update(item);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewUpdate_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetNItemViewsAtTheEnd(list);
+            foreach (var view in views)
+            {
+                // Arrange                       
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var i = Random.Next(0, view.Count);
+                var item = list.Choose();                
+
+                // Act
+                view.Update(item);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewUpdate_OneItemViewsAtTheEnd_BothViewsOffsetNotChanged()
+        {
+            // Arrange 
+            var views = GetOneItemViewsAtTheEnd(list);
+            var index = 0;
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var i = Random.Next(0, view.Count);
+                var item = list.Choose();                
+
+                // Act
+                view.Update(item);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+
+        }
+
+        [Test]
+        public void ViewUpdate_ZeroItemViewsAtTheEnd_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetZeroItemViewsAtTheEnd(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = list.Choose();                
+
+                // Act
+                view.Update(item);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        #endregion
+
+        #region Clear()
+        [Test]
+        public void ViewClear_NItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
+        {
+            var index = 0;
+            var views = GetNItemViewsInTheMiddle(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var viewCount = view.Count;
+
+                // Act
+                view.Clear();
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - viewCount), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewClear_OneItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
+        {
+            var index = 0;
+            var views = GetOneItemViewsInTheMiddle(list);
+            foreach (var view in views)
+            {
+                if (view.IsEmpty) continue;
+
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+
+                // Act
+                view.Clear();
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewClear_ZeroItemViewsInTheMiddle_BothViewsOffsetNotChanged()
+        {
+            var index = 0;         
+            var views = GetZeroItemViewsInTheMiddle(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+
+                // Act
+                view.Clear();
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test] // right aux view has 2 item -> after 2 removeAt(0) right aux view's offset would not chnage ???
+        public void ViewClear_NItemViewsInTheBeginning_RightAuxViewsOffsetAffected()
+        {
+            // Arrange 
+            var index = 0;
+            var views = GetOneItemViewsInTheBeginning(list);
+
+            var offsetLeft = auxViewLeft.Offset;
+            var offsetRight = auxViewRight.Offset;            
+            var view = views[index];
+            var viewCount = view.Count;
+
+            // Act
+            // do it on one of the views; They all are one-item overlapping views            
+            view.Clear();
+
+            // Assert    
+            Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+            Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - viewCount), $"view {index}");
+            foreach (var v in views)
+            {
+                Assert.That(v, Is.Empty, $"view {index}");
+            }
+        }
+
+        [Test]
+        public void ViewClear_OneItemViewsInTheBeginning_RightAuxViewsOffsetAffectedAndAllViewsGetEmpty()
+        {
+            // Arrange 
+            var views = GetOneItemViewsInTheBeginning(list);
+            var offsetLeft = auxViewLeft.Offset;
+            var offsetRight = auxViewRight.Offset;
+            var index = 0;
+
+            // Act
+            // do it on one of the views; They all are one-item overlapping views            
+            var view = views[index];
+            view.Clear();
+
+            // Assert    
+            Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+            Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+            foreach (var v in views)
+            {
+                Assert.That(v, Is.Empty, $"view {index}");
+            }
+        }
+
+        [Test]
+        public void ViewClear_ZeroItemViewsInTheBeginning_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetZeroItemViewsInTheBeginning(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+
+                // Act
+                view.Clear();
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewClear_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
+        {
+            // Arrange
+            var index = 0;
+            var views = GetNItemViewsAtTheEnd(list);
+            var offsetLeft = auxViewLeft.Offset;
+            var offsetRight = auxViewRight.Offset;            
+
+            // Act
+            // do it on one of the views; They all are one-item overlapping views            
+            var view = views[index];           
+            view.Clear();
+
+            // Assert    
+            Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+            Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+            foreach (var v in views)
+            {
+                Assert.That(v, Is.Empty, $"view {index}");
+            }
+        }
+
+        [Test]
+        public void ViewClear_OneItemViewsAtTheEnd_AuxViewsOffsetNotAffectedAndAllViewsGetEmpty()
+        {
+            // Arrange 
+            var index = 0;
+            var offsetLeft = auxViewLeft.Offset;
+            var offsetRight = auxViewRight.Offset;
+            var views = GetOneItemViewsAtTheEnd(list);
+            var i = Random.Next(0, views.Length);
+
+            // Act // Do it on one of the views; They all are one-item overlapping views            
+            var view = views[i];
+            view.Clear();
+
+            // Assert    
+            Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+            Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+            foreach (var v in views)
+            {
+                Assert.That(v.Count, Is.Zero, $"view {index}");
+            }
+        }
+
+        [Test]
+        public void ViewClear_ZeroItemViewsAtTheEnd_BothViewsOffsetNotChanged()
+        {            
+            var index = 0;
+            var views = GetZeroItemViewsAtTheEnd(list);
+            foreach (var view in views)
+            {                
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+
+                // Act
+                view.Clear();
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+        #endregion
+
+        #region Remove(T)
+        [Test]
+        public void ViewRemove_NItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
+        {
+            var index = 0;
+            var views = GetNItemViewsInTheMiddle(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = view.Choose();
+
+                // Act
+                view.Remove(item);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemove_OneItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
+        {
+            var index = 0;
+            var views = GetOneItemViewsInTheMiddle(list);
+            foreach (var view in views)
+            {
+                if (view.IsEmpty) continue;
+
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = view.Choose();
+
+                // Act
+                view.Remove(item);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemove_ZeroItemViewsInTheMiddle_BothViewsOffsetNotChanged()
+        {            
+            var index = 0;
+            var views = GetZeroItemViewsInTheMiddle(list);            
+            foreach (var view in views)
+            {                
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = list.Choose();
+
+                // Act
+                view.Remove(item);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemove_NItemViewsInTheBeginning_RightAuxViewsOffsetAffected()
+        {
+            // Arrange
+            var index = 0;
+            var offsetLeft = auxViewLeft.Offset;
+            var offsetRight = auxViewRight.Offset;
+            
+            var views = GetNItemViewsInTheBeginning(list);
+            var i = Random.Next(0, views.Length);            
+            var view = views[i];
+            var item = view.Choose();
+
+            // Act // Do it on one of the views; 
+            view.Remove(item); 
+
+            // Assert    
+            Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+            Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+            Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+        }
+
+        [Test]
+        public void ViewRemove_OneItemViewsInTheBeginning_RightAuxViewsOffsetAffectedAndAllViewsGetEmpty()
+        {
+            // Arrange 
+            var views = GetOneItemViewsInTheBeginning(list);
+            var offsetLeft = auxViewLeft.Offset;
+            var offsetRight = auxViewRight.Offset;
+            var index = Random.Next(0, views.Length);
+
+            // Act
+            // do it on one of the views; They all are one-item overlapping views            
+            var view = views[index];
+            var item = view.Choose();
+            view.Remove(item);
+
+            // Assert    
+            Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+            Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+            foreach (var v in views)
+            {
+                Assert.That(v, Is.Empty, $"view {index}");
+            }
+        }
+
+        [Test]
+        public void ViewRemove_ZeroItemViewsInTheBeginning_BothViewsOffsetNotChanged()
+        {            
+            var index = 0;
+            var views = GetZeroItemViewsInTheBeginning(list);
+            foreach (var view in views)
+            {                                            
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = list.Choose();
+
+                // Act
+                view.Remove(item);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemove_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetNItemViewsAtTheEnd(list);
+            foreach (var view in views)
+            {
+                // Arrange                       
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = view.Choose();
+
+                // Act
+                view.Remove(item);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemove_OneItemViewsAtTheEnd_AuxViewsOffsetNotAffectedAndAllViewsGetEmpty()
+        {
+            // Arrange 
+            var offsetLeft = auxViewLeft.Offset;
+            var offsetRight = auxViewRight.Offset;
+            var views = GetOneItemViewsAtTheEnd(list);
+            var index = Random.Next(0, views.Length);
+
+            // Act // Do it on one of the views; They all are one-item overlapping views            
+            var view = views[index];
+            var item = view.Choose();
+            view.Remove(item);
+
+            // Assert    
+            Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+            Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+            foreach (var v in views)
+            {
+                Assert.That(v.Count, Is.Zero, $"view {index}");
+            }
+        }
+
+        [Test]
+        public void ViewRemove_ZeroItemViewsAtTheEnd_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetZeroItemViewsAtTheEnd(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = list.Choose();
+
+                // Act
+                view.Remove(item);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+        #endregion
+
+        #region Remove(T, out T)
+        [Test]
+        public void ViewRemoveOut_NItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
+        {
+            var index = 0;
+            var views = GetNItemViewsInTheMiddle(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = view.Choose();
+                string outItem;
+
+                // Act
+                view.Remove(item, out outItem);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemoveOut_OneItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
+        {
+            // Arrange
+            var index = 0;
+            var offsetLeft = auxViewLeft.Offset;
+            var offsetRight = auxViewRight.Offset;
+            var views = GetOneItemViewsInTheMiddle(list);
+            var i = Random.Next(0, views.Length);
+            var view = views[i];
+            var item = view.Choose();
+            string outItem;
+
+            // Act // Do it on one of the views; 
+            view.Remove(item, out outItem);
+
+            // Assert    
+            Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+            Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+            Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+
+        }
+
+        [Test]
+        public void ViewRemoveOut_ZeroItemViewsInTheMiddle_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetZeroItemViewsInTheMiddle(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = list.Choose();
+                string outItem;
+
+                // Act
+                view.Remove(item, out outItem);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemoveOut_NItemViewsInTheBeginning_RightAuxViewsOffsetAffected()
+        {
+            // Arrange
+            var index = 0;
+            var offsetLeft = auxViewLeft.Offset;
+            var offsetRight = auxViewRight.Offset;
+
+            var views = GetNItemViewsInTheBeginning(list);
+            var i = Random.Next(0, views.Length);
+            var view = views[i];
+            var item = view.Choose();
+            string outItem;
+
+            // Act // Do it on one of the views; 
+            view.Remove(item, out outItem);
+
+            // Assert    
+            Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+            Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+            Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+        }
+
+        [Test]
+        public void ViewRemoveOut_OneItemViewsInTheBeginning_RightAuxViewsOffsetAffectedAndAllViewsGetEmpty()
+        {
+            // Arrange 
+            var views = GetOneItemViewsInTheBeginning(list);
+            var offsetLeft = auxViewLeft.Offset;
+            var offsetRight = auxViewRight.Offset;
+            var index = Random.Next(0, views.Length);
+            string outItem;
+
+            // Act
+            // do it on one of the views; They all are one-item overlapping views            
+            var view = views[index];
+            var item = view.Choose();
+            view.Remove(item, out outItem);
+
+            // Assert    
+            Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+            Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+            foreach (var v in views)
+            {
+                Assert.That(v, Is.Empty, $"view {index}");
+            }
+        }
+
+        [Test]
+        public void ViewRemoveOut_ZeroItemViewsInTheBeginning_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetZeroItemViewsInTheBeginning(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = list.Choose();
+                string outItem;
+
+                // Act
+                view.Remove(item, out outItem);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemoveOut_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetNItemViewsAtTheEnd(list);
+            foreach (var view in views)
+            {
+                // Arrange                       
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = view.Choose();
+
+                // Act
+                view.Remove(item, out item);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemoveOut_OneItemViewsAtTheEnd_AuxViewsOffsetNotAffectedAndAllViewsGetEmpty()
+        {
+            // Arrange 
+            var offsetLeft = auxViewLeft.Offset;
+            var offsetRight = auxViewRight.Offset;
+            var views = GetOneItemViewsAtTheEnd(list);
+            var index = Random.Next(0, views.Length);
+
+            // Act // Do it on one of the views; They all are one-item overlapping views            
+            var view = views[index];
+            var item = view.Choose();
+            view.Remove(item, out item);
+
+            // Assert    
+            Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+            Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+            foreach (var v in views)
+            {
+                Assert.That(v.Count, Is.Zero, $"view {index}");
+            }
+        }
+
+        [Test]
+        public void ViewRemoveOut_ZeroItemViewsAtTheEnd_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetZeroItemViewsAtTheEnd(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = list.Choose();
+                string outItem;
+
+                // Act
+                view.Remove(item, out outItem);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+        #endregion
+
+        #region RemoveRange(IEnumerable<T>)
+        [Test]
+        public void ViewRemoveRange_NItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
+        {
+            var index = 0;
+            var views = GetNItemViewsInTheMiddle(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = view.Choose();
+                var items = GetList(new[] { item });
+
+                // Act
+                view.RemoveRange(items);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemoveRange_OneItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
+        {
+            var index = 0;
+            var views = GetOneItemViewsInTheMiddle(list);
+            foreach (var view in views)
+            {
+                if (view.IsEmpty) continue;                
+                
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = view.Choose();
+                var items = GetList(new[] { item });
+
+                // Act
+                view.RemoveRange(items);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemoveRange_ZeroItemViewsInTheMiddle_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetZeroItemViewsInTheMiddle(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = list.Choose();
+                var items = GetList(new[] { item });
+
+                // Act
+                view.RemoveRange(items);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemoveRange_NItemViewsInTheBeginning_RightAuxViewsOffsetAffected()
+        {
+            // Arrange
+            var index = 0;
+            var offsetLeft = auxViewLeft.Offset;
+            var offsetRight = auxViewRight.Offset;
+
+            var views = GetNItemViewsInTheBeginning(list);
+            var i = Random.Next(0, views.Length);
+            var view = views[i];
+            var item = view.Choose();
+            var items = GetList(new[] { item });
+
+            // Act // Do it on one of the views; 
+            view.RemoveRange(items);
+
+            // Assert    
+            Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+            Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+            Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+        }
+
+        [Test]
+        public void ViewRemoveRange_OneItemViewsInTheBeginning_RightAuxViewsOffsetAffectedAndAllViewsGetEmpty()
+        {
+            // Arrange 
+            var views = GetOneItemViewsInTheBeginning(list);
+            var offsetLeft = auxViewLeft.Offset;
+            var offsetRight = auxViewRight.Offset;
+            var index = Random.Next(0, views.Length);
+            var view = views[index];
+            var item = view.Choose();
+            var items = GetList(new[] { item });
+
+            // Act
+            // do it on one of the views; They all are one-item overlapping views                        
+            view.RemoveRange(items);
+
+            // Assert    
+            Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+            Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+            foreach (var v in views)
+            {
+                Assert.That(v, Is.Empty, $"view {index}");
+            }
+        }
+
+        [Test]
+        public void ViewRemoveRange_ZeroItemViewsInTheBeginning_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetZeroItemViewsInTheBeginning(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = list.Choose();
+                var items = GetList(new[] { item });
+
+                // Act
+                view.RemoveRange(items);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemoveRange_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetNItemViewsAtTheEnd(list);
+            foreach (var view in views)
+            {
+                // Arrange                       
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = view.Choose();
+                var items = GetList(new[] { item });
+
+                // Act
+                view.RemoveRange(items);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemoveRange_OneItemViewsAtTheEnd_AuxViewsOffsetNotAffectedAndAllViewsGetEmpty()
+        {
+            // Arrange 
+            var offsetLeft = auxViewLeft.Offset;
+            var offsetRight = auxViewRight.Offset;
+            var views = GetOneItemViewsAtTheEnd(list);
+            var index = Random.Next(0, views.Length);
+
+            // Act // Do it on one of the views; They all are one-item overlapping views            
+            var view = views[index];
+            var item = view.Choose();
+            var items = GetList(new[] { item });
+            view.RemoveRange(items);
+
+            // Assert    
+            Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+            Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+            foreach (var v in views)
+            {
+                Assert.That(v.Count, Is.Zero, $"view {index}");
+            }
+        }
+
+        [Test]
+        public void ViewRemoveRange_ZeroItemViewsAtTheEnd_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetZeroItemViewsAtTheEnd(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = list.Choose();
+                var items = GetList(new[] { item });
+
+                // Act
+                view.RemoveRange(items);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        #endregion
+
+        #region RemoveDuplicates(T)
+        [Test]
+        public void ViewRemoveDuplicates_NItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
+        {
+            var index = 0;
+            var views = GetNItemViewsInTheMiddle(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = view.Choose();                
+
+                // Act
+                view.RemoveDuplicates(item);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemoveDuplicates_OneItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
+        {
+            var index = 0;
+            var views = GetOneItemViewsInTheMiddle(list);
+            foreach (var view in views)
+            {
+                if (view.IsEmpty) continue;
+
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = view.Choose();                
+
+                // Act
+                view.RemoveDuplicates(item);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemoveDuplicates_ZeroItemViewsInTheMiddle_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetZeroItemViewsInTheMiddle(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = list.Choose();                
+
+                // Act
+                view.RemoveDuplicates(item);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemoveDuplicates_NItemViewsInTheBeginning_RightAuxViewsOffsetAffected()
+        {
+            // Arrange
+            var index = 0;
+            var offsetLeft = auxViewLeft.Offset;
+            var offsetRight = auxViewRight.Offset;
+
+            var views = GetNItemViewsInTheBeginning(list);
+            var i = Random.Next(0, views.Length);
+            var view = views[i];
+            var item = view.Choose();
+
+            // Act // Do it on one of the views; 
+            view.RemoveDuplicates(item);
+
+            // Assert    
+            Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+            Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+            Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+        }
+
+        [Test]
+        public void ViewRemoveDuplicates_OneItemViewsInTheBeginning_RightAuxViewsOffsetAffectedAndAllViewsGetEmpty()
+        {
+            // Arrange 
+            var views = GetOneItemViewsInTheBeginning(list);
+            var offsetLeft = auxViewLeft.Offset;
+            var offsetRight = auxViewRight.Offset;
+            var index = Random.Next(0, views.Length);
+            var view = views[index];
+            var item = view.Choose();            
+
+            // Act
+            // do it on one of the views; They all are one-item overlapping views                        
+            view.RemoveDuplicates(item);
+
+            // Assert    
+            Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+            Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+            foreach (var v in views)
+            {
+                Assert.That(v, Is.Empty, $"view {index}");
+            }
+        }
+
+        [Test]
+        public void ViewRemoveDuplicates_ZeroItemViewsInTheBeginning_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetZeroItemViewsInTheBeginning(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = list.Choose();                
+
+                // Act
+                view.RemoveDuplicates(item);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemoveDuplicates_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetNItemViewsAtTheEnd(list);
+            foreach (var view in views)
+            {
+                // Arrange                       
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = view.Choose();
+
+                // Act
+                view.RemoveDuplicates(item);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRemoveDuplicates_OneItemViewsAtTheEnd_AuxViewsOffsetNotAffectedAndAllViewsGetEmpty()
+        {
+            // Arrange 
+            var offsetLeft = auxViewLeft.Offset;
+            var offsetRight = auxViewRight.Offset;
+            var views = GetOneItemViewsAtTheEnd(list);
+            var index = Random.Next(0, views.Length);
+            var view = views[index];
+            var item = view.Choose();            
+
+            // Act 
+            // Do it on one of the views; They all are one-item overlapping views            
+            view.RemoveDuplicates(item);
+
+            // Assert    
+            Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+            Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+            foreach (var v in views)
+            {
+                Assert.That(v.Count, Is.Zero, $"view {index}");
+            }
+        }
+
+        [Test]
+        public void ViewRemoveDuplicates_ZeroItemViewsAtTheEnd_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetZeroItemViewsAtTheEnd(list);
+            foreach (var view in views)
+            {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var item = list.Choose();                
+
+                // Act
+                view.RemoveDuplicates(item);
 
                 // Assert                
                 Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
@@ -8632,230 +10316,7 @@ namespace C6.Tests
             Assert.That(spannedView, Is.EqualTo(expectedView).Using(ReferenceEqualityComparer));
         }
 
-        #endregion
-
-        #region GeneralViewTests
-
-        [Test]
-        public void ViewRemoveAt_NItemMultipleViewsInTheMiddle_LeftAuxViewAffected() { }
-
-        [Test]
-        public void ViewRemoveAt_ZeroItemMultipleViewsInTheMiddle_LeftAuxViewAffected() { }
-
-        // moved to another TestFixture
-
-        /*[Test]
-        public void Case2ViewIntheMiddle_SCENARIO_BEHAVIOR()
-        {
-            // Arrange
-            var list = new [] { "aa", "bb", "cc", "dd", "ee", "ff", "gg", "hh", "ii", "jj", "kk", "ll", "mm", "nn",  "oo", "pp", "qq", "rr", "ss", "tt", "uu", "vv", "ww", "xx", "yy", "zz" };
-            var coll = new ArrayList<string>(list);  //GetStringList(Random);
-            //var item = coll[coll.Count/2]; // middle item
-            var views = new IList<string>[3];
-
-            // Arrange
-            var view = coll.View(coll.Count / 2 - 1, 3); // from the middle;
-            // ViewOf - no, 1-item view
-            // LastViewOf - no, 1-item view
-            views[0] = coll.View(coll.Count / 2 - 1, 3);
-            views[1] = view.Slide(-1);
-            views[2] = view.Slide(view.Count + 1, 3);
-            // TrySlide1 ???
-            // TrySlide2 ???
-
-            var auxView1 = coll.View(1, 2);
-            var auxView2 = coll.View(coll.Count - 2, 2); // last 2 items, beginning from index: Count - 3
-
-            // Act, methods to test + Asserts
-            foreach (var v in views)
-            {
-                // public T RemoveAt(int index)
-                var offset1 = auxView1.Offset;
-                var offset2 = auxView2.Offset;
-                v.RemoveAt(1); // ??? 1
-                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
-                Assert.That(auxView2.Offset, Is.EqualTo(offset2 - 1), "");
-                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
-
-                // public T RemoveFirst()
-                offset1 = auxView1.Offset;
-                offset2 = auxView2.Offset;
-                v.RemoveFirst();
-                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
-                Assert.That(auxView2.Offset, Is.EqualTo(offset2 - 1), "");
-                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
-
-
-                // public T RemoveLast()
-                offset1 = auxView1.Offset;
-                offset2 = auxView2.Offset;
-                v.RemoveLast();
-                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
-                Assert.That(auxView2.Offset, Is.EqualTo(offset2 - 1), "");
-                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
-
-
-                // public bool Add(T item)
-                offset1 = auxView1.Offset;
-                offset2 = auxView2.Offset;
-                v.Add("30"); //??? v.Add(GetUppercaseString(Random));
-                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
-                Assert.That(auxView2.Offset, Is.EqualTo(offset2 + 1), "");
-                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
-
-
-                // public void InsertRange(int index, SCG.IEnumerable<T> items)
-                offset1 = auxView1.Offset;
-                offset2 = auxView2.Offset;
-                var items = GetUppercaseStrings(Random).Take(3).ToArray();
-                v.InsertRange(1, items);
-                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
-                Assert.That(auxView2.Offset, Is.EqualTo(offset2 + items.Length), "");
-                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
-
-                // public void Insert(int index, T item)   
-                offset1 = auxView1.Offset;
-                offset2 = auxView2.Offset;
-                v.Insert(1, "5"); 
-                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "" );
-                Assert.That(auxView2.Offset, Is.EqualTo(offset2 + 1), "");
-                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
-
-                // public void InsertFirst(T item)
-                offset1 = auxView1.Offset;
-                offset2 = auxView2.Offset;
-                v.InsertFirst("10");                
-                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
-                Assert.That(auxView2.Offset, Is.EqualTo(offset2 + 1), "");
-                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
-
-                // public void InsertLast(T item)
-                offset1 = auxView1.Offset;
-                offset2 = auxView2.Offset;
-                v.InsertLast("20");                
-                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
-                Assert.That(auxView2.Offset, Is.EqualTo(offset2 + 1), "");
-                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
-
-                // public void Reverse()
-                offset1 = auxView1.Offset;
-                offset2 = auxView2.Offset;
-                v.Reverse();
-                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
-                Assert.That(auxView2.Offset, Is.EqualTo(offset2), "");
-                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
-
-                // public void Shuffle()
-                offset1 = auxView1.Offset;
-                offset2 = auxView2.Offset;
-                v.Shuffle();
-                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
-                Assert.That(auxView2.Offset, Is.EqualTo(offset2), "");
-                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
-
-                // public void Sort()
-                offset1 = auxView1.Offset;
-                offset2 = auxView2.Offset;
-                v.Sort();
-                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
-                Assert.That(auxView2.Offset, Is.EqualTo(offset2), "");
-                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
-
-                // public bool Remove(T item)
-                offset1 = auxView1.Offset;
-                offset2 = auxView2.Offset;
-                v.Remove(v.Choose());
-                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
-                Assert.That(auxView2.Offset, Is.EqualTo(offset2 - 1), "");
-                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
-
-                // public bool Remove(T item, out T removedItem)
-                offset1 = auxView1.Offset;
-                offset2 = auxView2.Offset;
-                string removedItem;
-                v.Remove(v.Choose(), out removedItem);
-                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
-                Assert.That(auxView2.Offset, Is.EqualTo(offset2 - 1), "");
-                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
-
-                // public bool RemoveDuplicates(T item) - how many are deleted ???
-                // public bool RemoveRange(SCG.IEnumerable<T> items) - how many are deleted ???
-                // public bool RetainRange(SCG.IEnumerable<T> items) - how many are deleted ???
-
-                // public bool Update(T item)
-                offset1 = auxView1.Offset;
-                offset2 = auxView2.Offset;
-                v.Update(v.Choose());
-                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
-                Assert.That(auxView2.Offset, Is.EqualTo(offset2), "");
-                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
-
-                // public bool Update(T item, out T oldItem)
-                offset1 = auxView1.Offset;
-                offset2 = auxView2.Offset;
-                string oldItem;
-                v.Update(v.Choose(), out oldItem);
-                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
-                Assert.That(auxView2.Offset, Is.EqualTo(offset2), "");
-                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
-
-                //public bool UpdateOrAdd(T item)
-                offset1 = auxView1.Offset;
-                offset2 = auxView2.Offset;
-                v.UpdateOrAdd(GetUppercaseString(Random));
-                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
-                Assert.That(auxView2.Offset, Is.EqualTo(offset2 + 1), "");
-                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
-
-                // public bool UpdateOrAdd(T item, out T oldItem)
-                offset1 = auxView1.Offset;
-                offset2 = auxView2.Offset;                
-                v.UpdateOrAdd(GetUppercaseString(Random), out oldItem);
-                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
-                Assert.That(auxView2.Offset, Is.EqualTo(offset2 + 1), "");
-                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
-
-                // public abstract bool AddRange(SCG.IEnumerable<T> items)
-                offset1 = auxView1.Offset;
-                offset2 = auxView2.Offset;
-                items = GetLowercaseStrings(Random).Take(3).ToArray(); // ??? 2
-                v.AddRange(items);
-                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
-                Assert.That(auxView2.Offset, Is.EqualTo(offset2 + items.Length), "");
-                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
-
-                // public abstract bool FindOrAdd(ref T item);
-                offset1 = auxView1.Offset;
-                offset2 = auxView2.Offset;
-                var item = GetUppercaseString(Random);
-                v.FindOrAdd(ref item);
-                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
-                Assert.That(auxView2.Offset, Is.EqualTo(offset2 + 1), "");
-                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
-
-                // public abstract void RemoveIndexRange(int startIndex, int count);
-                offset1 = auxView1.Offset;
-                offset2 = auxView2.Offset;
-                var count = 1; // ??? 1
-                v.RemoveIndexRange(0, count);
-                Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
-                Assert.That(auxView2.Offset, Is.EqualTo(offset2 - count), "");
-                Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
-
-                
-                // public void Clear()
-                //offset1 = auxView1.Offset;
-                //offset2 = auxView2.Offset;
-                //count = v.Count;
-                //v.Clear();
-                //Assert.That(auxView1.Offset, Is.EqualTo(offset1), "");
-                //Assert.That(auxView2.Offset, Is.EqualTo(offset2 - count), "");
-                //Assert.That(v, Is.EqualTo(coll.Skip(v.Offset).Take(v.Count)).Using(ReferenceEqualityComparer));
-            }
-        }
-        */
-
-        #endregion
+        #endregion       
 
         #endregion
 
