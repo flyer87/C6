@@ -27,19 +27,22 @@ namespace C6.UserGuideExamples
             //    SCG.EqualityComparer<string>.Default.GetHashCode);
 
             //var ec = CaseInsensitiveStringComparer.Default;
-            //var items = new[] { "8", "Ab", "3", "4", "5", "6", "7" };            
-            //var collection = new HashedLinkedList<string>(items, ec);                
+            var items = new[] { "8", "Ab", "3", "4", "5", "6", "7" };            
+            var collection = new HashedLinkedList<string>(items);          
+            //var arrayList = new ArrayList<string>(items);
+            collection.Insert(0,"7");
 
             // ==============================
-            var items = new[] { "8", "Ab", "3", "4", "5", "6", "7", "9" };
-            var collection = new ArrayList<string>(items);
-            var view1 = collection.View(0, 1); // longer
-            var view2 = collection.View(0, 2);
-            var item = view1.Choose();
-            var itms = new ArrayList<string>(new[] { item });
+            // RemoveRange
+            //var items = new[] { "8", "Ab", "3", "4", "5", "6", "7", "9" };
+            //var collection = new ArrayList<string>(items);
+            //var view1 = collection.View(0, 1); // longer
+            //var view2 = collection.View(0, 2);
+            //var item = view1.Choose();
+            //var itms = new ArrayList<string>(new[] { item });
 
-            view1.RemoveRange(itms);
-            Console.WriteLine(view2);
+            //view1.RemoveRange(itms);
+            //Console.WriteLine(view2);
 
 
             //var items = new[] { "8", "Ab", "3", "4", "5", "6", "7", "9" };     

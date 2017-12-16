@@ -151,74 +151,166 @@ namespace C6
         ///         </item>
         ///     </list>
         /// </remarks>
-        new void Clear();
+        new void Clear();  
 
-        // View part     
-
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <summary> Gets the number of items before the view within the underlyging list;</summary>
+        /// <value> The index of the view’s beginning within the underlying list.</value>
+        /// <remarks>Gets 0 if proper list</remarks>
         int Offset { get; }
 
         /// <summary>
-        ///  
+        ///  Gets the underlying list if this is a view; <c>null</c> if this is a proper list (not a view).
         /// </summary>
+        /// <value>The underlyig list of the view; <c>null</c> if not a view.</value>
         IList<T> Underlying { get; }
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="count"></param>
-        /// <returns></returns>
-        IList<T> View(int index, int count); 
+        ///     Returns a view of the specified range within this list or view.
+        /// </summary>        
+        /// <param name="index">
+        ///     The offset relative to the given list or view.
+        /// </param>
+        /// <param name="count">
+        ///     The lenght of the view.
+        /// </param>
+        /// <returns>
+        ///     Type: <see cref="IList{T}"/>
+        ///     Returns a view of the specified range within this list or view.
+        /// </returns>  
+        /// <remarks>
+        ///     <para>
+        ///         The returned <see cref="IList{T}"/> has the same status as a list:
+        ///         <list type="bullet">
+        ///             <item>
+        ///                 <description>
+        ///                     You can use the returned <see cref="IList{T}"/> as a list and execute all list operations.
+        ///                 </description>
+        ///             </item>
+        ///         </list>
+        ///     </para>
+        ///     <para>
+        ///         The view remains valid as long as <see cref = "ICollectionValue{T}.IsValid" /> is <c> true </c>. 
+        ///     </para>
+        ///     <para>
+        ///         Calling <see cref="Sort()"/>, <see cref="Reverse()"/> or <see cref="Shuffle()"/> on the underlying list or a view
+        ///         might invalide other views.
+        ///     </para>
+        ///     <para>
+        ///         A view created from a view is itself just a view of the underlying list.
+        ///         Views are not nested inside each other; for instance, a view created from another view <c>w</c> is
+        ///         not affected by subsequent sliding of <c>w</c>.        
+        ///     </para>
+        /// </remarks>
+        IList<T> View(int index, int count);
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="item"></param>
-        /// <returns></returns>
-        IList<T> ViewOf(T item); 
+        ///     Returns a new list view that points at the first occurrence of x, if any, in the list or view.
+        /// </summary>        
+        /// <param name="item">
+        ///     The item of the view.
+        /// </param>        
+        /// <returns>
+        ///     <para> Type: <see cref="IList{T}"/> </para>
+        ///     <para> Returns a new list view that points at the first occurrence of x, if any, in the list or view;
+        ///         otherwise <c>null</c>. 
+        ///     </para>
+        /// </returns>  
+        IList<T> ViewOf(T item);
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="item"></param>
-        /// <returns></returns>
-        IList<T> LastViewOf(T item); 
+        ///     Returns a new list view that points at the last occurrence of x, if any, in the list or view.
+        /// </summary>        
+        /// <param name="item">
+        ///     The item of the view.
+        /// </param>        
+        /// <returns>
+        ///     Type: <see cref="IList{T}"/>
+        ///     Returns a new list view that points at the last occurrence of x, if any, in the list or view.;
+        ///     otherwise <c>null</c>.
+        /// </returns>  
+        IList<T> LastViewOf(T item);
 
         /// <summary>
-        /// 
+        ///     Slides the view with <c>offset</c> items.
         /// </summary>
-        /// <param name="offset"></param>
-        /// <returns></returns>
+        /// <param name="offset">
+        ///     The number of the items to slide with.
+        /// </param>
+        /// <returns>
+        ///     <list type="none">
+        ///         <item>
+        ///             Type: <see cref="IList{T}"/>
+        ///         </item>
+        ///         <item>
+        ///             The same view, slided with <c>offset</c> items.
+        ///         </item>        
+        ///     </list>        
+        /// </returns>
+        /// <remarks>
+        ///     The method doesn't create a new view; It returns the same slided view.
+        /// </remarks>
         IList<T> Slide(int offset);
 
         /// <summary>
-        /// 
+        ///     Slides the view with <c>offset</c> items and sets the lenght to <c>count</c>.
         /// </summary>
-        /// <param name="offset"></param>
-        /// <param name="count"></param>
-        /// <returns></returns>
+        /// <param name="offset">
+        ///     The number of the items to slide with.
+        /// </param>
+        /// <param name="count">
+        ///     The lenght of the view.
+        /// </param>
+        /// <returns>
+        ///     The same view, slided with <c>offset</c> items and length <c>count</c>.
+        /// </returns>
         IList<T> Slide(int offset, int count);
 
         /// <summary>
-        /// 
+        ///      Slides the view with <c>offset</c> items. The retun value indicates if the sliding suceeded.
         /// </summary>
-        /// <param name="offset"></param>
-        /// <returns></returns>
+        /// <param name="offset">
+        ///     The number of the items to slide with.
+        /// </param>
+        /// <returns>
+        ///     <c>True</c> if slide suceeded; otherwise <c>false</c>.
+        /// </returns>
         bool TrySlide(int offset);
 
         /// <summary>
-        /// 
+        ///      Slides the view with <c>offset</c> items and sets it lenght to <c>count</c>. The retun value indicates if that suceeded.
         /// </summary>
-        /// <param name="offset"></param>
-        /// <param name="count"></param>
-        /// <returns></returns>
+        /// <param name="offset">
+        ///     The number of the items to slide with.
+        /// </param>
+        /// <param name="count">
+        ///     The length of the view.
+        /// </param>
+        /// <returns>
+        ///     <c>True</c> if the sliding suceeded; otherwise <c>false</c>.
+        /// </returns>
         bool TrySlide(int offset, int count);
 
-        IList<T> Span(IList<T> other);
-        // View part ============
+        /// <summary>
+        ///     Spans the view with another view.
+        /// </summary>
+        /// <param name="other">
+        ///     The other view to span with.
+        /// </param>
+        /// <returns>
+        ///     A new view as <see cref="IList{T}"/>.
+        ///     If the right endpoint of <c>other</c> is strictly to the left of the left endpoint of this view, then <c>null</c> is returned.
+        /// </returns>
+        /// <remarks>
+        ///     <para>
+        ///         <list type="bullet">
+        ///             <item>  
+        ///                 The left endpoint of the new view is the left endpoint of this view; 
+        ///                 the right endpoint - the right endpoint of <c>other</c> view.
+        ///             </item>              
+        ///         </list>
+        ///     </para>
+        /// </remarks>
+        IList<T> Span(IList<T> other);        
 
         /// <summary>
         ///     Searches from the beginning of the collection for the specified item and returns the zero-based index of the first
@@ -269,8 +361,7 @@ namespace C6
         ///                 </description>
         ///             </item>
         ///             <item>
-        ///                 <descri
-        ///                 ption>
+        ///                 <description>
         ///                     <see cref="IListenable{T}.CollectionChanged"/>.
         ///                 </description>
         ///             </item>
@@ -1582,8 +1673,7 @@ namespace C6
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
 
             // The collection is reversed                        
-            Ensures(this.IsSameSequenceAs(OldValue(Enumerable.Reverse(this).ToList())));
-
+            Ensures(this.IsSameSequenceAs(OldValue(Enumerable.Reverse(this).ToList())));            
             return;
         }
 
@@ -1918,7 +2008,7 @@ namespace C6
         void SCG.IList<T>.Insert(int index, T item) {}
 
         #endregion
-
+        
         #region ICollection<T>
 
         public abstract Speed ContainsSpeed { get; }

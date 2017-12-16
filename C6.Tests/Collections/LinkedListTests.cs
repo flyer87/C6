@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using SCG = System.Collections.Generic;
 
 using static C6.EventTypes;
 using static C6.Speed;
@@ -15,15 +15,14 @@ namespace C6.Tests.Collections
     {
     }
 
-
     [TestFixture]
     public class LinkedListViewTests : GeneralViewTest
     {
-        protected override IList<T> GetEmptyList<T>(IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
+        protected override IList<T> GetEmptyList<T>(SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
             => new LinkedList<T>(equalityComparer, allowsNull);
 
-        protected override IList<T> GetList<T>(IEnumerable<T> enumerable, IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
-            => new ArrayList<T>(enumerable, equalityComparer, allowsNull);
+        protected override IList<T> GetList<T>(SCG.IEnumerable<T> enumerable, SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
+            => new LinkedList<T>(enumerable, equalityComparer, allowsNull);
     }
 
 
@@ -40,10 +39,10 @@ namespace C6.Tests.Collections
         protected override Speed ContainsSpeed => Linear;
         protected override Speed IndexingSpeed => Linear;
 
-        protected override IList<T> GetEmptyList<T>(IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
+        protected override IList<T> GetEmptyList<T>(SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
             => new LinkedList<T>(equalityComparer, allowsNull);
 
-        protected override IList<T> GetList<T>(IEnumerable<T> enumerable, IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
+        protected override IList<T> GetList<T>(SCG.IEnumerable<T> enumerable, SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
             => new LinkedList<T>(enumerable, equalityComparer, allowsNull);        
     }
 }

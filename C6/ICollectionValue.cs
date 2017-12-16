@@ -115,11 +115,13 @@ namespace C6
         /// </returns>
         [Pure]
         T[] ToArray();
-
-        // View
+        
         /// <summary>
-        /// 
+        ///     Gets if the structure is valid; 
         /// </summary>
+        /// <value>
+        ///     <c>true</c> if this is valid; otherwise <c>false</c>.
+        /// </value>
         [Pure]
         bool IsValid { get; }
     }
