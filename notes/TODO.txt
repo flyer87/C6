@@ -5,8 +5,7 @@
 	- ??? Stack and Queues - do and write it in "Implementation of data structure"
 	- in Unit test I mentioned that I check for toArray() or whatever ??? (1)
 	- version question, Peter
-	- Assert.Multiple() (1)	
-	- ArrayList: _offseField -> Offset(1)
+	- Assert.Multiple() (1)		
 	- Code Contracts 
 		- only in the private methods ???
 		- look at private methods and try to add pre-conditions			

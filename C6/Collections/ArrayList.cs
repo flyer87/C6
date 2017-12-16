@@ -60,9 +60,8 @@ namespace C6.Collections
         private WeakViewList<ArrayList<T>> _views;
         private WeakViewList<CollectionValueBase<T>> _collValues = new WeakViewList<CollectionValueBase<T>>(); // Why CollectionValueBase, but not ICollectionValue
         private WeakViewList<ArrayList<T>>.Node _myWeakReference;
-        private int _offsetField;
-
-        private int _size;
+        //private int _offsetField;
+        //private int _size;
         // -new         
 
         private int _version, _sequencedHashCodeVersion = -1, _unsequencedHashCodeVersion = -1;
@@ -301,7 +300,8 @@ namespace C6.Collections
             }
         }
 
-        public virtual int Offset => _offsetField;
+        //public virtual int Offset => _offsetField;
+        public virtual int Offset { get; protected set; }
 
         public virtual IList<T> Underlying => _underlying;
 
@@ -450,7 +450,7 @@ namespace C6.Collections
                 return false;
             }
 
-            index += _offsetField;
+            index += Offset;
             item = _items[index];
             return true;
         }
@@ -611,7 +611,7 @@ namespace C6.Collections
             }
 
             // TODO: Can we check that comparison doesn't alter the collection?
-            for (var i = _offsetField + 1; i < Count + _offsetField; i++) {
+            for (var i = Offset + 1; i < Count + Offset; i++) {
                 if (comparison(_items[i - 1], _items[i]) > 0) {
                     return false;
                 }
@@ -646,14 +646,14 @@ namespace C6.Collections
             if (item == null) {
                 for (var i = Count - 1; i >= 0; i--) {
                     // Explicitly check against null to avoid using the (slower) equality comparer
-                    if (_items[_offsetField + i] == null) {
+                    if (_items[Offset + i] == null) {
                         return i;
                     }
                 }
             }
             else {
-                for (int i = Count - 1; i >= 0; i--) {
-                    if (Equals(item, _items[_offsetField + i])) {
+                for (var i = Count - 1; i >= 0; i--) {
+                    if (Equals(item, _items[Offset + i])) {
                         return i;
                     }
                 }
@@ -742,7 +742,7 @@ namespace C6.Collections
             // Only update version if item is actually removed
             UpdateVersion();
 
-            startIndex += _offsetField;
+            startIndex += Offset;
             FixViewsBeforeRemovePrivate(startIndex, count);
 
             if ((UnderlyingCount - count) > startIndex) {
@@ -827,7 +827,7 @@ namespace C6.Collections
             // Only update version if the collection is actually reversed
             UpdateVersion();
 
-            Array.Reverse(_items, _offsetField, Count);
+            Array.Reverse(_items, Offset, Count);
             //TODO: be more forgiving wrt. disposing ???
             DisposeOverlappingViewsPrivate(true);
             (_underlying ?? this).RaiseForReverse();
@@ -859,7 +859,7 @@ namespace C6.Collections
             // Only update version if the collection is shuffled
             UpdateVersion();
 
-            _items.Shuffle(_offsetField, Count, random);
+            _items.Shuffle(Offset, Count, random);
             DisposeOverlappingViewsPrivate(false);
             (_underlying ?? this).RaiseForShuffle();
         }
@@ -888,7 +888,7 @@ namespace C6.Collections
 
             // Only update version if the collection is actually sorted
             UpdateVersion();
-            Array.Sort(_items, _offsetField, Count, comparer);
+            Array.Sort(_items, Offset, Count, comparer);
             DisposeOverlappingViewsPrivate(false);
             (_underlying ?? this).RaiseForSort();
         }
@@ -952,8 +952,8 @@ namespace C6.Collections
                 // Only update version if item is actually updated
                 UpdateVersion();
 
-                oldItem = _items[_offsetField + index];
-                _items[_offsetField + index] = item;
+                oldItem = _items[Offset + index];
+                _items[Offset + index] = item;
 
                 (_underlying ?? this).RaiseForUpdate(item, oldItem);
 
@@ -1001,7 +1001,7 @@ namespace C6.Collections
 
             var view = (ArrayList<T>) MemberwiseClone();
             view._underlying = _underlying ?? this;
-            view._offsetField = _offsetField + index;
+            view.Offset = Offset + index;
             view.Count = count;
 
             view._myWeakReference = _views.Add(view);
@@ -1059,7 +1059,7 @@ namespace C6.Collections
 
             UpdateVersion();
 
-            _offsetField = newOffset;
+            Offset = newOffset;
             Count = count;
 
             return true;
@@ -1091,7 +1091,7 @@ namespace C6.Collections
             Requires(IsValid);
 
             var s = "";
-            for (var i = _offsetField; i < Count; i++) {
+            for (var i = Offset; i < Count; i++) {
                 s += _items[i] + ", ";
             }
             return s;
@@ -1310,14 +1310,14 @@ namespace C6.Collections
             if (item == null) {
                 for (var i = 0; i < Count; i++) {
                     // Explicitly check against null to avoid using the (slower) equality comparer
-                    if (_items[_offsetField + i] == null) {
+                    if (_items[Offset + i] == null) {
                         return i;
                     }
                 }
             }
             else {
                 for (var i = 0; i < Count; i++) {
-                    if (Equals(item, _items[_offsetField + i])) {
+                    if (Equals(item, _items[Offset + i])) {
                         return i;
                     }
                 }
@@ -1337,14 +1337,14 @@ namespace C6.Collections
             if (item == null) {
                 for (var i = Count - 1; i >= 0; i--) {
                     // Explicitly check against null to avoid using the (slower) equality comparer
-                    if (_items[_offsetField + i] == null) {
+                    if (_items[Offset + i] == null) {
                         return i;
                     }
                 }
             }
             else {
                 for (var i = Count - 1; i >= 0; i--) {
-                    if (Equals(item, _items[_offsetField + i])) {
+                    if (Equals(item, _items[Offset + i])) {
                         return i;
                     }
                 }
@@ -1399,7 +1399,7 @@ namespace C6.Collections
                 switch (viewPosition(view.Offset, view.Count)) {
                     case MutualViewPosition.ContainedIn:
                         if (reverse)
-                            view._offsetField = 2 * Offset + Count - view.Count - view.Offset;
+                            view.Offset = 2 * Offset + Count - view.Count - view.Offset;
                         else
                             view.Dispose();
                         break;
@@ -1474,7 +1474,7 @@ namespace C6.Collections
             // TODO: Check if Count == Capacity?
             EnsureCapacity(UnderlyingCount + 1);
 
-            index += _offsetField;
+            index += Offset;
             // Move items one to the right
             if (index < UnderlyingCount) {
                 Array.Copy(_items, index, _items, index + 1, UnderlyingCount - index);
@@ -1498,10 +1498,10 @@ namespace C6.Collections
                 if (view == this)
                     continue;
 
-                if (view._offsetField <= realRemovalIndex && view._offsetField + view.Count > realRemovalIndex)
+                if (view.Offset <= realRemovalIndex && view.Offset + view.Count > realRemovalIndex)
                     view.Count--;
-                if (view._offsetField > realRemovalIndex)
-                    view._offsetField--;
+                if (view.Offset > realRemovalIndex)
+                    view.Offset--;
             }
         }
 
@@ -1512,12 +1512,12 @@ namespace C6.Collections
                 foreach (ArrayList<T> view in _views) {
                     if (view == this)
                         continue;
-                    int viewoffset = view._offsetField, viewend = viewoffset + view.Count - 1;
+                    int viewoffset = view.Offset, viewend = viewoffset + view.Count - 1;
                     if (start < viewoffset) {
                         if (clearend < viewoffset)
-                            view._offsetField = viewoffset - count;
+                            view.Offset = viewoffset - count;
                         else {
-                            view._offsetField = start;
+                            view.Offset = start;
                             view.Count = clearend < viewend ? viewend - clearend : 0;
                         }
                     }
@@ -1532,11 +1532,11 @@ namespace C6.Collections
                 foreach (ArrayList<T> view in _views) {
                     if (view != this) {
                         // in the middle
-                        if (view._offsetField < realInsertionIndex && realInsertionIndex < view._offsetField + view.Count)
+                        if (view.Offset < realInsertionIndex && realInsertionIndex < view.Offset + view.Count)
                             view.Count += added;
                         // before the beginning
-                        if (view._offsetField > realInsertionIndex || (view._offsetField == realInsertionIndex && view.Count > 0))
-                            view._offsetField += added;
+                        if (view.Offset > realInsertionIndex || (view.Offset == realInsertionIndex && view.Count > 0))
+                            view.Offset += added;
                     }
                 }
         }
@@ -1560,7 +1560,7 @@ namespace C6.Collections
             var count = items.Length;
             (_underlying ?? this).EnsureCapacity(UnderlyingCount + count); // ??? old:EnsureCapacity(Count + count);
 
-            index += _offsetField;
+            index += Offset;
             if (index < UnderlyingCount) {
                 Array.Copy(_items, index, _items, index + count, UnderlyingCount - index);
             }
@@ -1612,7 +1612,7 @@ namespace C6.Collections
             public Position(ArrayList<T> view, bool left)
             {
                 this.view = view;
-                index = left ? view._offsetField : view._offsetField + view.Count - 1;
+                index = left ? view.Offset : view.Offset + view.Count - 1;
             }
 
             public Position(int index)
@@ -1665,7 +1665,7 @@ namespace C6.Collections
                     Position endpoint;
                     while (leftEndIndex < viewCount && (endpoint = leftEnds[leftEndIndex]).index <= realindex) {
                         var view = endpoint.view;
-                        view._offsetField = view._offsetField - removed;
+                        view.Offset = view.Offset - removed;
                         view.Count += removed;
                         leftEndIndex++;
                     }
@@ -1682,7 +1682,7 @@ namespace C6.Collections
                     Position endpoint;
                     while (leftEndIndex < viewCount && (endpoint = leftEnds[leftEndIndex]).index <= realindex) {
                         ArrayList<T> view = endpoint.view;
-                        view._offsetField = view.Offset - removed;
+                        view.Offset = view.Offset - removed;
                         view.Count += removed;
                         leftEndIndex++;
                     }
@@ -1754,7 +1754,7 @@ namespace C6.Collections
 
             viewHandler.updateViewSizesAndCounts(cntRemoved, UnderlyingCount);
 
-            Array.Copy(_items, _offsetField + Count, _items, j, UnderlyingCount - _offsetField - Count);
+            Array.Copy(_items, Offset + Count, _items, j, UnderlyingCount - Offset - Count);
             Count -= cntRemoved;
             if (_underlying != null) {
                 _underlying.Count -= cntRemoved;
@@ -1776,7 +1776,7 @@ namespace C6.Collections
         {
             UpdateVersion();
 
-            index += _offsetField;
+            index += Offset;
             FixViewsBeforeSingleRemovePrivate(index);
 
             Count--;
