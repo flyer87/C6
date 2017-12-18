@@ -44,4 +44,19 @@ namespace C6.Tests.Collections
         protected override IList<T> GetList<T>(IEnumerable<T> enumerable, IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
             => new HashedArrayList<T>(enumerable, equalityComparer);
     }
+
+
+    public class HashedArrayListStackTests : IStackTests
+    {
+        protected override bool AllowsNull => false;        
+        protected override EventTypes ListenableEvents => All;
+        protected override bool IsReadOnly => false;
+       
+
+        protected override IStack<T> GetEmptyStack<T>(bool allowsNull = false)
+            => new HashedArrayList<T>();
+
+        protected override IStack<T> GetStack<T>(IEnumerable<T> enumerable, bool allowsNull = false)
+            => new HashedArrayList<T>(enumerable);        
+    }
 }

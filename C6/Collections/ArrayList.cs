@@ -1950,7 +1950,7 @@ namespace C6.Collections
         #endregion
 
         #region Nested Types
-
+        
         // TODO: Explicitly check against null to avoid using the (slower) equality comparer
         [Serializable]
         [DebuggerTypeProxy(typeof(CollectionValueDebugView<>))]

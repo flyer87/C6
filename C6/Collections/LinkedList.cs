@@ -20,7 +20,7 @@ using SCG = System.Collections.Generic;
 
 namespace C6.Collections
 {
-    public class LinkedList<T> : IList<T>
+    public class LinkedList<T> : IList<T>, IStack<T>, IQueue<T>
     {
         #region Fields
 
@@ -942,6 +942,21 @@ namespace C6.Collections
             var index = Count - 1;
             return !FindNodePrivate(item, ref node, ref index, EnumerationDirection.Backwards) ? null : View(index, 1);
         }
+
+        #endregion
+
+        #region IStack<T>
+        public T Pop() => RemoveLast();
+
+        public void Push(T item) => InsertLast(item);
+
+        #endregion
+
+        #region IQueue<T>
+
+        public virtual T Dequeue() => RemoveLast();
+
+        public virtual void Enqueue(T item) => InsertFirst(item);
 
         #endregion
 

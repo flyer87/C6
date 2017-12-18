@@ -20,7 +20,7 @@ using SCG = System.Collections.Generic;
 namespace C6.Tests
 {
     [TestFixture]
-    public abstract class IStackTests : IListenableTests
+    public abstract class IStackTests : IListenableTests 
     {
         #region Factories
 
@@ -127,6 +127,8 @@ namespace C6.Tests
         [Test]
         public void ItemGet_RandomCollectionWithNull_Null()
         {
+            Run.If(AllowsNull);
+
             // Arrange
             var items = GetStrings(Random).WithNull(Random);
             var collection = GetStack(items, true);
@@ -254,6 +256,8 @@ namespace C6.Tests
         [Test]
         public void Pop_RandomCollectionWithNullRemoveNull_Null()
         {
+            Run.If(AllowsNull);
+
             // Arrange
             var items = GetStrings(Random).Append(null);
             var collection = GetStack(items, allowsNull: true);
@@ -337,6 +341,8 @@ namespace C6.Tests
         [Test]
         public void Push_AllowsNull_Null()
         {
+            Run.If(AllowsNull);
+
             // Arrange
             var collection = GetStringStack(Random, allowsNull: true);
             var array = collection.Append(null).ToArray();
@@ -364,8 +370,9 @@ namespace C6.Tests
         }
 
         [Test]
+        [Ignore("AllowsDuplicates not inherited")]
         public void Push_RandomCollectionInsertExistingLast_InsertedLast()
-        {
+        {            
             // Arrange
             var collection = GetStringStack(Random);
             var item = collection.ToArray().Choose(Random);

@@ -35,7 +35,7 @@ using SCG = System.Collections.Generic;
 
 namespace C6.Collections
 {
-    public class HashedArrayList<T> : IList<T>
+    public class HashedArrayList<T> : IList<T>, IStack<T>
     {
         #region Fields
 
@@ -1067,6 +1067,12 @@ namespace C6.Collections
 
         public virtual IList<T> LastViewOf(T item) => ViewOf(item);
 
+        #endregion
+
+        #region IStack<T>
+        public virtual T Pop() => RemoveLast();
+
+        public virtual void Push(T item) => Add(item);
         #endregion
 
         #endregion

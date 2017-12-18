@@ -1,8 +1,12 @@
 - RESTS:		
-	- The rest of the tests for views 
+	- The rest of the tests for views (!!!!!)
+		- Constructor tests 
+		- Queue tests
 	- Stack and Queues - do and write it in "Implementation of data structure" (1)
 	- in Unit test I mentioned that I check for toArray() or whatever ??? (1)	
 	- Assert.Multiple() (1)	
+	- Run.If:
+		- public void ItemGet_RandomCollectionWithNull_Null()
 	- version question, Peter
 	- SCG.IEnumerable<T> items -> call .toArray() in the beginning of the method;
 		- catch eventual bad enumerator somehow -> 

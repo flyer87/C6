@@ -393,10 +393,6 @@ namespace C6.Tests.Collections
     }
 
 
-    //[TestFixture]
-    // public class ArrayListViewTests : IListViewTests { }
-
-
     [TestFixture]
     public class ArrayListListTests : IListTests
     {

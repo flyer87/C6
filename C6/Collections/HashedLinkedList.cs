@@ -18,7 +18,7 @@ using SC = System.Collections;
 
 namespace C6.Collections
 {
-    public class HashedLinkedList<T> : IList<T>
+    public class HashedLinkedList<T> : IList<T>, IStack<T>, IQueue<T>
     {
         #region Fields
 
@@ -1005,6 +1005,20 @@ namespace C6.Collections
             return FindNodeAndIndexByItemPrivate(item, ref node, ref index, EnumerationDirection.Forwards)
                 ? View(index, 1) : null;
         }
+
+        #endregion
+
+        #region IStack<T>
+        public T Pop() => RemoveLast();
+
+        public void Push(T item) => InsertLast(item);
+
+        #endregion
+
+        #region IQueue<T>
+        public virtual T Dequeue() => RemoveLast();
+
+        public virtual void Enqueue(T item) => InsertLast(item);
 
         #endregion
 
