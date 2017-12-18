@@ -308,7 +308,9 @@ namespace C6
 
             // All items must be non-null if collection disallows null values
             Requires(AllowsNull || ForAll(items, item => item != null), ItemsMustBeNonNull);
-            
+            //Requires(ForAll(items, item => true), ItemsMustBeNonNull);
+
+
             // The collection becomes non-empty, if items are non-empty
             Ensures(items.IsEmpty() || !IsEmpty);
 

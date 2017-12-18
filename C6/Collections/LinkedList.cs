@@ -305,7 +305,8 @@ namespace C6.Collections
 
             var oldCount = Count;
             ClearPrivate();
-            (_underlying ?? this).RaiseForClear(oldCount);
+            //(_underlying ?? this).RaiseForClear(oldCount);
+            (_underlying ?? this).RaiseForRemoveIndexRange(Offset, oldCount);
         }
 
         public virtual bool Contains(T item) => IndexOf(item) >= 0;
@@ -599,7 +600,10 @@ namespace C6.Collections
 
         public virtual void RemoveIndexRange(int startIndex, int count)
         {
-            #region Code Contracts            
+            #region Code Contracts
+
+            // If collection changes, the version is updated
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
             #endregion
 
@@ -609,7 +613,7 @@ namespace C6.Collections
 
             RemoveIndexRangePrivate(startIndex, count);
 
-            (_underlying ?? this).RaiseForRemoveIndexRange(Offset + startIndex, count);
+            //(_underlying ?? this).RaiseForRemoveIndexRange(Offset + startIndex, count);
         }
 
         #endregion
@@ -1213,8 +1217,10 @@ namespace C6.Collections
 
             var clearend = start + count - 1;
             foreach (var view in _views) {
-                if (view == this)
+                if (view == this) {
                     continue;
+                }
+
                 int viewoffset = view.Offset, viewend = viewoffset + view.Count - 1;
                 //sentinels
                 if (start < viewoffset && viewoffset - 1 <= clearend)
@@ -1263,39 +1269,15 @@ namespace C6.Collections
         #endregion
 
         private void RemoveIndexRangePrivate(int startIndex, int count)
-        {
-            // TODO: if ocunt == Count & this is properlist
-            var itemsRemoved = new ArrayList<T>(allowsNull: true); // HashedArrayList doesn't allow nulls
+        {                      
+            if (count == 0 || IsEmpty)
+            {
+                return;
+            }
 
             UpdateVersion();
-
-
-            //var cursor = GetNodeAtPrivate(startIndex);
-            //var firsNode = cursor;            
-            //var index = 0;
-            //while (index < count)
-            //{
-            //    cursor.Prev.Next = cursor.Next;
-            //    cursor.Next.Prev = cursor.Prev;
-            //    itemsRemoved.Add(cursor.item);
-
-            //    cursor = cursor.Next;
-            //    index++;                              
-            //}
-
-            // TODO: getNode(startIndex); getNode(startIndex + count)
-            var firstNode = GetNodeAtPrivate(startIndex);
-            var lastNode = GetNodeAtPrivate(startIndex + count - 1);
-
-            FixViewsBeforeRemovePrivate(startIndex, count, firstNode, lastNode);
-
-            firstNode.Prev.Next = lastNode.Next;
-            lastNode.Next.Prev = firstNode.Prev;
-
-            Count -= count;
-            if (_underlying != null) {
-                _underlying.Count -= count;
-            }
+            
+            View(startIndex, count).Clear();           
         }
 
         private void DisposePrivate(bool disposingUnderlying)
@@ -1663,7 +1645,7 @@ namespace C6.Collections
         {
             UpdateVersion();
 
-            FixViewsBeforeRemovePrivate(0, Count, _startSentinel.Next, _endSentinel.Prev);
+            FixViewsBeforeRemovePrivate(Offset, Count, _startSentinel.Next, _endSentinel.Prev);
 
             _startSentinel.Next = _endSentinel; //_startSentinel.Prev = null;
             _endSentinel.Prev = _startSentinel; //_endSentinel.Next = null;
@@ -1755,10 +1737,10 @@ namespace C6.Collections
             return node.item;
         }
 
-        private void RaiseForRemoveIndexRange(int count, int startIndex)
+        private void RaiseForRemoveIndexRange(int startIndex, int count)
         {
             if (ActiveEvents.HasFlag(Cleared)) {
-                OnCollectionCleared(false, startIndex, count);
+                OnCollectionCleared(false, count, startIndex);
             }
                             
             OnCollectionChanged();

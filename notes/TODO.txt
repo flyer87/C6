@@ -1,11 +1,16 @@
-- RESTS:	
-	//- documentation - fix the small issues.
-	- The rest of the tests for views (1)
-	//- C6 -> C6 Cont
-	- ??? Stack and Queues - do and write it in "Implementation of data structure"
-	- in Unit test I mentioned that I check for toArray() or whatever ??? (1)
+- RESTS:		
+	- The rest of the tests for views 
+	- Stack and Queues - do and write it in "Implementation of data structure" (1)
+	- in Unit test I mentioned that I check for toArray() or whatever ??? (1)	
+	- Assert.Multiple() (1)	
 	- version question, Peter
-	- Assert.Multiple() (1)		
+	- SCG.IEnumerable<T> items -> call .toArray() in the beginning of the method;
+		- catch eventual bad enumerator somehow -> 
+			IExtensible.Requires(ForAll(items, item => true), ItemsMustBeNonNull);
+	- LL.ClearPrivate()
+		- UpdateVersion() - naeaeaeh. Move it up ?!
+	- All data structures
+		- RaiseForClear -> RaiseForRemoveIndexRange
 	- Code Contracts 
 		- only in the private methods ???
 		- look at private methods and try to add pre-conditions			
@@ -13,9 +18,9 @@
 		- C. contracts warned me for what?
 		- HLL: tag invarinats
 		"offers guarantees regarding the state of an object"	
-	- Tests
-		- iExtensible for HAL, HLL: Ensures(AllowsDuplicates ? Result<bool>() : OldValue(!this.Contains(item, EqualityComparer)));
-		- failing IsValid tests
+		
+	- Tests:
+		- iExtensible for HAL, HLL: Ensures(AllowsDuplicates ? Result<bool>() : OldValue(!this.Contains(item, EqualityComparer)));		
 		- failing volatile tests
 		- Implement the test for the remaining methods for views
 		- fluctuating tests still	

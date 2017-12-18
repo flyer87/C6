@@ -27,6 +27,7 @@ namespace C6.Tests
     public abstract class GeneralViewTest : TestBase
     {
         #region Factories
+
         protected abstract IList<T> GetEmptyList<T>(SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false);
 
         protected abstract IList<T> GetList<T>(SCG.IEnumerable<T> enumerable, SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false);
@@ -138,7 +139,7 @@ namespace C6.Tests
 
         private static IList<string>[] GetZeroItemViewsInTheBeginning(IList<string> coll)
         {
-            var zeroItemViews = new IList<string>[5];            
+            var zeroItemViews = new IList<string>[5];
             const int index = 0;
             const int count = 0;
 
@@ -227,7 +228,7 @@ namespace C6.Tests
             var array = new[] {
                 "aa", "cc", "bb", "dd", "ee", "ff", "gg", "hh", "ii", "jj", "kk", "ll",
                 "mm", "nn", "oo", "pp", "qq", "rr", "ss", "tt", "uu", "vv", "ww", "xx",
-                "yy", "zz", "bbb", "aaa",  "ccc", "ddd", "eee", "fff", "ggg", "hhh", "iii", "jjj",
+                "yy", "zz", "bbb", "aaa", "ccc", "ddd", "eee", "fff", "ggg", "hhh", "iii", "jjj",
                 "kkk", "lll", "mmm", "nnn", "ooo", "ppp", "qqq", "rrr", "sss", "ttt", "uuu", "vvv",
                 "www", "xxx", "zzz", "yyy"
             };
@@ -249,19 +250,19 @@ namespace C6.Tests
         }
 
         #region this[int]
+
         [Test]
         public void Viewthis_NItemViewsInTheMiddle_BothViewsOffsetNotChanged()
         {
             var index = 0;
             var views = GetNItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
                 var i = Random.Next(0, view.Count);
                 var item = GetUppercaseString(Random);
-                
+
                 // Act
                 view[i] = item;
 
@@ -278,8 +279,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetOneItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 //if (view.IsEmpty) continue;
 
                 // Arrange 
@@ -306,8 +306,7 @@ namespace C6.Tests
             var item = GetUppercaseString(Random);
             // Act & Assert
             var views = GetZeroItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 Assert.That(() => view[0] = item, Violates.PreconditionSaying(ArgumentMustBeWithinBounds));
             }
         }
@@ -317,8 +316,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -342,8 +340,7 @@ namespace C6.Tests
             // Arrange 
             var views = GetOneItemViewsInTheBeginning(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -369,8 +366,7 @@ namespace C6.Tests
 
             // Act & Assert
             var views = GetZeroItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 Assert.That(() => view[0] = item, Violates.Precondition);
             }
         }
@@ -380,8 +376,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -399,14 +394,13 @@ namespace C6.Tests
             }
         }
 
-        [Test] 
+        [Test]
         public void Viewthis_OneItemViewsAtTheEnd_BothViewsOffsetNotChanged()
         {
             // Arrange 
             var views = GetOneItemViewsAtTheEnd(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -433,8 +427,7 @@ namespace C6.Tests
 
             // Act & Assert
             var views = GetZeroItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 Assert.That(() => view[0] = item, Violates.Precondition);
             }
         }
@@ -442,13 +435,13 @@ namespace C6.Tests
         #endregion
 
         #region Add(T)
+
         [Test]
         public void ViewAdd_NItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
         {
             var index = 0;
             var views = GetNItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -470,13 +463,12 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetOneItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 //if (view.IsEmpty) continue;
 
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
-                var offsetRight = auxViewRight.Offset;                
+                var offsetRight = auxViewRight.Offset;
                 var item = GetUppercaseString(Random);
 
                 // Act
@@ -492,11 +484,10 @@ namespace C6.Tests
 
         [Test]
         public void ViewAdd_ZeroItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
-        {                        
+        {
             var views = GetZeroItemViewsInTheMiddle(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 //if (view.IsEmpty) continue;
 
                 // Arrange 
@@ -520,11 +511,10 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
-                var offsetRight = auxViewRight.Offset;                
+                var offsetRight = auxViewRight.Offset;
                 var item = GetUppercaseString(Random);
 
                 // Act
@@ -544,11 +534,10 @@ namespace C6.Tests
             // Arrange 
             var views = GetOneItemViewsInTheBeginning(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
-                var offsetRight = auxViewRight.Offset;                
+                var offsetRight = auxViewRight.Offset;
                 var item = GetUppercaseString(Random);
 
                 // Act
@@ -556,7 +545,7 @@ namespace C6.Tests
 
                 // Assert                
                 Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
-                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight+1), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight + 1), $"view {index}");
                 Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
                 index++;
             }
@@ -568,8 +557,7 @@ namespace C6.Tests
             // Arrange 
             var views = GetZeroItemViewsInTheBeginning(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -591,11 +579,10 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
-                var offsetRight = auxViewRight.Offset;                
+                var offsetRight = auxViewRight.Offset;
                 var item = GetUppercaseString(Random);
 
                 // Act
@@ -615,11 +602,10 @@ namespace C6.Tests
             // Arrange 
             var views = GetOneItemViewsAtTheEnd(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
-                var offsetRight = auxViewRight.Offset;                
+                var offsetRight = auxViewRight.Offset;
                 var item = GetUppercaseString(Random);
 
                 // Act
@@ -639,8 +625,7 @@ namespace C6.Tests
             // Arrange             
             var views = GetZeroItemViewsAtTheEnd(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -660,13 +645,13 @@ namespace C6.Tests
         #endregion
 
         #region RemoveAt(int)
+
         [Test]
         public void ViewRemoveAt_NItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
         {
             var index = 0;
             var views = GetNItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -687,9 +672,9 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetOneItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
-                if (view.IsEmpty) continue;
+            foreach (var view in views) {
+                if (view.IsEmpty)
+                    continue;
 
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
@@ -711,8 +696,7 @@ namespace C6.Tests
         {
             // Act & Assert
             var views = GetZeroItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 Assert.That(() => view.RemoveAt(0), Violates.PreconditionSaying(ArgumentMustBeWithinBounds));
             }
         }
@@ -722,8 +706,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -756,8 +739,7 @@ namespace C6.Tests
             // Assert    
             Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
             Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
-            foreach (var v in views)
-            {
+            foreach (var v in views) {
                 Assert.That(v, Is.Empty, $"view {index}");
             }
         }
@@ -767,8 +749,7 @@ namespace C6.Tests
         {
             // Act & Assert
             var views = GetZeroItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 Assert.That(() => view.RemoveAt(0), Violates.Precondition);
             }
         }
@@ -778,8 +759,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -811,8 +791,7 @@ namespace C6.Tests
             // Assert    
             Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
             Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
-            foreach (var v in views)
-            {
+            foreach (var v in views) {
                 Assert.That(v.Count, Is.Zero, $"view {index}");
             }
         }
@@ -822,21 +801,21 @@ namespace C6.Tests
         {
             // Act & Assert
             var views = GetZeroItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 Assert.That(() => view.RemoveAt(0), Violates.Precondition);
             }
         }
+
         #endregion
 
         #region Insert(int, T)
+
         [Test]
         public void ViewInsertWithIndexZero_NItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
         {
             var index = 0;
             var views = GetNItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -858,8 +837,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetOneItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 //if (view.IsEmpty) continue;
 
                 // Arrange 
@@ -883,8 +861,7 @@ namespace C6.Tests
         {
             var views = GetZeroItemViewsInTheMiddle(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 //if (view.IsEmpty) continue;
 
                 // Arrange 
@@ -908,8 +885,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -932,15 +908,14 @@ namespace C6.Tests
             // Arrange 
             var views = GetOneItemViewsInTheBeginning(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
                 var item = GetUppercaseString(Random);
 
                 // Act
-                view.Insert(0,item);
+                view.Insert(0, item);
 
                 // Assert                
                 Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft + 1), $"view {index}");
@@ -956,8 +931,7 @@ namespace C6.Tests
             // Arrange 
             var views = GetZeroItemViewsInTheBeginning(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -979,8 +953,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1003,8 +976,7 @@ namespace C6.Tests
             // Arrange 
             var views = GetOneItemViewsAtTheEnd(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1027,8 +999,7 @@ namespace C6.Tests
             // Arrange             
             var views = GetZeroItemViewsAtTheEnd(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1044,16 +1015,17 @@ namespace C6.Tests
                 index++;
             }
         }
+
         #endregion
 
         #region InsertFirst()
+
         [Test]
         public void ViewInsertFirst_NItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
         {
             var index = 0;
             var views = GetNItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1075,8 +1047,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetOneItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 //if (view.IsEmpty) continue;
 
                 // Arrange 
@@ -1100,8 +1071,7 @@ namespace C6.Tests
         {
             var views = GetZeroItemViewsInTheMiddle(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 //if (view.IsEmpty) continue;
 
                 // Arrange 
@@ -1125,8 +1095,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1149,8 +1118,7 @@ namespace C6.Tests
             // Arrange 
             var views = GetOneItemViewsInTheBeginning(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1173,8 +1141,7 @@ namespace C6.Tests
             // Arrange 
             var views = GetZeroItemViewsInTheBeginning(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1196,8 +1163,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1220,8 +1186,7 @@ namespace C6.Tests
             // Arrange 
             var views = GetOneItemViewsAtTheEnd(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1244,8 +1209,7 @@ namespace C6.Tests
             // Arrange             
             var views = GetZeroItemViewsAtTheEnd(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1261,16 +1225,17 @@ namespace C6.Tests
                 index++;
             }
         }
+
         #endregion
 
         #region InsertLast()      
+
         [Test]
         public void ViewInsertLast_NItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
         {
             var index = 0;
             var views = GetNItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1292,8 +1257,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetOneItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 //if (view.IsEmpty) continue;
 
                 // Arrange 
@@ -1317,8 +1281,7 @@ namespace C6.Tests
         {
             var views = GetZeroItemViewsInTheMiddle(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 //if (view.IsEmpty) continue;
 
                 // Arrange 
@@ -1342,8 +1305,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1366,8 +1328,7 @@ namespace C6.Tests
             // Arrange 
             var views = GetOneItemViewsInTheBeginning(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1390,8 +1351,7 @@ namespace C6.Tests
             // Arrange 
             var views = GetZeroItemViewsInTheBeginning(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1413,8 +1373,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1437,8 +1396,7 @@ namespace C6.Tests
             // Arrange 
             var views = GetOneItemViewsAtTheEnd(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1461,8 +1419,7 @@ namespace C6.Tests
             // Arrange             
             var views = GetZeroItemViewsAtTheEnd(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1478,16 +1435,17 @@ namespace C6.Tests
                 index++;
             }
         }
+
         #endregion
 
         #region RemoveFirst()
+
         [Test]
         public void ViewRemoveFirst_NItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
         {
             var index = 0;
             var views = GetNItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1508,9 +1466,9 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetOneItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
-                if (view.IsEmpty) continue;
+            foreach (var view in views) {
+                if (view.IsEmpty)
+                    continue;
 
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
@@ -1532,8 +1490,7 @@ namespace C6.Tests
         {
             // Act & Assert
             var views = GetZeroItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 Assert.That(() => view.RemoveFirst(), Violates.PreconditionSaying(CollectionMustBeNonEmpty));
             }
         }
@@ -1543,8 +1500,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1577,8 +1533,7 @@ namespace C6.Tests
             // Assert    
             Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
             Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
-            foreach (var v in views)
-            {
+            foreach (var v in views) {
                 Assert.That(v, Is.Empty, $"view {index}");
             }
         }
@@ -1588,8 +1543,7 @@ namespace C6.Tests
         {
             // Act & Assert
             var views = GetZeroItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 Assert.That(() => view.RemoveFirst(), Violates.Precondition);
             }
         }
@@ -1599,8 +1553,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1632,8 +1585,7 @@ namespace C6.Tests
             // Assert    
             Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
             Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
-            foreach (var v in views)
-            {
+            foreach (var v in views) {
                 Assert.That(v.Count, Is.Zero, $"view {index}");
             }
         }
@@ -1643,21 +1595,21 @@ namespace C6.Tests
         {
             // Act & Assert
             var views = GetZeroItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 Assert.That(() => view.RemoveFirst(), Violates.Precondition);
             }
         }
+
         #endregion
 
         #region RemoveLast()
+
         [Test]
         public void ViewRemoveLast_NItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
         {
             var index = 0;
             var views = GetNItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1678,9 +1630,9 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetOneItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
-                if (view.IsEmpty) continue;
+            foreach (var view in views) {
+                if (view.IsEmpty)
+                    continue;
 
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
@@ -1702,8 +1654,7 @@ namespace C6.Tests
         {
             // Act & Assert
             var views = GetZeroItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 Assert.That(() => view.RemoveLast(), Violates.PreconditionSaying(CollectionMustBeNonEmpty));
             }
         }
@@ -1713,8 +1664,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1747,8 +1697,7 @@ namespace C6.Tests
             // Assert    
             Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
             Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
-            foreach (var v in views)
-            {
+            foreach (var v in views) {
                 Assert.That(v, Is.Empty, $"view {index}");
             }
         }
@@ -1758,8 +1707,7 @@ namespace C6.Tests
         {
             // Act & Assert
             var views = GetZeroItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 Assert.That(() => view.RemoveLast(), Violates.Precondition);
             }
         }
@@ -1769,8 +1717,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1802,8 +1749,7 @@ namespace C6.Tests
             // Assert    
             Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
             Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
-            foreach (var v in views)
-            {
+            foreach (var v in views) {
                 Assert.That(v.Count, Is.Zero, $"view {index}");
             }
         }
@@ -1813,21 +1759,21 @@ namespace C6.Tests
         {
             // Act & Assert
             var views = GetZeroItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 Assert.That(() => view.RemoveLast(), Violates.Precondition);
             }
         }
+
         #endregion
 
         #region Reverse()
+
         [Test]
         public void ViewReverse_NItemViewsInTheMiddle_BothViewsOffsetNotChanged()
         {
             var index = 0;
             var views = GetNItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1848,8 +1794,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetOneItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 //if (view.IsEmpty) continue;
 
                 // Arrange 
@@ -1873,8 +1818,7 @@ namespace C6.Tests
             // Act & Assert
             var views = GetZeroItemViewsInTheMiddle(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1895,10 +1839,9 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
-                var offsetLeft = auxViewLeft.Offset;                
+                var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
 
                 // Act
@@ -1919,8 +1862,7 @@ namespace C6.Tests
             // Arrange 
             var views = GetOneItemViewsInTheBeginning(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1942,8 +1884,7 @@ namespace C6.Tests
             // Act & Assert
             var views = GetZeroItemViewsInTheBeginning(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -1964,11 +1905,10 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
-                var offsetRight = auxViewRight.Offset;                
+                var offsetRight = auxViewRight.Offset;
 
                 // Act
                 view.Reverse();
@@ -1987,11 +1927,10 @@ namespace C6.Tests
             // Arrange 
             var views = GetOneItemViewsAtTheEnd(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
-                var offsetRight = auxViewRight.Offset;                
+                var offsetRight = auxViewRight.Offset;
 
                 // Act
                 view.Reverse();
@@ -2007,12 +1946,11 @@ namespace C6.Tests
 
         [Test]
         public void ViewReverse_ZeroItemViewsAtTheEnd_BothViewsOffsetNotChanged()
-        {           
+        {
             // Act & Assert
             var views = GetZeroItemViewsAtTheEnd(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2031,13 +1969,13 @@ namespace C6.Tests
         #endregion
 
         #region Shuffle()
+
         [Test]
         public void ViewShuffle_NItemViewsInTheMiddle_BothViewsOffsetNotChanged()
         {
             var index = 0;
             var views = GetNItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2058,8 +1996,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetOneItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {               
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2081,8 +2018,7 @@ namespace C6.Tests
             // Act & Assert
             var views = GetZeroItemViewsInTheMiddle(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2107,7 +2043,7 @@ namespace C6.Tests
             var view = views.Choose(Random);
             var offsetLeft = auxViewLeft.Offset;
             var offsetRight = auxViewRight.Offset;
-          
+
             // Act
             view.Shuffle();
 
@@ -2122,8 +2058,7 @@ namespace C6.Tests
             // Arrange 
             var index = 0;
             var views = GetOneItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2145,8 +2080,7 @@ namespace C6.Tests
             // Arrange 
             var index = 0;
             var views = GetZeroItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2167,8 +2101,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2190,8 +2123,7 @@ namespace C6.Tests
             // Arrange 
             var views = GetOneItemViewsAtTheEnd(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2214,8 +2146,7 @@ namespace C6.Tests
             // Act & Assert
             var views = GetZeroItemViewsAtTheEnd(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2234,15 +2165,15 @@ namespace C6.Tests
         #endregion
 
         #region Sort()
+
         [Test]
         public void ViewSort_NItemViewsInTheMiddle_BothViewsOffsetNotChanged()
         {
             var index = 0;
             var views = GetNItemViewsInTheMiddle(list);
 
-            var v2 = views.Take(2);
-            foreach (var view in v2)
-            {
+            var v2 = views.Take(2).ToList();
+            foreach (var view in v2) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2263,8 +2194,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetOneItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2286,8 +2216,7 @@ namespace C6.Tests
             // Act & Assert
             var views = GetZeroItemViewsInTheMiddle(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2328,8 +2257,7 @@ namespace C6.Tests
             // Arrange 
             var index = 0;
             var views = GetOneItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2351,8 +2279,7 @@ namespace C6.Tests
             // Arrange 
             var index = 0;
             var views = GetZeroItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2373,8 +2300,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2396,8 +2322,7 @@ namespace C6.Tests
             // Arrange 
             var views = GetOneItemViewsAtTheEnd(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2420,8 +2345,7 @@ namespace C6.Tests
             // Act & Assert
             var views = GetZeroItemViewsAtTheEnd(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2440,19 +2364,19 @@ namespace C6.Tests
         #endregion
 
         #region RemoveIndexRange(int, int)
+
         [Test]
         public void ViewRemoveIndexRange_NItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
         {
             var index = 0;
             var views = GetNItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
 
                 // Act
-                view.RemoveIndexRange(0, 1);                
+                view.RemoveIndexRange(0, 1);
 
                 // Assert                
                 Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
@@ -2467,9 +2391,9 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetOneItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
-                if (view.IsEmpty) continue;
+            foreach (var view in views) {
+                if (view.IsEmpty)
+                    continue;
 
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
@@ -2491,9 +2415,8 @@ namespace C6.Tests
         {
             // Act & Assert
             var views = GetZeroItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
-                Assert.That(() => view.RemoveIndexRange(0,1), Violates.PreconditionSaying(ArgumentMustBeWithinBounds));
+            foreach (var view in views) {
+                Assert.That(() => view.RemoveIndexRange(0, 1), Violates.PreconditionSaying(ArgumentMustBeWithinBounds));
             }
         }
 
@@ -2502,8 +2425,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2531,13 +2453,12 @@ namespace C6.Tests
             // Act
             // do it on one of the views; They all are one-item overlapping views            
             var view = views[index];
-            view.RemoveIndexRange(0,1);
+            view.RemoveIndexRange(0, 1);
 
             // Assert    
             Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
             Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
-            foreach (var v in views)
-            {
+            foreach (var v in views) {
                 Assert.That(v, Is.Empty, $"view {index}");
             }
         }
@@ -2547,9 +2468,8 @@ namespace C6.Tests
         {
             // Act & Assert
             var views = GetZeroItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
-                Assert.That(() => view.RemoveIndexRange(0,2), Violates.Precondition);
+            foreach (var view in views) {
+                Assert.That(() => view.RemoveIndexRange(0, 2), Violates.Precondition);
             }
         }
 
@@ -2558,14 +2478,13 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
 
                 // Act
-                view.RemoveIndexRange(0,1);
+                view.RemoveIndexRange(0, 1);
 
                 // Assert                
                 Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
@@ -2586,13 +2505,12 @@ namespace C6.Tests
 
             // Act // Do it on one of the views; They all are one-item overlapping views            
             var view = views[index];
-            view.RemoveIndexRange(0,1);
+            view.RemoveIndexRange(0, 1);
 
             // Assert    
             Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
             Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
-            foreach (var v in views)
-            {
+            foreach (var v in views) {
                 Assert.That(v.Count, Is.Zero, $"view {index}");
             }
         }
@@ -2602,9 +2520,8 @@ namespace C6.Tests
         {
             // Act & Assert
             var views = GetZeroItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
-                Assert.That(() => view.RemoveIndexRange(0,2), Violates.Precondition);
+            foreach (var view in views) {
+                Assert.That(() => view.RemoveIndexRange(0, 2), Violates.Precondition);
             }
         }
 
@@ -2612,13 +2529,13 @@ namespace C6.Tests
         #endregion
 
         #region Update(T, out T)
+
         [Test]
         public void ViewUpdateOut_NItemViewsInTheMiddle_BothViewsOffsetNotChanged()
         {
             var index = 0;
             var views = GetNItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2641,8 +2558,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetOneItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {                
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2662,11 +2578,10 @@ namespace C6.Tests
 
         [Test]
         public void ViewUpdateOut_ZeroItemViewsInTheMiddle_BothViewsOffsetNotChanged()
-        {         
+        {
             var views = GetZeroItemViewsInTheMiddle(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2689,8 +2604,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2715,8 +2629,7 @@ namespace C6.Tests
             // Arrange 
             var views = GetOneItemViewsInTheBeginning(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2740,8 +2653,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetZeroItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2764,8 +2676,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2790,8 +2701,7 @@ namespace C6.Tests
             // Arrange 
             var views = GetOneItemViewsAtTheEnd(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2816,11 +2726,10 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetZeroItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
-                var offsetRight = auxViewRight.Offset;                
+                var offsetRight = auxViewRight.Offset;
                 var item = list.Choose();
                 string outItem;
 
@@ -2838,17 +2747,17 @@ namespace C6.Tests
         #endregion
 
         #region Update(T)
+
         [Test]
         public void ViewUpdate_NItemViewsInTheMiddle_BothViewsOffsetNotChanged()
         {
             var index = 0;
             var views = GetNItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
-                var item = list.Choose();                
+                var item = list.Choose();
 
                 // Act
                 view.Update(item);
@@ -2866,12 +2775,11 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetOneItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
-                var item = list.Choose();                
+                var item = list.Choose();
 
                 // Act
                 view.Update(item);
@@ -2889,12 +2797,11 @@ namespace C6.Tests
         {
             var views = GetZeroItemViewsInTheMiddle(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
-                var item = list.Choose();                
+                var item = list.Choose();
 
                 // Act
                 view.Update(item);
@@ -2912,13 +2819,12 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
                 var i = Random.Next(0, view.Count);
-                var item = list.Choose();                
+                var item = list.Choose();
 
                 // Act
                 view.Update(item);
@@ -2937,13 +2843,12 @@ namespace C6.Tests
             // Arrange 
             var views = GetOneItemViewsInTheBeginning(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
                 var i = Random.Next(0, view.Count);
-                var item = list.Choose();                
+                var item = list.Choose();
 
                 // Act
                 view.Update(item);
@@ -2961,12 +2866,11 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetZeroItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
-                var item = list.Choose();                
+                var item = list.Choose();
 
                 // Act
                 view.Update(item);
@@ -2984,13 +2888,12 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
                 var i = Random.Next(0, view.Count);
-                var item = list.Choose();                
+                var item = list.Choose();
 
                 // Act
                 view.Update(item);
@@ -3009,13 +2912,12 @@ namespace C6.Tests
             // Arrange 
             var views = GetOneItemViewsAtTheEnd(list);
             var index = 0;
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
                 var i = Random.Next(0, view.Count);
-                var item = list.Choose();                
+                var item = list.Choose();
 
                 // Act
                 view.Update(item);
@@ -3034,12 +2936,11 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetZeroItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
-                var item = list.Choose();                
+                var item = list.Choose();
 
                 // Act
                 view.Update(item);
@@ -3055,13 +2956,13 @@ namespace C6.Tests
         #endregion
 
         #region Clear()
+
         [Test]
         public void ViewClear_NItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
         {
             var index = 0;
             var views = GetNItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -3083,9 +2984,9 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetOneItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
-                if (view.IsEmpty) continue;
+            foreach (var view in views) {
+                if (view.IsEmpty)
+                    continue;
 
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
@@ -3105,10 +3006,9 @@ namespace C6.Tests
         [Test]
         public void ViewClear_ZeroItemViewsInTheMiddle_BothViewsOffsetNotChanged()
         {
-            var index = 0;         
+            var index = 0;
             var views = GetZeroItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -3132,7 +3032,7 @@ namespace C6.Tests
             var views = GetOneItemViewsInTheBeginning(list);
 
             var offsetLeft = auxViewLeft.Offset;
-            var offsetRight = auxViewRight.Offset;            
+            var offsetRight = auxViewRight.Offset;
             var view = views[index];
             var viewCount = view.Count;
 
@@ -3143,8 +3043,7 @@ namespace C6.Tests
             // Assert    
             Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
             Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - viewCount), $"view {index}");
-            foreach (var v in views)
-            {
+            foreach (var v in views) {
                 Assert.That(v, Is.Empty, $"view {index}");
             }
         }
@@ -3166,8 +3065,7 @@ namespace C6.Tests
             // Assert    
             Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
             Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
-            foreach (var v in views)
-            {
+            foreach (var v in views) {
                 Assert.That(v, Is.Empty, $"view {index}");
             }
         }
@@ -3177,8 +3075,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetZeroItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -3201,18 +3098,17 @@ namespace C6.Tests
             var index = 0;
             var views = GetNItemViewsAtTheEnd(list);
             var offsetLeft = auxViewLeft.Offset;
-            var offsetRight = auxViewRight.Offset;            
+            var offsetRight = auxViewRight.Offset;
 
             // Act
             // do it on one of the views; They all are one-item overlapping views            
-            var view = views[index];           
+            var view = views[index];
             view.Clear();
 
             // Assert    
             Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
             Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
-            foreach (var v in views)
-            {
+            foreach (var v in views) {
                 Assert.That(v, Is.Empty, $"view {index}");
             }
         }
@@ -3234,19 +3130,17 @@ namespace C6.Tests
             // Assert    
             Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
             Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
-            foreach (var v in views)
-            {
+            foreach (var v in views) {
                 Assert.That(v.Count, Is.Zero, $"view {index}");
             }
         }
 
         [Test]
         public void ViewClear_ZeroItemViewsAtTheEnd_BothViewsOffsetNotChanged()
-        {            
+        {
             var index = 0;
             var views = GetZeroItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {                
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -3261,16 +3155,17 @@ namespace C6.Tests
                 index++;
             }
         }
+
         #endregion
 
         #region Remove(T)
+
         [Test]
         public void ViewRemove_NItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
         {
             var index = 0;
             var views = GetNItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -3292,9 +3187,9 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetOneItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
-                if (view.IsEmpty) continue;
+            foreach (var view in views) {
+                if (view.IsEmpty)
+                    continue;
 
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
@@ -3314,11 +3209,10 @@ namespace C6.Tests
 
         [Test]
         public void ViewRemove_ZeroItemViewsInTheMiddle_BothViewsOffsetNotChanged()
-        {            
+        {
             var index = 0;
-            var views = GetZeroItemViewsInTheMiddle(list);            
-            foreach (var view in views)
-            {                
+            var views = GetZeroItemViewsInTheMiddle(list);
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -3342,14 +3236,14 @@ namespace C6.Tests
             var index = 0;
             var offsetLeft = auxViewLeft.Offset;
             var offsetRight = auxViewRight.Offset;
-            
+
             var views = GetNItemViewsInTheBeginning(list);
-            var i = Random.Next(0, views.Length);            
+            var i = Random.Next(0, views.Length);
             var view = views[i];
             var item = view.Choose();
 
             // Act // Do it on one of the views; 
-            view.Remove(item); 
+            view.Remove(item);
 
             // Assert    
             Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
@@ -3375,19 +3269,17 @@ namespace C6.Tests
             // Assert    
             Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
             Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
-            foreach (var v in views)
-            {
+            foreach (var v in views) {
                 Assert.That(v, Is.Empty, $"view {index}");
             }
         }
 
         [Test]
         public void ViewRemove_ZeroItemViewsInTheBeginning_BothViewsOffsetNotChanged()
-        {            
+        {
             var index = 0;
             var views = GetZeroItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {                                            
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -3409,8 +3301,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -3444,8 +3335,7 @@ namespace C6.Tests
             // Assert    
             Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
             Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
-            foreach (var v in views)
-            {
+            foreach (var v in views) {
                 Assert.That(v.Count, Is.Zero, $"view {index}");
             }
         }
@@ -3455,8 +3345,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetZeroItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -3472,16 +3361,17 @@ namespace C6.Tests
                 index++;
             }
         }
+
         #endregion
 
         #region Remove(T, out T)
+
         [Test]
         public void ViewRemoveOut_NItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
         {
             var index = 0;
             var views = GetNItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -3527,8 +3417,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetZeroItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -3588,8 +3477,7 @@ namespace C6.Tests
             // Assert    
             Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
             Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
-            foreach (var v in views)
-            {
+            foreach (var v in views) {
                 Assert.That(v, Is.Empty, $"view {index}");
             }
         }
@@ -3599,8 +3487,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetZeroItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -3623,8 +3510,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -3658,8 +3544,7 @@ namespace C6.Tests
             // Assert    
             Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
             Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
-            foreach (var v in views)
-            {
+            foreach (var v in views) {
                 Assert.That(v.Count, Is.Zero, $"view {index}");
             }
         }
@@ -3669,8 +3554,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetZeroItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -3687,16 +3571,17 @@ namespace C6.Tests
                 index++;
             }
         }
+
         #endregion
 
         #region RemoveRange(IEnumerable<T>)
+
         [Test]
         public void ViewRemoveRange_NItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
         {
             var index = 0;
             var views = GetNItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -3719,10 +3604,10 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetOneItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
-                if (view.IsEmpty) continue;                
-                
+            foreach (var view in views) {
+                if (view.IsEmpty)
+                    continue;
+
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -3745,8 +3630,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetZeroItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -3806,8 +3690,7 @@ namespace C6.Tests
             // Assert    
             Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
             Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
-            foreach (var v in views)
-            {
+            foreach (var v in views) {
                 Assert.That(v, Is.Empty, $"view {index}");
             }
         }
@@ -3817,8 +3700,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetZeroItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -3841,8 +3723,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -3878,8 +3759,7 @@ namespace C6.Tests
             // Assert    
             Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
             Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
-            foreach (var v in views)
-            {
+            foreach (var v in views) {
                 Assert.That(v.Count, Is.Zero, $"view {index}");
             }
         }
@@ -3889,8 +3769,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetZeroItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -3911,17 +3790,17 @@ namespace C6.Tests
         #endregion
 
         #region RemoveDuplicates(T)
+
         [Test]
         public void ViewRemoveDuplicates_NItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
         {
             var index = 0;
             var views = GetNItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
-                var item = view.Choose();                
+                var item = view.Choose();
 
                 // Act
                 view.RemoveDuplicates(item);
@@ -3939,14 +3818,14 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetOneItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
-                if (view.IsEmpty) continue;
+            foreach (var view in views) {
+                if (view.IsEmpty)
+                    continue;
 
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
-                var item = view.Choose();                
+                var item = view.Choose();
 
                 // Act
                 view.RemoveDuplicates(item);
@@ -3964,12 +3843,11 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetZeroItemViewsInTheMiddle(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
-                var item = list.Choose();                
+                var item = list.Choose();
 
                 // Act
                 view.RemoveDuplicates(item);
@@ -4013,7 +3891,7 @@ namespace C6.Tests
             var offsetRight = auxViewRight.Offset;
             var index = Random.Next(0, views.Length);
             var view = views[index];
-            var item = view.Choose();            
+            var item = view.Choose();
 
             // Act
             // do it on one of the views; They all are one-item overlapping views                        
@@ -4022,8 +3900,7 @@ namespace C6.Tests
             // Assert    
             Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
             Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
-            foreach (var v in views)
-            {
+            foreach (var v in views) {
                 Assert.That(v, Is.Empty, $"view {index}");
             }
         }
@@ -4033,12 +3910,11 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetZeroItemViewsInTheBeginning(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
-                var item = list.Choose();                
+                var item = list.Choose();
 
                 // Act
                 view.RemoveDuplicates(item);
@@ -4056,8 +3932,7 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetNItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -4083,7 +3958,7 @@ namespace C6.Tests
             var views = GetOneItemViewsAtTheEnd(list);
             var index = Random.Next(0, views.Length);
             var view = views[index];
-            var item = view.Choose();            
+            var item = view.Choose();
 
             // Act 
             // Do it on one of the views; They all are one-item overlapping views            
@@ -4092,8 +3967,7 @@ namespace C6.Tests
             // Assert    
             Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
             Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
-            foreach (var v in views)
-            {
+            foreach (var v in views) {
                 Assert.That(v.Count, Is.Zero, $"view {index}");
             }
         }
@@ -4103,12 +3977,11 @@ namespace C6.Tests
         {
             var index = 0;
             var views = GetZeroItemViewsAtTheEnd(list);
-            foreach (var view in views)
-            {
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
-                var item = list.Choose();                
+                var item = list.Choose();
 
                 // Act
                 view.RemoveDuplicates(item);
@@ -4122,8 +3995,214 @@ namespace C6.Tests
         }
 
         #endregion
+
+        #region RetainRange(T)
+
+        [Test]
+        public void ViewRetainRange_NItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
+        {
+            var index = 0;
+            var views = GetNItemViewsInTheMiddle(list);
+            foreach (var view in views) {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var retainItems = view.Skip(1).Take(view.Count - 1).ToArray();
+
+                // Act
+                view.RetainRange(retainItems);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRetainRange_OneItemViewsInTheMiddle_RightAuxViewsOffsetAffected()
+        {
+            var index = 0;
+            var views = GetOneItemViewsInTheMiddle(list);
+            foreach (var view in views) {
+                if (view.IsEmpty)
+                    continue;
+
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var retainRange = view.Skip(1).Take(view.Count - 1).ToArray();
+
+                // Act
+                view.RetainRange(retainRange);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRetainRange_ZeroItemViewsInTheMiddle_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetZeroItemViewsInTheMiddle(list);
+            foreach (var view in views) {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+
+                // Act
+                view.RetainRange(view);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRetainRange_NItemViewsInTheBeginning_RightAuxViewsOffsetAffected()
+        {
+            // Arrange
+            var index = 0;
+            var offsetLeft = auxViewLeft.Offset;
+            var offsetRight = auxViewRight.Offset;
+
+            var views = GetNItemViewsInTheBeginning(list);
+            var i = Random.Next(0, views.Length);
+            var view = views[i];
+            var retainItems = view.Skip(1).Take(view.Count - 1).ToList();
+
+            // Act // Do it on one of the views; 
+            view.RetainRange(retainItems);
+
+            // Assert    
+            Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+            Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+            Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+        }
+
+        [Test]
+        public void ViewRetainRange_OneItemViewsInTheBeginning_RightAuxViewsOffsetAffectedAndAllViewsGetEmpty()
+        {
+            // Arrange 
+            var views = GetOneItemViewsInTheBeginning(list);
+            var offsetLeft = auxViewLeft.Offset;
+            var offsetRight = auxViewRight.Offset;
+            var index = Random.Next(0, views.Length);
+            var view = views[index];
+            var retainItems = view.Skip(1).Take(view.Count - 1).ToArray();
+
+            // Act
+            // do it on one of the views; They all are one-item overlapping views                        
+            view.RetainRange(retainItems);
+
+            // Assert    
+            Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+            Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight - 1), $"view {index}");
+            foreach (var v in views) {
+                Assert.That(v, Is.Empty, $"view {index}");
+            }
+        }
+
+        [Test]
+        public void ViewRetainRange_ZeroItemViewsInTheBeginning_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetZeroItemViewsInTheBeginning(list);
+            foreach (var view in views) {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+
+                // Act
+                view.RetainRange(view);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRetainRange_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetNItemViewsAtTheEnd(list);
+            foreach (var view in views) {
+                // Arrange                       
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var retainItems = view.Skip(1).Take(view.Count - 1).ToArray();
+
+                // Act
+                view.RetainRange(retainItems);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRetainRange_OneItemViewsAtTheEnd_AuxViewsOffsetNotAffectedAndAllViewsGetEmpty()
+        {
+            // Arrange 
+            var index = 0;
+            var views = GetOneItemViewsAtTheEnd(list);
+            foreach (var view in views) {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+                var retainRange = view.Skip(1).Take(view.Count - 1).ToArray();
+
+                // Act
+                view.RetainRange(retainRange);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        [Test]
+        public void ViewRetainRange_ZeroItemViewsAtTheEnd_BothViewsOffsetNotChanged()
+        {
+            var index = 0;
+            var views = GetZeroItemViewsAtTheEnd(list);
+            foreach (var view in views) {
+                // Arrange 
+                var offsetLeft = auxViewLeft.Offset;
+                var offsetRight = auxViewRight.Offset;
+
+                // Act
+                view.RetainRange(view);
+
+                // Assert                
+                Assert.That(auxViewLeft.Offset, Is.EqualTo(offsetLeft), $"view {index}");
+                Assert.That(auxViewRight.Offset, Is.EqualTo(offsetRight), $"view {index}");
+                Assert.That(view, Is.EqualTo(list.Skip(view.Offset).Take(view.Count)).Using(ReferenceEqualityComparer), $"view {index}");
+                index++;
+            }
+        }
+
+        #endregion
+
         // How many methods ?
     }
+
 
     [TestFixture]
     public abstract class IListTests : IIndexedTests
@@ -4144,14 +4223,14 @@ namespace C6.Tests
         private static Comparable[] GetComparables(Random random, int count) => Enumerable.Range(0, count).Select(i => new Comparable(random.Next())).ToArray();
 
         private static IList<T> GetEmptyView<T>(IList<T> list)
-        {            
+        {
             var index = Random.Next(0, list.Count);
             const int count = 0;
             return list.View(index, count);
         }
 
         private static IList<T> GetView<T>(IList<T> list, int? minOffset = null, int? maxOffset = null)
-        {            
+        {
             var minValue = minOffset == null ? 0 :
                 minOffset < 0 || minOffset > list.Count - 1 ? 0 : minOffset.Value;
 
@@ -4741,8 +4820,7 @@ namespace C6.Tests
             var items = GetStrings(Random, count);
 
             // Act
-            foreach (var item in items)
-            {
+            foreach (var item in items) {
                 ((SC.IList) collection).Add(item); // TODO: Verify that items were added?
             }
 
@@ -8213,7 +8291,7 @@ namespace C6.Tests
             var view = GetView(collection);
 
             // Act
-            collection.Reverse();   
+            collection.Reverse();
 
             // Assert
             Assert.That(view.IsValid, Is.True);
@@ -8240,7 +8318,7 @@ namespace C6.Tests
         public void Reverse_View2ContainedInView1_View2IsValid()
         {
             // Arrange
-            var items = new[] {  "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+            var items = new[] { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
             var collection = GetList(items); //GetStringList(Random);
             var view2 = collection.View(3, 2);
@@ -8258,7 +8336,7 @@ namespace C6.Tests
         public void Reverse_View1AndView2Overlaping_View2NotValid()
         {
             // Arrange
-            var collection = GetStringList(Random);            
+            var collection = GetStringList(Random);
             var view2 = collection.View(2, 4); // longer           
             var view1 = collection.View(3, 4);
 
@@ -8268,7 +8346,7 @@ namespace C6.Tests
             // Assert
             Assert.That(view2.IsValid, Is.False);
         }
-        
+
         [Test]
         [Category("Unfinished")]
         [Ignore("Unfinished")]
@@ -8930,7 +9008,7 @@ namespace C6.Tests
         public void Sort_View2ContainedInView1_View2IsNotValid()
         {
             // Arrange
-            var collection = new HashedLinkedList<string>(new [] {"1", "8", "a3", "v4", "b5", "y6", "7", "8"}, SCG.EqualityComparer<string>.Default); //GetStringList(Random);
+            var collection = new HashedLinkedList<string>(new[] { "1", "8", "a3", "v4", "b5", "y6", "7", "8" }, SCG.EqualityComparer<string>.Default); //GetStringList(Random);
             var view2 = collection.View(3, 2);
             var view1 = collection.View(2, 4); // longer           
 
@@ -9693,7 +9771,7 @@ namespace C6.Tests
         public void LastViewOf_ExistingItem_IsTheSame()
         {
             // Arrange
-            var collection = new HashedLinkedList<string>(new [] {"1", "2", "3"}, SCG.EqualityComparer<string>.Default);  //GetStringList(Random);
+            var collection = new HashedLinkedList<string>(new[] { "1", "2", "3" }, SCG.EqualityComparer<string>.Default); //GetStringList(Random);
             var item = collection.Last;
 
             // Act
@@ -10316,7 +10394,7 @@ namespace C6.Tests
             Assert.That(spannedView, Is.EqualTo(expectedView).Using(ReferenceEqualityComparer));
         }
 
-        #endregion       
+        #endregion
 
         #endregion
 
@@ -10336,12 +10414,14 @@ namespace C6.Tests
             public int Value { get; }
         }
 
+
         private class Comparable : NonComparable, IComparable<NonComparable>
         {
             public Comparable(int value) : base(value) { }
             public int CompareTo(NonComparable other) => Value.CompareTo(other.Value);
         }
-    
+
+
         private readonly Comparison<NonComparable> _nonComparableComparison = (x, y) => x.Value.CompareTo(y.Value);
 
         private SCG.IComparer<NonComparable> NonComparableComparer => _nonComparableComparison.ToComparer();

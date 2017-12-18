@@ -307,7 +307,7 @@ namespace C6.Collections
 
         #endregion
 
-        private int UnderlyingCount => (Underlying ?? this).Count;
+        private int UnderlyingCount => (_underlying ?? this).Count;
 
         #region Public Methods
 
@@ -405,7 +405,8 @@ namespace C6.Collections
             var oldCount = Count;
             FixViewsBeforeRemovePrivate(0, Count); // this is time-consuming, no need?
             ClearPrivate();
-            (_underlying ?? this).RaiseForClear(oldCount);
+            //(_underlying ?? this).RaiseForClear(oldCount);
+            (_underlying ?? this).RaiseForRemoveIndexRange(Offset, oldCount);
         }
 
         public virtual bool Contains(T item) => IndexOf(item) >= 0;
@@ -794,17 +795,19 @@ namespace C6.Collections
                 return false;
             }
 
-            if (items.IsEmpty()) {
+            if (items.IsEmpty() && Underlying == null) { // proper list
                 // Optimize call, if no items should be retained
                 UpdateVersion();
-                var itemsRemoved = this; // for views ??? Use "this"
+
+                var itemsRemoved = ToArray();
                 ClearPrivate();
+
                 RaiseForRemoveAllWhere(itemsRemoved);
                 return true;
             }
 
             // TODO: Replace ArrayList<T> with more efficient data structure like HashBag<T>
-            var itemsToRemove = new ArrayList<T>(items, EqualityComparer, AllowsNull);
+            var itemsToRemove = new LinkedList<T>(items, EqualityComparer, AllowsNull);
             return RemoveAllWhere(item => !itemsToRemove.Remove(item));
         }
 
@@ -1745,6 +1748,7 @@ namespace C6.Collections
                     viewHandler.updateViewSizesAndCounts(cntRemoved, i + 1);
                 }
             }
+
             // No items were removed
             if (cntRemoved == 0) // (Count == j) 
             {

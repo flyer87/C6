@@ -437,22 +437,13 @@ namespace C6.Collections
                 return false;
             }
 
-            if (items.IsEmpty()) {
+            // proper list and empty
+            if (items.IsEmpty() && Underlying == null) { 
                 // Optimize call, if no items should be retained
                 UpdateVersion();
-
-                T[] itemsRemoved;
-                // proper list
-                if (_underlying == null) {
-                    itemsRemoved = _items;
-                    ClearPrivate();
-                }
-                else {
-                    // views                
-                    itemsRemoved = new T[Count];
-                    Array.Copy(_items, Offset, itemsRemoved, 0, Count);
-                    (_underlying ?? this).RemoveIndexRange(0, Count);
-                }
+                
+                var itemsRemoved = ToArray();
+                ClearPrivate();
 
                 RaiseForRemoveAllWhere(itemsRemoved);
                 return true;
@@ -627,7 +618,8 @@ namespace C6.Collections
             var oldCount = Count;
             FixViewsBeforeRemovePrivate(0, Count);
             ClearPrivate();
-            (_underlying ?? this).RaiseForClear(oldCount);
+            //(_underlying ?? this).RaiseForClear(oldCount);
+            (_underlying ?? this).RaiseForRemoveIndexRange(Offset, oldCount);
         }
 
         public virtual bool Contains(T item) => IndexOf(item) >= 0;
@@ -1274,8 +1266,7 @@ namespace C6.Collections
                         _items[j] = item;
                     }
                     _itemIndex[item] = j;
-                    j++; // next "free" place 
-                    //viewHandler.skipEndpoints(cntRemoved, i + 1); // TODO: not effective
+                    j++; // next "free" place                     
                 }
 
                 viewHandler.skipEndpoints(cntRemoved, i); // TODO: not effective
@@ -1297,6 +1288,9 @@ namespace C6.Collections
                 return false;
             }
 
+            // Only update version if items are actually removed
+            UpdateVersion();
+
             viewHandler.updateViewSizesAndCounts(cntRemoved, UnderlyingCount);
             // shrink the freed space
             Array.Copy(_items, Offset + Count, _items, j, UnderlyingCount - Offset - Count);
@@ -1306,11 +1300,10 @@ namespace C6.Collections
                 _underlying.Count -= cntRemoved;
             }
 
-            // Only update version if items are actually removed
-            UpdateVersion();
-
             // Clean up            
-            Array.Clear(_items, UnderlyingCount, cntRemoved); // underlyingCount != j !!!            
+            Array.Clear(_items, UnderlyingCount, cntRemoved);
+
+            ReindexPrivate(j);
 
             (_underlying ?? this).RaiseForRemoveAllWhere(itemsRemoved);
             return true;

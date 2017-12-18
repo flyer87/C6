@@ -20,7 +20,7 @@
 		"offers guarantees regarding the state of an object"	
 	- Tests
 		- iExtensible for HAL, HLL: Ensures(AllowsDuplicates ? Result<bool>() : OldValue(!this.Contains(item, EqualityComparer)));
-		- failing IsValid tests
+		//- failing IsValid tests
 		- failing volatile tests
 		- Implement the test for the remaining methods for views
 		- fluctuating tests still

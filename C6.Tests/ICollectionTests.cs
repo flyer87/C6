@@ -144,7 +144,8 @@ namespace C6.Tests
             var collection = GetStringCollection(Random);
             var count = collection.Count;
             var expectedEvents = new[] {
-                Cleared(true, count, null, collection),
+                //Cleared(true, count, null, collection),
+                Cleared(false, count, 0, collection),
                 Changed(collection),
             };
 

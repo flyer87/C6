@@ -315,8 +315,8 @@ namespace C6.Collections
                 return;
             }
 
-            var oldCount = Count;
             // Clear dict
+            var oldCount = Count;
             if (_underlying == null) {
                 _itemNode.Clear();
             }
@@ -326,10 +326,11 @@ namespace C6.Collections
                 }
             }
 
-            //clear linkedlist
+            //Clear linkedlist
             ClearPrivate();
 
-            (_underlying ?? this).RaiseForClear(oldCount);
+            //(_underlying ?? this).RaiseForClear(oldCount);
+            (_underlying ?? this).RaiseForRemoveIndexRange(Offset, oldCount);
         }
 
         public virtual bool Contains(T item) => IndexOf(item) >= 0;
@@ -644,9 +645,14 @@ namespace C6.Collections
                 return;
             }
 
-            // Version with view: View(startIndex, count).Clear();
-
             UpdateVersion();
+
+            // Version with view: 
+            View(startIndex, count).Clear();            
+
+            return;
+
+            
 
             // =====================================
             // Version with NO view:
@@ -659,7 +665,7 @@ namespace C6.Collections
                 _itemNode.Remove(cursor.item);
                 cursor = cursor.Next;
             }
-
+            
             // clean the list; ??? lines down can be replaced with RemoveFromListPrivate()
             startNode.Prev.Next = endNode.Next;
             endNode.Next.Prev = startNode.Prev;
@@ -1605,6 +1611,13 @@ namespace C6.Collections
         private void UpdateVersion(bool updateUnderlying = true)
         {
             _version++;
+            if (updateUnderlying)
+            {
+                if (_underlying != null)
+                {
+                    _underlying._version++;
+                }
+            }
         }
 
         /*private void UpdateVersion(bool updateUnderlying = true)

@@ -3,7 +3,6 @@
 
 using System;
 using System.Linq;
-using System.Collections.Generic;
 using System.Text;
 
 using C6.Collections;
@@ -27,10 +26,14 @@ namespace C6.UserGuideExamples
             //    SCG.EqualityComparer<string>.Default.GetHashCode);
 
             //var ec = CaseInsensitiveStringComparer.Default;
-            var items = new[] { "8", "Ab", "3", "4", "5", "6", "7" };            
-            var collection = new HashedLinkedList<string>(items);          
-            //var arrayList = new ArrayList<string>(items);
-            collection.Insert(0,"7");
+            var items = new[] { "8", "Ab", "4", "3", "5", "6", "7" };
+            var collection = new LinkedList<string>(items);
+            var v1 = collection.View(collection.Count - 2, 2);
+            var v2 = collection.View(collection.Count - 4, 4);
+            Console.WriteLine(v2);
+            v1.RemoveIndexRange(0, 1);
+            Console.WriteLine(v2);
+
 
             // ==============================
             // RemoveRange
@@ -126,8 +129,7 @@ namespace C6.UserGuideExamples
             var range = list.GetIndexRange(index, 4);
 
             // Print range in reverse order
-            foreach (var prime in range.Backwards())
-            {
+            foreach (var prime in range.Backwards()) {
                 Console.WriteLine(prime);
             }
 
@@ -179,8 +181,7 @@ namespace C6.UserGuideExamples
             list.Shuffle(random);
 
             // Print list using indexer
-            for (var i = 0; i < list.Count; i++)
-            {
+            for (var i = 0; i < list.Count; i++) {
                 Console.WriteLine($"{i,2}: {list[i],2}");
             }
 
