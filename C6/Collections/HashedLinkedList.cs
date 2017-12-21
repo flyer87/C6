@@ -15,7 +15,6 @@ using static C6.Speed;
 using SCG = System.Collections.Generic;
 using SC = System.Collections;
 
-
 namespace C6.Collections
 {
     public class HashedLinkedList<T> : IList<T>, IStack<T>, IQueue<T>
@@ -258,6 +257,12 @@ namespace C6.Collections
 
         public virtual bool Add(T item)
         {
+            #region Code Contracts            
+            // version is updated, if item is added
+            Ensures(!Result<bool>() || _version != OldValue(_version));
+
+            #endregion
+
             var node = new Node(item);
             if (FindOrAddToHashPrivate(item, node)) {
                 return false;
@@ -271,6 +276,8 @@ namespace C6.Collections
         public virtual bool AddRange(SCG.IEnumerable<T> items)
         {
             #region Code Contracts            
+            // If collection changes, the version is updated
+            // !@ Ensures(this.IsSameSequenceAs(OldValue((_underlying ?? this).ToArray())) || _version != OldValue(_version));
 
             #endregion
 
@@ -311,6 +318,13 @@ namespace C6.Collections
 
         public virtual void Clear()
         {
+            #region Code Contracts            
+
+            // If collection changes, the version is updated
+            Contract.Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+
+            #endregion
+
             if (Count <= 0) {
                 return;
             }
@@ -353,10 +367,6 @@ namespace C6.Collections
 
         public virtual bool Find(ref T item)
         {
-            #region Code Contracts            
-
-            #endregion
-
             // try find in hash
             Node node;
             if (!ContainsItemPrivate(item, out node)) {
@@ -369,7 +379,16 @@ namespace C6.Collections
 
         public virtual ICollectionValue<T> FindDuplicates(T item) => new Duplicates(this, item);
 
-        public virtual bool FindOrAdd(ref T item) => Find(ref item) || !Add(item);
+        public virtual bool FindOrAdd(ref T item)
+        {
+            #region Code Contracts                        
+            // If collection changes, the version is updated            
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+
+            #endregion
+
+            return Find(ref item) || !Add(item);
+        }
 
         public virtual int GetUnsequencedHashCode()
         {
@@ -389,7 +408,10 @@ namespace C6.Collections
 
         public virtual bool Remove(T item, out T removedItem)
         {
-            #region Code Contracts
+            #region Code Contracts                        
+
+            // If collection changes, the version is updated
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
             #endregion
 
@@ -415,7 +437,10 @@ namespace C6.Collections
 
         public virtual bool Remove(T item)
         {
-            #region Code Contracts
+            #region Code Contracts                        
+
+            // If collection changes, the version is updated
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
             #endregion
 
@@ -483,7 +508,9 @@ namespace C6.Collections
 
         public virtual bool Update(T item)
         {
-            #region Code Contracts
+            #region Code Contracts            
+            // If collection changes, the version is updated
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
             #endregion
 
@@ -494,6 +521,8 @@ namespace C6.Collections
         public virtual bool Update(T item, out T oldItem)
         {
             #region Code Contracts            
+            // If collection changes, the version is updated
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
             #endregion
 
@@ -512,9 +541,27 @@ namespace C6.Collections
             return true;
         }
 
-        public virtual bool UpdateOrAdd(T item) => Update(item) || !Add(item);
+        public virtual bool UpdateOrAdd(T item)
+        {
+            #region Code Contracts            
+            // If collection changes, the version is updated
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
-        public virtual bool UpdateOrAdd(T item, out T oldItem) => Update(item, out oldItem) || !Add(item);
+            #endregion
+
+            return Update(item) || !Add(item);
+        }
+
+        public virtual bool UpdateOrAdd(T item, out T oldItem)
+        {
+            #region Code Contracts            
+            // If collection changes, the version is updated
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+
+            #endregion
+
+            return Update(item, out oldItem) || !Add(item);
+        }
 
         #endregion
 
@@ -541,17 +588,13 @@ namespace C6.Collections
         public virtual bool SequencedEquals(ISequenced<T> otherCollection)
             => this.SequencedEquals(otherCollection, EqualityComparer);
 
-
         #endregion
 
         #region IIndexed
 
         public virtual int IndexOf(T item)
         {
-            #region Code Contracts
-
-            // TODO: Add contract to IList<T>.LastIndexOf
-
+            #region Code Contracts            
             Ensures(Contains(item)
                 ? 0 <= Result<int>() && Result<int>() < Count
                 : ~Result<int>() == Count);
@@ -612,14 +655,26 @@ namespace C6.Collections
             }
         }
 
-        public virtual int LastIndexOf(T item) => IndexOf(item);
+        public virtual int LastIndexOf(T item)
+        {
+            #region Code Contracts            
+            // Result is a valid index                                    
+            Ensures(Contains(item)
+                ? 0 <= Result<int>() && Result<int>() < Count
+                : ~Result<int>() == Count);
+
+            // Item at index is the first equal to item
+            Ensures(Result<int>() < 0 || !this.Skip(Result<int>() + 1).Contains(item, EqualityComparer) && EqualityComparer.Equals(item, this.ElementAt(Result<int>())));
+
+            #endregion
+
+            return IndexOf(item);
+        }
 
         public virtual T RemoveAt(int index)
         {
             #region Code Contracts
-
-            // If collection changes, the version is updated
-            //var old = OldValue(this.ToArray());            
+            // If collection changes, the version is updated                      
             Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
             #endregion
@@ -751,9 +806,7 @@ namespace C6.Collections
 
         public virtual bool IsSorted(SCG.IComparer<T> comparer) => IsSorted((comparer ?? SCG.Comparer<T>.Default).Compare);
 
-        public virtual bool IsSorted() => IsSorted(SCG.Comparer<T>.Default.Compare);
-
-        public virtual IList<T> LastViewOf(T item) => ViewOf(item); // ??? wrong 
+        public virtual bool IsSorted() => IsSorted(SCG.Comparer<T>.Default.Compare);        
 
         public virtual T RemoveFirst() => RemoveAt(0);
 
@@ -761,6 +814,14 @@ namespace C6.Collections
 
         public virtual void Reverse()
         {
+            #region Code Contracts            
+
+            // ReSharper disable InvocationIsSkipped
+            // If collection changes, the version is updated
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+            // ReSharper enable InvocationIsSkipped
+            #endregion
+
             if (Count <= 1)
                 return;
 
@@ -1006,6 +1067,7 @@ namespace C6.Collections
                 ? View(index, 1) : null;
         }
 
+        public virtual IList<T> LastViewOf(T item) => ViewOf(item);
         #endregion
 
         #region IStack<T>

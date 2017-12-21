@@ -309,7 +309,7 @@ namespace C6.Collections
         #endregion
 
         private int UnderlyingCount => (_underlying ?? this).Count;
-
+        
         #region Public Methods
 
         public override T[] ToArray()
@@ -384,9 +384,8 @@ namespace C6.Collections
         public virtual void Clear()
         {
             #region Code Contracts            
-
             // If collection changes, the version is updated
-            Contract.Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
             #endregion
 
@@ -819,7 +818,7 @@ namespace C6.Collections
             // If collection changes, the version is updated
             Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
-            // !Contained || Reversed 
+            // TODO: When Code Contracts get updated and allows OldValue(T) of enumerable
             //Ensures(ForAll(_views, v => !Contained(v) || Reversed(OldValue(DuplicateView(v)), v)) ) ;            
 
             #endregion
@@ -1011,25 +1010,13 @@ namespace C6.Collections
             view._myWeakReference = _views.Add(view);
             return view;
         }
-
-        /// <summary>
-        /// Create a list view on this list containing the (first) occurrence of a particular item.
-        /// <para>Returns <code>null</code> if the item is not in this list.</para>
-        /// </summary>
-        /// <param name="item">The item to find.</param>
-        /// <returns>The new list view.</returns>
+        
         public virtual IList<T> ViewOf(T item)
         {
             var index = IndexOf(item);
             return index < 0 ? null : View(index, 1);
         }
 
-        /// <summary>
-        /// Create a list view on this list containing the last occurrence of a particular item. 
-        /// <para>Returns <code>null</code> if the item is not in this list.</para>
-        /// </summary>
-        /// <param name="item">The item to find.</param>
-        /// <returns>The new list view.</returns>
         public virtual IList<T> LastViewOf(T item)
         {
             var index = LastIndexOf(item);

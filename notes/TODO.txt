@@ -1,23 +1,23 @@
-- RESTS:		
-	- Queue tests
-	- 8 methods		
+- RESTS:			
 	- Introduction
 	- Abstract
 	- Conclussion	
 	====
+	Prioritized:
+		- _verion ++
+		- AddRange()
+		- RemoveAt_violatesPrecondtions - failed
+		- fluctuating tests still	
+		- ToArray() in view methods; written in the report
+		- Usage examples
+		- SCG.IEnumerable<T> items -> call .toArray() in the beginning of the method;
+			- catch eventual bad enumerator somehow -> 
+				IExtensible.Requires(ForAll(items, item => true), ItemsMustBeNonNull);			
+	====
 	- The strcuture of the report is influenced by C6
-	- The rest of the tests for views (!!!!!)		
-		- Queue tests
+	- The rest of the tests for views (!!!!!)				
 		- view tests - only updating ones	
-		- Stack: Run.If() - needed
-	- HLL.Add() misses Ensure. It also should check that the result is true.
-	- SCG.IEnumerable<T> items -> call .toArray() in the beginning of the method;
-		- catch eventual bad enumerator somehow -> 
-			IExtensible.Requires(ForAll(items, item => true), ItemsMustBeNonNull);		
-	- All data structures - fix it (1)
-		- RaiseForClear -> RaiseForRemoveIndexRange		
-	- Usage examples
-	- in Unit test I mentioned that I check for toArray() or whatever ??? (1)	
+		- Stack: Run.If() - needed		
 	- Assert.Multiple() (1)	
 	- Stack and Queues - do and write it in "Implementation of data structure" (1)
 	- Run.If:
@@ -38,10 +38,7 @@
 		"offers guarantees regarding the state of an object"	
 		
 	- Tests:
-		- iExtensible for HAL, HLL: Ensures(AllowsDuplicates ? Result<bool>() : OldValue(!this.Contains(item, EqualityComparer)));		
-		- failing violate tests
-		- Implement the test for the remaining methods for views
-		- fluctuating tests still	
+		- iExtensible for HAL, HLL: Ensures(AllowsDuplicates ? Result<bool>() : OldValue(!this.Contains(item, EqualityComparer)));								
 		
 	
 - Al+HAL in array; LL + HLL in linkedlists???	
