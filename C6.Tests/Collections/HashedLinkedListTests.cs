@@ -38,7 +38,6 @@ namespace C6.Tests.Collections
             => new HashedLinkedList<T>(enumerable, equalityComparer);
     }
 
-
     public class HashedLinkedListStackTests : IStackTests
     {
         protected override bool AllowsNull => false;
@@ -50,5 +49,18 @@ namespace C6.Tests.Collections
 
         protected override IStack<T> GetStack<T>(IEnumerable<T> enumerable, bool allowsNull = false)
             => new HashedLinkedList<T>(enumerable);
+    }
+
+    public class HashedLinkedListQueueTests : IQueueTests
+    {
+        protected override bool AllowsNull => false;
+        protected override EventTypes ListenableEvents => All;
+        protected override bool IsReadOnly => false;
+
+        protected override IQueue<T> GetEmptyQueue<T>(bool allowsNull = false)
+            => new HashedLinkedList<T>();
+
+        protected override IQueue<T> GetQueue<T>(IEnumerable<T> enumerable, bool allowsNull = false)
+            => new HashedLinkedList<T>(enumerable);        
     }
 }

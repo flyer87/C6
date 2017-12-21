@@ -1016,7 +1016,7 @@ namespace C6.Collections
         #endregion
 
         #region IQueue<T>
-        public virtual T Dequeue() => RemoveLast();
+        public virtual T Dequeue() => RemoveFirst();
 
         public virtual void Enqueue(T item) => InsertLast(item);
 

@@ -227,6 +227,7 @@
     <Compile Include="Collections\HashedArrayListTests.cs" />
     <Compile Include="Collections\HashedLinkedListTests.cs" />
     <Compile Include="Collections\LinkedListTests.cs" />
+    <Compile Include="IQueueTests.cs" />
     <Compile Include="MyCollEventHolder.cs" />
     <Compile Include="ComparerFactoryTests.cs" />
     <Compile Include="Helpers\BadEnumerable.cs" />

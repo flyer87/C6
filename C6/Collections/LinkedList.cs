@@ -268,6 +268,7 @@ namespace C6.Collections
             #endregion
 
             InsertPrivate(Count, _endSentinel, item);
+
             (_underlying ?? this).RaiseForAdd(item);
             return true;
         }
@@ -954,9 +955,9 @@ namespace C6.Collections
 
         #region IQueue<T>
 
-        public virtual T Dequeue() => RemoveLast();
+        public virtual T Dequeue() => RemoveFirst();
 
-        public virtual void Enqueue(T item) => InsertFirst(item);
+        public virtual void Enqueue(T item) => InsertLast(item);
 
         #endregion
 

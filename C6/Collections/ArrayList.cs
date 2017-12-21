@@ -9,6 +9,7 @@ using System.Linq;
 using C6.Contracts;
 
 using static System.Diagnostics.Contracts.Contract;
+//using System.Diagnostics.Contracts;
 
 using static C6.Collections.ExceptionMessages;
 using static C6.Contracts.ContractMessage;
@@ -329,7 +330,7 @@ namespace C6.Collections
 
             InsertPrivate(Count, item);
             (_underlying ?? this).RaiseForAdd(item);
-            // InvalidateCollectionValuesPrivate();
+            
             return true;
         }
 
@@ -385,7 +386,7 @@ namespace C6.Collections
             #region Code Contracts            
 
             // If collection changes, the version is updated
-            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+            Contract.Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
             #endregion
 

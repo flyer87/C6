@@ -234,7 +234,7 @@ namespace C6.Collections
 
         public bool IsEmpty => Count == 0; // to base:virtual
 
-        public T Choose() => _items[Offset]; //to_base: virtual // Count - 1
+        public T Choose() => _items[Offset];
 
         #endregion
 
@@ -932,7 +932,7 @@ namespace C6.Collections
 
             UpdateVersion();
 
-            //Array.Reverse(_items, Offset, Count);
+            //Array.Reverse(_items, Offset, Count); // Why ???
             for (int i = 0, length = Count / 2, end = Offset + Count - 1; i < length; i++) {
                 var swap = _items[Offset + i];
 
@@ -1409,13 +1409,14 @@ namespace C6.Collections
                 return;
             }
 
-            foreach (HashedArrayList<T> view in _views) {
-                if (view != this) {
-                    if (view.Offset <= realRemovalIndex && realRemovalIndex < view.Offset + view.Count)
-                        view.Count--;
-                    if (view.Offset > realRemovalIndex)
-                        view.Offset--;
+            foreach (var view in _views) {
+                if (view == this) {
+                    continue;
                 }
+                if (view.Offset <= realRemovalIndex && realRemovalIndex < view.Offset + view.Count)
+                    view.Count--;
+                if (view.Offset > realRemovalIndex)
+                    view.Offset--;
             }
         }
 

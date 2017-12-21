@@ -401,22 +401,6 @@ namespace C6.Tests
         }
 
         [Test]
-        public void Push_ManyItems_Equal()
-        {
-            // Arrange
-            var collection = GetEmptyStack<string>();
-            var items = GetStrings(Random, Random.Next(100, 250));
-
-            // Act
-            foreach (var item in items) {
-                collection.Push(item);
-            }
-
-            // Assert
-            Assert.That(collection, Is.EqualTo(items).Using(ReferenceEqualityComparer));
-        }
-
-        [Test]
         public void Push_RandomCollectionPush_RaisesExpectedEvents()
         {
             // Arrange
@@ -430,6 +414,22 @@ namespace C6.Tests
 
             // Act & Assert
             Assert.That(() => collection.Push(item), Raises(expectedEvents).For(collection));
+        }
+
+        [Test]
+        public void Push_ManyItems_Equal()
+        {
+            // Arrange
+            var collection = GetEmptyStack<string>();
+            var items = GetStrings(Random, Random.Next(100, 250));
+
+            // Act
+            foreach (var item in items) {
+                collection.Push(item);
+            }
+
+            // Assert
+            Assert.That(collection, Is.EqualTo(items).Using(ReferenceEqualityComparer));
         }
 
         [Test]

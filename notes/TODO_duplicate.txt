@@ -1,6 +1,12 @@
 - RESTS:	
 	//- documentation - fix the small issues.
 	- The rest of the tests for views (1)
+	//- Fill Code Contracts - re-rea
+	//- Add Code Contracts helped me with ...
+		- minuses  
+			preconditions can not be hardened, extended
+		- pluses
+			more...
 	//- C6 -> C6 Cont
 	- ??? Stack and Queues - do and write it in "Implementation of data structure"
 	- in Unit test I mettion that I check for toArray() or whatever ???

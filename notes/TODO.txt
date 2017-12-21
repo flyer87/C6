@@ -1,31 +1,45 @@
 - RESTS:		
-	- The rest of the tests for views (!!!!!)
-		- Constructor tests 
+	- Queue tests
+	- 8 methods		
+	- Introduction
+	- Abstract
+	- Conclussion	
+	====
+	- The strcuture of the report is influenced by C6
+	- The rest of the tests for views (!!!!!)		
 		- Queue tests
-	- Stack and Queues - do and write it in "Implementation of data structure" (1)
-	- in Unit test I mentioned that I check for toArray() or whatever ??? (1)	
-	- Assert.Multiple() (1)	
-	- Run.If:
-		- public void ItemGet_RandomCollectionWithNull_Null()
-	- version question, Peter
+		- view tests - only updating ones	
+		- Stack: Run.If() - needed
+	- HLL.Add() misses Ensure. It also should check that the result is true.
 	- SCG.IEnumerable<T> items -> call .toArray() in the beginning of the method;
 		- catch eventual bad enumerator somehow -> 
-			IExtensible.Requires(ForAll(items, item => true), ItemsMustBeNonNull);
+			IExtensible.Requires(ForAll(items, item => true), ItemsMustBeNonNull);		
+	- All data structures - fix it (1)
+		- RaiseForClear -> RaiseForRemoveIndexRange		
+	- Usage examples
+	- in Unit test I mentioned that I check for toArray() or whatever ??? (1)	
+	- Assert.Multiple() (1)	
+	- Stack and Queues - do and write it in "Implementation of data structure" (1)
+	- Run.If:
+		- public void ItemGet_RandomCollectionWithNull_Null()
+	- version question, Peter	
 	- LL.ClearPrivate()
 		- UpdateVersion() - naeaeaeh. Move it up ?!
-	- All data structures
-		- RaiseForClear -> RaiseForRemoveIndexRange
 	- Code Contracts 
 		- only in the private methods ???
 		- look at private methods and try to add pre-conditions			
 			- additional postconditions: look at Mikkel's implementations.				
 		- C. contracts warned me for what?
+			Before tests to fail Code Contracts failed (!!!!!!!!!!!!!!!!!!!!!!)
+				- View enumerator.Skip.take and bam!
+				- HAL... => [Offset]; it was HAL... =>[0]
+				- There were cases when the Code Contracts passed, but the test failed. This is the case with view, where there are many aspects to check and missed some of them.
 		- HLL: tag invarinats
 		"offers guarantees regarding the state of an object"	
 		
 	- Tests:
 		- iExtensible for HAL, HLL: Ensures(AllowsDuplicates ? Result<bool>() : OldValue(!this.Contains(item, EqualityComparer)));		
-		- failing volatile tests
+		- failing violate tests
 		- Implement the test for the remaining methods for views
 		- fluctuating tests still	
 		
