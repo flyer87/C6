@@ -28,7 +28,9 @@ namespace C6.UserGuideExamples
             //var ec = CaseInsensitiveStringComparer.Default;
             var items = new[] { "8", "Ab", "4", "3", "5", "6", "7" };
             var collection = new LinkedList<string>(items, allowsNull: true);
-            collection.Enqueue(null);
+            var coll2 = new ArrayList<string>(collection, allowsNull: true);
+            coll2.Push(null);
+                        
 
             // ==============================
             // RemoveRange

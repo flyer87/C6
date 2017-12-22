@@ -148,17 +148,7 @@ namespace C6.Collections
         public LinkedList(SCG.IEnumerable<T> items, SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
             : this(equalityComparer, allowsNull)
         {
-            #region Code Contracts
-
-            // ReSharper disable InvocationIsSkipped
-            // Argument must be non-null
-            Requires(items != null, ArgumentMustBeNonNull);
-
-            // ReSharper enable InvocationIsSkipped
-
-            #endregion
-
-            AddRange(items); // ??? do we need it
+            AddRange(items);
         }
 
         #endregion
@@ -275,9 +265,8 @@ namespace C6.Collections
         public virtual bool AddRange(SCG.IEnumerable<T> items)
         {
             #region Code Contracts            
-
             // If collection changes, the version is updated
-            // !@ Ensures(this.IsSameSequenceAs(OldValue((_underlying ?? this).ToArray())) || _version != OldValue(_version));
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
             #endregion
 

@@ -120,36 +120,30 @@ namespace C6.Collections
             // ReSharper enable InvocationIsSkipped
 
             #endregion
-
-            // allowsNull = false - by default !
+            
             IsValid = true;
-            EqualityComparer = equalityComparer ?? SCG.EqualityComparer<T>.Default;
+            EqualityComparer = equalityComparer ?? SCG.EqualityComparer<T>.Default;            
 
             //var collectionValues = items as ICollectionValue<T>;
             //var collection = items as SCG.ICollection<T>;
 
-            //if (collectionValues != null) 
-            //{
+            //if (collectionValues != null) {
             //    _items = collectionValues.IsEmpty ? EmptyArray : collectionValues.ToArray();
-            //    _itemIndex = 
-            //    Count = collectionValues.Count;
+            //    Count = Capacity;
             //}
-            //else if (collection != null)
-            //{
+            //else if (collection != null) {
             //    Count = collection.Count;
-            //    _items = Count == 0 ? EmptyArray : new T[Count];
-            //    _itemIndex = null;
+            //    _items = Count == 0 ? EmptyArray : new T[Count];                
             //    collection.CopyTo(_items, 0);
             //}
-            //else
-            //{
-            _items = EmptyArray;
-            _itemIndex = new SCG.Dictionary<T, int>(equalityComparer ?? SCG.EqualityComparer<T>.Default); // EqualityComparer as paramter ??
-            AddRange(items); // ??? do we need it
+            //else {
+                _items = EmptyArray;
+                _itemIndex = new SCG.Dictionary<T, int>(EqualityComparer); // EqualityComparer as paramter ??               
+                AddRange(items); 
             //}
         }
 
-        public HashedArrayList(int capacity = 0, SCG.IEqualityComparer<T> equalityComparer = null) // why 0 ???
+        public HashedArrayList(int capacity = 0, SCG.IEqualityComparer<T> equalityComparer = null)
         {
             #region Code Contracts            
 
@@ -348,7 +342,7 @@ namespace C6.Collections
             #region Code Contracts
 
             // The version is updated            
-            // Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
             #endregion
 
@@ -1089,7 +1083,7 @@ namespace C6.Collections
 
         public virtual T Pop() => RemoveLast();
 
-        public virtual void Push(T item) => Add(item);
+        public virtual void Push(T item) => InsertLast(item);
 
         #endregion
 

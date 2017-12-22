@@ -5,7 +5,7 @@
 	====
 	Prioritized:
 		- _verion ++
-		- AddRange()
+		//- AddRange()
 		- RemoveAt_violatesPrecondtions - failed
 		- fluctuating tests still	
 		- ToArray() in view methods; written in the report
@@ -13,6 +13,7 @@
 		- SCG.IEnumerable<T> items -> call .toArray() in the beginning of the method;
 			- catch eventual bad enumerator somehow -> 
 				IExtensible.Requires(ForAll(items, item => true), ItemsMustBeNonNull);			
+		- documentation
 	====
 	- The strcuture of the report is influenced by C6
 	- The rest of the tests for views (!!!!!)				

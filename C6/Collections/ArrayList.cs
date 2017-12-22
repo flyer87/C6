@@ -157,13 +157,11 @@ namespace C6.Collections
 
             var collectionValue = items as ICollectionValue<T>;
             var collection = items as SCG.ICollection<T>;
-
-            // Use ToArray() for ICollectionValue<T>
+            
             if (collectionValue != null) {
                 _items = collectionValue.IsEmpty ? EmptyArray : collectionValue.ToArray();
                 Count = Capacity;
-            }
-            // Use CopyTo() for ICollection<T>
+            }            
             else if (collection != null) {
                 Count = collection.Count;
                 _items = Count == 0 ? EmptyArray : new T[Count];
@@ -352,10 +350,10 @@ namespace C6.Collections
         public virtual bool AddRange(SCG.IEnumerable<T> items)
         {
             #region Code Contracts            
-
+            // ReSharper disable InvocationIsSkipped
             // If collection changes, the version is updated
-            // !@ Ensures(this.IsSameSequenceAs(OldValue((_underlying ?? this).ToArray())) || _version != OldValue(_version));
-
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+            // ReSharper enable InvocationIsSkipped
             #endregion
 
             // TODO: Handle ICollectionValue<T> and ICollection<T>
@@ -846,7 +844,6 @@ namespace C6.Collections
         public virtual void Shuffle(Random random)
         {
             #region Code Contracts                        
-
             // ReSharper disable InvocationIsSkipped
 
             // If collection changes, the version is updated

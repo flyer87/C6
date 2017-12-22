@@ -277,7 +277,7 @@ namespace C6.Collections
         {
             #region Code Contracts            
             // If collection changes, the version is updated
-            // !@ Ensures(this.IsSameSequenceAs(OldValue((_underlying ?? this).ToArray())) || _version != OldValue(_version));
+            Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
             #endregion
 
