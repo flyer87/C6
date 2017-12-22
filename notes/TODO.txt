@@ -3,17 +3,21 @@
 	- Abstract
 	- Conclussion	
 	====
-	Prioritized:
-		- _verion ++
-		//- AddRange()
-		- RemoveAt_violatesPrecondtions - failed
-		- fluctuating tests still	
-		- ToArray() in view methods; written in the report
-		- Usage examples
+	Prioritized:		
 		- SCG.IEnumerable<T> items -> call .toArray() in the beginning of the method;
 			- catch eventual bad enumerator somehow -> 
-				IExtensible.Requires(ForAll(items, item => true), ItemsMustBeNonNull);			
+				IExtensible.Requires(ForAll(items, item => true), ItemsMustBeNonNull);
+		- ToArray() in view methods; written in the report
+		- _version ++				
+		- fluctuating tests still				
+			
 		- documentation
+		//- AddRange()
+		//- RemoveAt_violatesPrecondtions - failed
+			IList.RemoveAt(int), normally no preconditions allowed, but it is new in IList
+			Added the preconditions, it worked.
+		// User examples
+	
 	====
 	- The strcuture of the report is influenced by C6
 	- The rest of the tests for views (!!!!!)				

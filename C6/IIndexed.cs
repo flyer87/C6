@@ -317,8 +317,7 @@ namespace C6
             Requires(index < Count, ArgumentMustBeWithinBounds);
 
 
-            // Result is the item previously at the specified index
-            // !@ 
+            // Result is the item previously at the specified index            
             Ensures(Result<T>().IsSameAs(OldValue(this[index])));
 
             // Only the item at index is removed
@@ -329,7 +328,6 @@ namespace C6
 
             // Removing an item decreases the count by one
             Ensures(Count == OldValue(Count) - 1);
-
 
             return default(T);
         }

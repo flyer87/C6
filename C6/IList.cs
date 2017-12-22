@@ -1592,13 +1592,33 @@ namespace C6
             return default(bool);
         }
 
-        public T RemoveAt(int index)
+        public T RemoveAt(int index) //
         {
-            // No additional preconditions allowed
+            // is Valid, not disposed
+            Requires(IsValid);
+
+            // Collection must be non-read-only
+            Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
+
+            // Collection must be non-fixed-sized
+            Requires(!IsFixedSize, CollectionMustBeNonFixedSize);
+
+            // Argument must be within bounds (collection must be non-empty)
+            Requires(0 <= index, ArgumentMustBeWithinBounds);
+            Requires(index < Count, ArgumentMustBeWithinBounds);
 
 
-            // No postconditions
+            // Result is the item previously at the specified index            
+            Ensures(Result<T>().IsSameAs(OldValue(this[index])));
 
+            // Only the item at index is removed
+            Ensures(this.IsSameSequenceAs(OldValue(this.SkipIndex(index).ToList())));
+
+            // Result is non-null
+            Ensures(AllowsNull || Result<T>() != null);
+
+            // Removing an item decreases the count by one
+            Ensures(Count == OldValue(Count) - 1);            
 
             return default(T);
         }

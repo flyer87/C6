@@ -697,7 +697,8 @@ namespace C6.Tests
             // Act & Assert
             var views = GetZeroItemViewsInTheMiddle(list);
             foreach (var view in views) {
-                Assert.That(() => view.RemoveAt(0), Violates.PreconditionSaying(ArgumentMustBeWithinBounds));
+                //Assert.That(() => view.RemoveAt(0), Violates.PreconditionSaying(ArgumentMustBeWithinBounds));
+                Assert.That(() => view.RemoveAt(0), Violates.Precondition);
             }
         }
 

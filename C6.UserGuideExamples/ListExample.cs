@@ -3,14 +3,8 @@
 
 using System;
 using System.Linq;
-using System.Text;
 
 using C6.Collections;
-using C6.Contracts;
-using C6.Tests;
-
-using static C6.Contracts.ContractMessage;
-
 
 using SCG = System.Collections.Generic;
 using SC = System.Collections;
@@ -20,7 +14,7 @@ namespace C6.UserGuideExamples
 {
     public class ListExample
     {
-        public static void Main()
+        public void Main()
         {
             //var eq = new C6.ComparerFactory.EqualityComparer<string>(ReferenceEquals,
             //    SCG.EqualityComparer<string>.Default.GetHashCode);
