@@ -57,9 +57,9 @@ namespace C6.Collections
 
         // new 
         private ArrayList<T> _underlying;
-
+        
         private WeakViewList<ArrayList<T>> _views;
-        private WeakViewList<CollectionValueBase<T>> _collValues = new WeakViewList<CollectionValueBase<T>>(); // Why CollectionValueBase, but not ICollectionValue
+        //private WeakViewList<CollectionValueBase<T>> _collValues = new WeakViewList<CollectionValueBase<T>>(); // Why CollectionValueBase, but not ICollectionValue
         private WeakViewList<ArrayList<T>>.Node _myWeakReference;
         //private int _offsetField;
         //private int _size;
@@ -139,6 +139,7 @@ namespace C6.Collections
 
             // Argument must be non-null
             Requires(items != null, ArgumentMustBeNonNull);
+
 
             // All items must be non-null if collection disallows null values
             Requires(allowsNull || ForAll(items, item => item != null), ItemsMustBeNonNull);
@@ -351,6 +352,7 @@ namespace C6.Collections
         {
             #region Code Contracts            
             // ReSharper disable InvocationIsSkipped
+
             // If collection changes, the version is updated
             Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
             // ReSharper enable InvocationIsSkipped
@@ -361,6 +363,7 @@ namespace C6.Collections
             // TODO: Avoid creating an array? Requires a lot of extra code, since we need to properly handle items already added from a bad enumerable
             // A bad enumerator will throw an exception here            
             var array = items.ToArray();
+
             if (array.IsEmpty()) {
                 return false;
             }
@@ -457,7 +460,7 @@ namespace C6.Collections
         public virtual ICollectionValue<T> FindDuplicates(T item)
         {
             var duplicates = new Duplicates(this, item);
-            _collValues.Add(duplicates); // ???  so far, no. Intsead of UpdateVersi() _collValues could be used, but ...
+            //_collValues.Add(duplicates); // ???  so far, no. Intsead of UpdateVersi() _collValues could be used, but ...
 
             return duplicates;
         }

@@ -36,6 +36,6 @@ namespace C6.Contracts
         // View
         public static string MustBeValid => "The list or view must be valid";
         public static string NotAView => "Not a view";
-        public static string UnderlyingListMustBeTheSame = "The underlying list must be the same";
+        public static string UnderlyingListMustBeTheSame = "The underlying list must be the same";        
     }
 }

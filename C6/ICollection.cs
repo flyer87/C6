@@ -1302,7 +1302,7 @@ namespace C6
             Requires(!IsFixedSize, CollectionMustBeNonFixedSize);
 
             // Argument must be non-null
-            Requires(items != null, ArgumentMustBeNonNull);
+            Requires(items != null, ArgumentMustBeNonNull);            
 
             // All items must be non-null if collection disallows null values
             Requires(AllowsNull || ForAll(items, item => item != null), ItemsMustBeNonNull);

@@ -850,6 +850,9 @@ namespace C6
             // Result's Count is equal to count
             Ensures(Result<IList<T>>().Count == count);
 
+            // ToArray() is the same as taking count items starting from index
+            Ensures(Result<IList<T>>().ToArray().IsSameSequenceAs(this.Skip(index).Take(count)));
+
             // Result's IsFixedSize is the same as this's
             Ensures(Result<IList<T>>().IsFixedSize == IsFixedSize);
 
@@ -908,6 +911,10 @@ namespace C6
             // Result's Count is equal to count
             Ensures(Result<IList<T>>() == null || Result<IList<T>>().Count == 1);
 
+            // ToArray() is the same as taking the first item equal to item(argument)
+            Ensures(Result<IList<T>>() == null || 
+                Result<IList<T>>().ToArray().First().IsSameAs(this.First(x => x.Equals(item))));
+
             // Result's IsFixedSize is the same as this's
             Ensures(Result<IList<T>>() == null || Result<IList<T>>().IsFixedSize == IsFixedSize);
 
@@ -965,6 +972,10 @@ namespace C6
 
             // Result's Count is equal to count
             Ensures(Result<IList<T>>() == null || Result<IList<T>>().Count == 1);
+
+            // ToArray is the same as skipping last inddex items and taking the next one.
+            Ensures(Result<IList<T>>() == null ||  
+                Result<IList<T>>().ToArray().IsSameSequenceAs(this.Skip(this.LastIndexOf(item)).Take(1).ToList()));
 
             // Result's IsFixedSize is the same as this's
             Ensures(Result<IList<T>>() == null || Result<IList<T>>().IsFixedSize == IsFixedSize);
@@ -1308,6 +1319,10 @@ namespace C6
 
             // Result's Count is equal to the end of the other view minus this's Offset
             Ensures(Result<IList<T>>() == null || Result<IList<T>>().Count == otherView.Offset + otherView.Count - Offset);
+
+            // ToArray() is the same as the items beteween the left endpoint of this and right endpoint of otherView.
+            Ensures(Result<IList<T>>() == null ||
+                    Result<IList<T>>().IsSameSequenceAs(Underlying.Skip(Offset).Take(otherView.Offset + otherView.Count - Offset)));
 
             // Result's IsFixedSize is the same as this's
             Ensures(Result<IList<T>>() == null || Result<IList<T>>().IsFixedSize == IsFixedSize);

@@ -3,23 +3,30 @@
 	- Abstract
 	- Conclussion	
 	====
+	SCG.IEnumerable<T> items
 	Prioritized:		
-		- SCG.IEnumerable<T> items -> call .toArray() in the beginning of the method;
-			- catch eventual bad enumerator somehow -> 
-				IExtensible.Requires(ForAll(items, item => true), ItemsMustBeNonNull);
-		- ToArray() in view methods; written in the report
+
+		// no! - write about: RemoveAt_violatesPrecondtions, isGoodEnuerable()
+		//- ToArray() in view methods; written in the report
+		
 		- _version ++				
-		- fluctuating tests still				
-			
+		- fluctuating tests still							
 		- documentation
+		- fill: Conclusion
+		
+		Nedelya:
+		- re-read the project
+		- small  staff in .cs files with ??
 		//- AddRange()
 		//- RemoveAt_violatesPrecondtions - failed
 			IList.RemoveAt(int), normally no preconditions allowed, but it is new in IList
 			Added the preconditions, it worked.
-		// User examples
+		// User examples		
+		// 		- SCG.IEnumerable<T> items -> call .toArray() in the beginning of the method;
+				isGoodEnuerable() added, KEEP iT! Update the tests (their names + violate precondition, instead of throws exception).
 	
 	====
-	- The strcuture of the report is influenced by C6
+	- The structure of the report is influenced by C6
 	- The rest of the tests for views (!!!!!)				
 		- view tests - only updating ones	
 		- Stack: Run.If() - needed		

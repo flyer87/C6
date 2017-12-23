@@ -145,9 +145,16 @@ namespace C6.Collections
 
         public HashedArrayList(int capacity = 0, SCG.IEqualityComparer<T> equalityComparer = null)
         {
-            #region Code Contracts            
+            #region Code Contracts                       
 
-            Requires(capacity >= 0, ArgumentMustBeNonNegative);
+            // ReSharper disable InvocationIsSkipped
+
+            // Argument must be non-negative
+            Requires(0 <= capacity, ArgumentMustBeNonNegative);
+
+            // ReSharper restore InvocationIsSkipped            
+
+            
 
             #endregion
 

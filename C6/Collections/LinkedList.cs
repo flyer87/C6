@@ -135,6 +135,17 @@ namespace C6.Collections
 
         public LinkedList(SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
         {
+            #region Code Contracts
+
+            // ReSharper disable InvocationIsSkipped
+
+            // Value types cannot be null
+            Requires(!typeof(T).IsValueType || !allowsNull, AllowsNullMustBeFalseForValueTypes);
+
+            // ReSharper restore InvocationIsSkipped
+
+            #endregion
+
             IsValid = true;
             EqualityComparer = equalityComparer ?? SCG.EqualityComparer<T>.Default;
             AllowsNull = allowsNull;
@@ -148,6 +159,20 @@ namespace C6.Collections
         public LinkedList(SCG.IEnumerable<T> items, SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
             : this(equalityComparer, allowsNull)
         {
+            #region Code Contracts
+            // ReSharper disable InvocationIsSkipped
+            // Argument must be non-null
+            Requires(items != null, ArgumentMustBeNonNull);
+
+            // All items must be non-null if collection disallows null values
+            Requires(allowsNull || ForAll(items, item => item != null), ItemsMustBeNonNull);
+
+            // Value types cannot be null
+            Requires(!typeof(T).IsValueType || !allowsNull, AllowsNullMustBeFalseForValueTypes);
+
+            // ReSharper restore InvocationIsSkipped
+            #endregion
+
             AddRange(items);
         }
 

@@ -144,6 +144,16 @@ namespace C6.Collections
         public HashedLinkedList(SCG.IEnumerable<T> items, SCG.IEqualityComparer<T> equalityComparer = null) :
             this(equalityComparer)
         {
+            #region Code Contracts
+
+            // ReSharper disable InvocationIsSkipped
+
+            // Argument must be non-null
+            Requires(items != null, ArgumentMustBeNonNull);
+
+            // ReSharper restore InvocationIsSkipped
+            #endregion
+
             AddRange(items);
         }
 

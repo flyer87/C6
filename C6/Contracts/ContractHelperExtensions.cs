@@ -104,8 +104,7 @@ namespace C6.Contracts
         {
             #region Code Contracts
 
-            // first remains unchanged
-            // !@ 
+            // first remains unchanged            
             Ensures(first == null || first.IsSameSequenceAs(OldValue(first.ToList())));
 
             // second remains unchanged

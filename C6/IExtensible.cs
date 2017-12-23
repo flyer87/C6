@@ -304,19 +304,17 @@ namespace C6
             Requires(!IsFixedSize, CollectionMustBeNonFixedSize);
 
             // Argument must be non-null
-            Requires(items != null, ArgumentMustBeNonNull);
+            Requires(items != null, ArgumentMustBeNonNull);            
 
             // All items must be non-null if collection disallows null values
-            Requires(AllowsNull || ForAll(items, item => item != null), ItemsMustBeNonNull);
-            //Requires(ForAll(items, item => true), ItemsMustBeNonNull);
+            Requires(AllowsNull || ForAll(items, item => item != null), ItemsMustBeNonNull);            
 
 
             // The collection becomes non-empty, if items are non-empty
             Ensures(items.IsEmpty() || !IsEmpty);
 
             // The collection will contain the items added            
-            Ensures(ForAll(items, item => this.Contains(item, EqualityComparer))); 
-            // XXX when range added to a view .this means View, but we can't say it here run ForAll for the underlying/proper list
+            Ensures(ForAll(items, item => this.Contains(item, EqualityComparer)));             
 
             // If items were added, the count increases; otherwise it stays the same
             Ensures(Result<bool>() ? Count > OldValue(Count) : Count == OldValue(Count));

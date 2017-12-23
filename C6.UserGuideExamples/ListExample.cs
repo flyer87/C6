@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 
 using C6.Collections;
+using C6.Tests.Helpers;
 
 using SCG = System.Collections.Generic;
 using SC = System.Collections;
@@ -14,17 +15,25 @@ namespace C6.UserGuideExamples
 {
     public class ListExample
     {
-        public void Main()
+        public static void Main()
         {
             //var eq = new C6.ComparerFactory.EqualityComparer<string>(ReferenceEquals,
             //    SCG.EqualityComparer<string>.Default.GetHashCode);
 
-            //var ec = CaseInsensitiveStringComparer.Default;
             var items = new[] { "8", "Ab", "4", "3", "5", "6", "7" };
-            var collection = new LinkedList<string>(items, allowsNull: true);
-            var coll2 = new ArrayList<string>(collection, allowsNull: true);
-            coll2.Push(null);
-                        
+            ArrayList<string> collection = new ArrayList<string>(items, allowsNull: true);
+            var r = new[] { "3", "4" };
+            var rng = new ArrayList<string>(r).AsBadEnumerable();
+
+
+            var view = collection.View(0, 2);
+            Console.WriteLine(view);
+
+
+
+
+
+
 
             // ==============================
             // RemoveRange
