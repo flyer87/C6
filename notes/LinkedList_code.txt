@@ -88,6 +88,28 @@ Complex methods:
 
 ================
 Thesis notes:	
+	view.Sort() changes the endSentinel of the previous and the next view (they get 1 more item)
+	Code:
+		var items = new[] { "-8", "Ab", "6", "-4", "5", "-2", "7", "1", "10", "8" };
+		var collection = new LinkedList<string>(items);
+		//collection.AddAll(items);
+		var v0 = collection.View(0, 2);
+		var vCount2 = collection.View(collection.Count - 2, 2);
+		var v2 = collection.View(2, 2);
+		var v4 = collection.View(4, 2);
+		var v6 = collection.View(6, 2);
+
+		v2.Sort();
+
+		Console.WriteLine($"v0 = {v0}; Count = {v0.Count}; Offset = {v0.Offset}");
+		Console.WriteLine($"v2 = {v2}");            
+		Console.WriteLine($"v4 = {v4}; Count = {v4.Count}; Offset = {v4.Offset}");
+		foreach (var item in v4) {
+			Console.WriteLine(item);
+		}
+
+		Console.WriteLine($"v6 = {v6}");
+		Console.WriteLine($"vCount2 = {vCount2}");
 	//it was: private void raiseForInsertAll(Node node, int i, int added, bool insertion)
 	//	now: private void RaiseForAddRange(SCG.IEnumerable<T> items)
 	//- get -> getNodeAtPrivate

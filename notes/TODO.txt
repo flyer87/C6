@@ -8,23 +8,26 @@
 
 		// no! - write about: RemoveAt_violatesPrecondtions, isGoodEnuerable()
 		//- ToArray() in view methods; written in the report
-		
-		- _version ++				
-		- fluctuating tests still							
+								
 		//- documentation
-		- fill: Conclusion
-		
-		Nedelya:
-		- re-read the project
+		//- fill: Conclusion
+		Nedelya:				
+		- fluctuating tests still	
+		- re-read the project - Microsoft's code contracts.
 		- small  staff in .cs files with ??
+		- _version ++				
 		//- AddRange()
+		// User examples		
+		// 		- SCG.IEnumerable<T> items -> call .toArray() in the beginning of the method;
+				isGoodEnuerable() added, KEEP IT! Update the tests (their names + violate precondition, instead of throws exception).
+	=========
+	Writing:
+		overlapping nitem views or what.
 		//- RemoveAt_violatesPrecondtions - failed
 			IList.RemoveAt(int), normally no preconditions allowed, but it is new in IList
 			Added the preconditions, it worked.
-		// User examples		
-		// 		- SCG.IEnumerable<T> items -> call .toArray() in the beginning of the method;
-				isGoodEnuerable() added, KEEP iT! Update the tests (their names + violate precondition, instead of throws exception).
-	
+		- Sort fails for LL and HLL
+		
 	====
 	- The structure of the report is influenced by C6
 	- The rest of the tests for views (!!!!!)				

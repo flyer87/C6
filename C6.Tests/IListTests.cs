@@ -2168,13 +2168,13 @@ namespace C6.Tests
         #region Sort()
 
         [Test]
+        // TODO: For LinkedList<T> and HashedLinkedList<T> might fail until Sort() is fixed!
         public void ViewSort_NItemViewsInTheMiddle_BothViewsOffsetNotChanged()
         {
             var index = 0;
             var views = GetNItemViewsInTheMiddle(list);
-
-            var v2 = views.Take(2).ToList();
-            foreach (var view in v2) {
+            
+            foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
@@ -2361,6 +2361,27 @@ namespace C6.Tests
                 index++;
             }
         }
+
+        [Test]
+        // TODO: For LinkedList<T> and HashedLinkedList<T> might fail until Sort() is fixed!
+        public void Sort_NonOverlappingNeighbourViews_Corect()
+        {
+            // Arrange
+            var items = GetUppercaseStrings(Random);
+            var collection = GetList(items);
+
+            var view1  = collection.View(0, Random.Next(1, collection.Count - 1));
+            var view1RightEndPoint = view1.Offset + view1.Count;
+            var view2 = collection.View(view1RightEndPoint, Random.Next(1, collection.Count - view1RightEndPoint));
+            var view2Old = GetList(view2);
+
+            // Act
+            view1.Sort();
+
+            // Assert
+            Assert.That(view2, Is.EqualTo(view2Old));
+        }
+        
 
         #endregion
 

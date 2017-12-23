@@ -1189,8 +1189,18 @@ namespace C6.Collections
 
         SC.IEnumerator SC.IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public SCG.IEnumerator<T> GetEnumerator() // overrides valuebase 
+        public virtual SCG.IEnumerator<T> GetEnumerator() // overrides valuebase 
         {
+            #region Code Contracts   
+            
+            // Must be valid
+            Requires(IsValid, MustBeValid);                        
+
+            // The version is not updated
+            Ensures(_version == OldValue(_version));
+
+            #endregion
+
             // var version = (_underlying ?? this)._version; // ??? underlying !!!
             var version = _version;
 
@@ -1705,18 +1715,6 @@ namespace C6.Collections
                 }
             }
         }
-
-        /*private void UpdateVersion(bool updateUnderlying = true)
-        {
-            _version++;
-            //if (updateUnderlying)
-            //{
-            //    if (_underlying != null)
-            //    {
-            //        _underlying._version++;
-            //    }
-            //}
-        }*/
 
         private void InsertNodeBeforePrivate(bool updateViews, Node succ, Node node) // ??? updateViews
         {

@@ -1084,7 +1084,19 @@ namespace C6.Collections
 
         public SCG.IEnumerator<T> GetEnumerator() // overrides valuebase 
         {
-            var version = _version; //_underlying?._version ?? _version; 
+            #region Code Contracts   
+            // ReSharper disable InvocationIsSkipped
+
+            // Must be valid
+            Requires(IsValid, MustBeValid);
+
+            // The version is not updated
+            Ensures(_version == OldValue(_version));
+
+            // ReSharper enable InvocationIsSkipped
+            #endregion
+
+            var version = _version; //_underlying?._version ?? _version; HERE!
 
             var cursor = _startSentinel.Next;
             while (cursor != _endSentinel && CheckVersion(version)) {

@@ -20,14 +20,30 @@ namespace C6.UserGuideExamples
             //var eq = new C6.ComparerFactory.EqualityComparer<string>(ReferenceEquals,
             //    SCG.EqualityComparer<string>.Default.GetHashCode);
 
-            var items = new[] { "8", "Ab", "4", "3", "5", "6", "7" };
-            ArrayList<string> collection = new ArrayList<string>(items, allowsNull: true);
-            var r = new[] { "3", "4" };
-            var rng = new ArrayList<string>(r).AsBadEnumerable();
+            //var items = new[] { "-8", "Ab", "6", "-4", "5", "-2", "-1", "1", "10", "8" };
+            //var al = new LinkedList<string>(items);
+            //var v1 = al.View(2, 2);
+            //var v2 = al.View(3, 2);
+            //v1.Sort();
+            //Console.WriteLine(v2);
 
 
-            var view = collection.View(0, 2);
-            Console.WriteLine(view);
+            
+            var items = new[] { "-8", "Ab", "6", "-4", "5", "-2", "-1", "1", "10", "8" };
+            var collection = new HashedLinkedList<string>(items);
+
+            var v0 = collection.View(0, 2);
+
+            var v4 = collection.View(4, 2);
+            var v6 = collection.View(6, 2);
+
+            var vCount2 = collection.View(collection.Count - 2, 2);
+
+
+            v4.Sort();
+            Console.WriteLine(v4);
+            Console.WriteLine(v6);
+
 
 
 
@@ -210,6 +226,29 @@ namespace C6.UserGuideExamples
 
             return;
         }
+
+        private static IList<string>[] GetNItemViewsInTheMiddle(IList<string> coll)
+        {
+            var nItemViews = new IList<string>[5];
+            const int count = 3;
+            var index = coll.Count / 2 - 1; // from the middel
+
+            nItemViews[0] = coll.View(index, count); // View(int, int)
+
+            nItemViews[1] = coll.View(index, count);
+            nItemViews[1].Slide(-3); // Slide(int)
+
+            nItemViews[2] = coll.View(index, count);
+            nItemViews[2].Slide(3, count); // Slide(int, int)
+
+            nItemViews[3] = coll.View(index, count);
+            nItemViews[3].TrySlide(-6); // not overlapping with nItemViews[1]
+
+            nItemViews[4] = coll.View(index, count);
+            nItemViews[4].TrySlide(6, count); // not overlapping with nItemViews[2]            
+
+            return nItemViews;
+        }
     }
 
 
@@ -228,4 +267,6 @@ namespace C6.UserGuideExamples
 
         private string ToLower(string item) => item?.ToLower() ?? string.Empty;
     }
+
+
 }
