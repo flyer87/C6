@@ -153,7 +153,7 @@ namespace C6
         /// </remarks>
         new void Clear();  
 
-        /// <summary> Gets the number of items before the view within the underlyging list;</summary>
+        /// <summary> Gets the number of items in the underlyging list before the view; view's left endpoint</summary>
         /// <value> The index of the view’s beginning within the underlying list.</value>
         /// <remarks>Gets 0 if proper list</remarks>
         int Offset { get; }
@@ -165,7 +165,7 @@ namespace C6
         IList<T> Underlying { get; }
 
         /// <summary>
-        ///     Returns a view of the specified range within this list or view.
+        ///     Returns a view of the specified range within list or view
         /// </summary>        
         /// <param name="index">
         ///     The offset relative to the given list or view.
@@ -179,7 +179,7 @@ namespace C6
         /// </returns>  
         /// <remarks>
         ///     <para>
-        ///         The returned <see cref="IList{T}"/> has the same status as a list:
+        ///         The returned <see cref="IList{T}"/> has the same functionality as a list:
         ///         <list type="bullet">
         ///             <item>
         ///                 <description>
@@ -189,7 +189,7 @@ namespace C6
         ///         </list>
         ///     </para>
         ///     <para>
-        ///         The view remains valid as long as <see cref = "ICollectionValue{T}.IsValid" /> is <c> true </c>. 
+        ///         The view remains valid as long as <see cref = "ICollectionValue{T}.IsValid" /> evaluates to <c> true </c>. 
         ///     </para>
         ///     <para>
         ///         Calling <see cref="Sort()"/>, <see cref="Reverse()"/> or <see cref="Shuffle()"/> on the underlying list or a view
@@ -214,6 +214,28 @@ namespace C6
         ///     <para> Returns a new list view that points at the first occurrence of x, if any, in the list or view;
         ///         otherwise <c>null</c>. 
         ///     </para>
+        ///     <para>
+        ///         The returned <see cref="IList{T}"/> has the same functionality as a list:
+        ///         <list type="bullet">
+        ///             <item>
+        ///                 <description>
+        ///                     You can use the returned <see cref="IList{T}"/> as a list and execute all list operations.
+        ///                 </description>
+        ///             </item>
+        ///         </list>
+        ///     </para>
+        ///     <para>
+        ///         The view remains valid as long as <see cref = "ICollectionValue{T}.IsValid" /> evaluates to <c> true </c>. 
+        ///     </para>
+        ///     <para>
+        ///         Calling <see cref="Sort()"/>, <see cref="Reverse()"/> or <see cref="Shuffle()"/> on the underlying list or a view
+        ///         might invalide other views.
+        ///     </para>
+        ///     <para>
+        ///         A view created from a view is itself just a view of the underlying list.
+        ///         Views are not nested inside each other; for instance, a view created from another view <c>w</c> is
+        ///         not affected by subsequent sliding of <c>w</c>.        
+        ///     </para>
         /// </returns>  
         IList<T> ViewOf(T item);
 
@@ -225,9 +247,33 @@ namespace C6
         /// </param>        
         /// <returns>
         ///     Type: <see cref="IList{T}"/>
-        ///     Returns a new list view that points at the last occurrence of x, if any, in the list or view.;
+        ///     Returns a new list view that points at the last occurrence of x, if any, in the list or view;
         ///     otherwise <c>null</c>.
         /// </returns>  
+        /// <remarks>
+        ///     <para>
+        ///         The returned <see cref="IList{T}"/> has the same functionality as a list:
+        ///         <list type="bullet">
+        ///             <item>
+        ///                 <description>
+        ///                     You can use the returned <see cref="IList{T}"/> as a list and execute all list operations.
+        ///                 </description>
+        ///             </item>
+        ///         </list>
+        ///     </para>
+        ///     <para>
+        ///         The view remains valid as long as <see cref = "ICollectionValue{T}.IsValid" /> evaluates to <c> true </c>. 
+        ///     </para>
+        ///     <para>
+        ///         Calling <see cref="Sort()"/>, <see cref="Reverse()"/> or <see cref="Shuffle()"/> on the underlying list or a view
+        ///         might invalide other views.
+        ///     </para>
+        ///     <para>
+        ///         A view created from a view is itself just a view of the underlying list.
+        ///         Views are not nested inside each other; for instance, a view created from another view <c>w</c> is
+        ///         not affected by subsequent sliding of <c>w</c>.        
+        ///     </para>
+        /// </remarks>
         IList<T> LastViewOf(T item);
 
         /// <summary>
@@ -247,7 +293,7 @@ namespace C6
         ///     </list>        
         /// </returns>
         /// <remarks>
-        ///     The method doesn't create a new view; It returns the same slided view.
+        ///     The method doesn't create a new view; It returns the same view, but slided.
         /// </remarks>
         IList<T> Slide(int offset);
 
@@ -260,8 +306,8 @@ namespace C6
         /// <param name="count">
         ///     The lenght of the view.
         /// </param>
-        /// <returns>
-        ///     The same view, slided with <c>offset</c> items and length <c>count</c>.
+        /// <returns>        
+        ///     The method doesn't create a new view; It returns the same view, slided with <c>offset</c> items and length <c>count</c>.
         /// </returns>
         IList<T> Slide(int offset, int count);
 
@@ -272,7 +318,7 @@ namespace C6
         ///     The number of the items to slide with.
         /// </param>
         /// <returns>
-        ///     <c>True</c> if slide suceeded; otherwise <c>false</c>.
+        ///     <c>True</c> if sliding suceeded; otherwise <c>false</c>.
         /// </returns>
         bool TrySlide(int offset);
 
@@ -291,7 +337,7 @@ namespace C6
         bool TrySlide(int offset, int count);
 
         /// <summary>
-        ///     Spans the view with another view.
+        ///     Spans a view with another view.
         /// </summary>
         /// <param name="other">
         ///     The other view to span with.

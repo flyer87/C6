@@ -11,7 +11,7 @@
 		
 		- _version ++				
 		- fluctuating tests still							
-		- documentation
+		//- documentation
 		- fill: Conclusion
 		
 		Nedelya:
