@@ -305,9 +305,7 @@ namespace C6.Collections
 
         public virtual IList<T> Underlying => _underlying;
 
-        #endregion
-
-        private int UnderlyingCount => (_underlying ?? this).Count;
+        #endregion        
         
         #region Public Methods
 
@@ -457,13 +455,7 @@ namespace C6.Collections
             return true;
         }
 
-        public virtual ICollectionValue<T> FindDuplicates(T item)
-        {
-            var duplicates = new Duplicates(this, item);
-            //_collValues.Add(duplicates); // ???  so far, no. Intsead of UpdateVersi() _collValues could be used, but ...
-
-            return duplicates;
-        }
+        public virtual ICollectionValue<T> FindDuplicates(T item) => new Duplicates(this, item);                        
 
         public virtual bool FindOrAdd(ref T item)
         {
@@ -627,7 +619,7 @@ namespace C6.Collections
         // TODO: Defer execution
         public virtual ICollectionValue<KeyValuePair<T, int>> ItemMultiplicities()
         {
-            throw new NotImplementedException(); // ???
+            throw new NotImplementedException();
         }
 
         public virtual int LastIndexOf(T item)
@@ -711,7 +703,6 @@ namespace C6.Collections
             #region Code Contracts
 
             // If collection changes, the version is updated
-            //var old = OldValue(this.ToArray());            
             Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
             #endregion
@@ -722,7 +713,7 @@ namespace C6.Collections
         }
 
         // Explicitly check against null to avoid using the (slower) equality comparer
-        public virtual bool RemoveDuplicates(T item) => item == null ? RemoveAllWhere(x => x == null) : RemoveAllWhere(x => Equals(item, x));
+        public virtual bool RemoveDuplicates(T item) => item == null ? RemoveAllWherePrivate(x => x == null) : RemoveAllWherePrivate(x => Equals(item, x));
 
         public void DoSomething() { }
 
@@ -772,15 +763,15 @@ namespace C6.Collections
             Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
             #endregion
-
-            // toArray ???
-            if (IsEmpty || items.IsEmpty()) {
+            
+            var array = items.ToArray();
+            if (IsEmpty || array.IsEmpty()) {
                 return false;
             }
 
             // TODO: Replace ArrayList<T> with more efficient data structure like HashBag<T>
-            var itemsToRemove = new ArrayList<T>(items, EqualityComparer, AllowsNull);
-            return RemoveAllWhere(item => itemsToRemove.Remove(item));
+            var itemsToRemove = new ArrayList<T>(array, EqualityComparer, AllowsNull);
+            return RemoveAllWherePrivate(item => itemsToRemove.Remove(item));
         }
 
         public virtual bool RetainRange(SCG.IEnumerable<T> items)
@@ -809,7 +800,7 @@ namespace C6.Collections
 
             // TODO: Replace ArrayList<T> with more efficient data structure like HashBag<T>
             var itemsToRemove = new LinkedList<T>(items, EqualityComparer, AllowsNull);
-            return RemoveAllWhere(item => !itemsToRemove.Remove(item));
+            return RemoveAllWherePrivate(item => !itemsToRemove.Remove(item));
         }
 
         public virtual void Reverse()
@@ -1253,20 +1244,22 @@ namespace C6.Collections
 
         #region Private Members
 
+        private int UnderlyingCount => (_underlying ?? this).Count;
+
         private void Dispose(bool disposingUnderlying)
         {
             if (!IsValid) {
                 return;
             }
 
-            if (_underlying != null) // view
+            if (_underlying != null) // view calls Dispose()
             {
                 IsValid = false;
-                if (!disposingUnderlying && _views != null) // the purpose of disposingUnderlying
+                if (!disposingUnderlying && _views != null) 
                     _views.Remove(_myWeakReference);
+
                 _underlying = null;
-                _views = null; // shared ref. for _view! Does this set other views to null ??? No!
-                // only the current view's field (_view) starts to point to null.
+                _views = null;                 
                 _myWeakReference = null;
             }
             else // proper list
@@ -1274,16 +1267,10 @@ namespace C6.Collections
                 //isValid = false;
                 if (_views != null)
                     foreach (var view in _views)
-                        view.Dispose(true); // How can we assure that the nodes are deleted?
+                        view.Dispose(true); 
                 Clear();
             }
         }
-
-        /*private bool RequireValidity()
-        {
-            Requires(IsValid, MustBeValid);
-            return true;
-        }*/
 
         private bool CheckVersion(int version)
         {
@@ -1295,64 +1282,9 @@ namespace C6.Collections
             throw new InvalidOperationException(CollectionWasModified);
         }
 
-        private int indexOf(T item) //new!
-        {
-            // ??? CodeContract here - NO. item could be null, no matter of AllowsNull's value            
-            if (item == null) {
-                for (var i = 0; i < Count; i++) {
-                    // Explicitly check against null to avoid using the (slower) equality comparer
-                    if (_items[Offset + i] == null) {
-                        return i;
-                    }
-                }
-            }
-            else {
-                for (var i = 0; i < Count; i++) {
-                    if (Equals(item, _items[Offset + i])) {
-                        return i;
-                    }
-                }
-            }
-
-            return ~Count;
-
-            //for (int i = 0; i < _size; i++)
-            //    if (equals(item, array[offsetField + i]))
-            //        return i;
-            //return ~_size;
-        }
-
-        private int lastIndexOf(T item) //new! ??? Do we need this. There is already a public method.
-        {
-            // CodeContract here ???
-            if (item == null) {
-                for (var i = Count - 1; i >= 0; i--) {
-                    // Explicitly check against null to avoid using the (slower) equality comparer
-                    if (_items[Offset + i] == null) {
-                        return i;
-                    }
-                }
-            }
-            else {
-                for (var i = Count - 1; i >= 0; i--) {
-                    if (Equals(item, _items[Offset + i])) {
-                        return i;
-                    }
-                }
-            }
-
-            return ~Count;
-        }
-
-        //protected void checkRange(int start, int count)
-        //{
-        //    if (start < 0 || count < 0 || start + count > size)
-        //        throw new ArgumentOutOfRangeException();
-        //}
-
         private void ClearPrivate()
         {
-            _items = EmptyArray; //
+            _items = EmptyArray; 
             Count = 0;
         }
 
@@ -1362,7 +1294,7 @@ namespace C6.Collections
         /// <param name="otherOffset"></param>
         /// <param name="otherCount"></param>
         /// <returns>The position of View(otherOffset, otherSize) with respect to this view</returns>
-        MutualViewPosition viewPosition(int otherOffset, int otherCount)
+        private MutualViewPosition ViewPositionPrivate(int otherOffset, int otherCount)
         {
             int end = Offset + Count, otherEnd = otherOffset + otherCount;
 
@@ -1387,7 +1319,7 @@ namespace C6.Collections
                 if (view == this)
                     continue;
 
-                switch (viewPosition(view.Offset, view.Count)) {
+                switch (ViewPositionPrivate(view.Offset, view.Count)) {
                     case MutualViewPosition.ContainedIn:
                         if (reverse)
                             view.Offset = 2 * Offset + Count - view.Count - view.Offset;
@@ -1444,7 +1376,7 @@ namespace C6.Collections
         private bool Equals(T x, T y) => EqualityComparer.Equals(x, y);
 
         [Pure]
-        private int GetHashCode(T x) => EqualityComparer.GetHashCode(x); // ??? Not used
+        private int GetHashCode(T x) => EqualityComparer.GetHashCode(x);
 
         private void InsertPrivate(int index, T item)
         {
@@ -1549,41 +1481,122 @@ namespace C6.Collections
             UpdateVersion();
 
             var count = items.Length;
-            (_underlying ?? this).EnsureCapacity(UnderlyingCount + count); // ??? old:EnsureCapacity(Count + count);
+            (_underlying ?? this).EnsureCapacity(UnderlyingCount + count); 
 
             index += Offset;
             if (index < UnderlyingCount) {
                 Array.Copy(_items, index, _items, index + count, UnderlyingCount - index);
             }
 
-            // C5
-            //var underlyingsize = (_underlying ?? this).Count;
-            //int added = index - Count - _offsetField;
-            //if (added < count)
-            //{
-            //    Array.Copy(_items, Count + _offsetField + count, _items, index, underlyingsize - Count - _offsetField);
-            //    // Array.Copy(array, size + offsetField + toadd, array, i, underlyingsize - size - offsetField);
-            //    Array.Clear(_items, underlyingsize + added, count - added);
-            //}
-            //if (added > 0)
-            //{
-            //    Count += count;
-            //    FixViewsAfterInsert(count, index);
-            //    // raise                 
-            //}
-
             Array.Copy(items, 0, _items, index, count); // View:          
 
             Count += count;
             if (_underlying != null)
                 _underlying.Count += count;
+
             FixViewsAfterInsertPrivate(count, index);
+        }        
+
+        private static bool IsCompatibleObject(object value) => value is T || value == null && default(T) == null;
+
+        private bool RemoveAllWherePrivate(Func<T, bool> predicate)
+        {
+            // If result is false, the collection remains unchanged
+
+            #region Code Contract            
+
+            Ensures(Result<bool>() || this.IsSameSequenceAs(OldValue(ToArray())));
+
+            #endregion            
+
+            if (IsEmpty) {
+                return false;
+            }
+
+            var shouldRememberItems = ActiveEvents.HasFlag(Removed); 
+            IExtensible<T> itemsRemoved = null;
+            var cntRemoved = 0;
+            var viewHandler = new ViewHandler(this);
+
+            // TODO: Use bulk moves - consider using predicate(item) ^ something ???
+            var j = Offset;
+            for (var i = Offset; i < Offset + Count; i++) {
+                var item = _items[i];
+                var predicateResult = predicate(item);
+
+                if (!predicateResult) {
+                    // Avoid overriding an item with itself
+                    if (j != i) {
+                        _items[j] = item;
+                    }
+                    j++;                    
+                }
+
+                viewHandler.skipEndpoints(cntRemoved, i);
+
+                if (predicateResult) {
+                    if (shouldRememberItems) {
+                        (itemsRemoved ?? (itemsRemoved = new ArrayList<T>(allowsNull: AllowsNull))).Add(item); // TODO: Test allows null
+                    }
+                    cntRemoved++;
+                    viewHandler.updateViewSizesAndCounts(cntRemoved, i + 1);
+                }
+            }
+
+            // No items were removed
+            if (cntRemoved == 0)
+            {
+                Assert(itemsRemoved == null);
+                return false;
+            }
+
+            viewHandler.updateViewSizesAndCounts(cntRemoved, UnderlyingCount);
+
+            Array.Copy(_items, Offset + Count, _items, j, UnderlyingCount - Offset - Count);
+            Count -= cntRemoved;
+            if (_underlying != null) {
+                _underlying.Count -= cntRemoved;
+            }
+
+
+            UpdateVersion(); // Only update version if items are actually removed
+
+            // Clean up            
+            Array.Clear(_items, UnderlyingCount, cntRemoved);
+
+            (_underlying ?? this).RaiseForRemoveAllWhere(itemsRemoved);
+
+            return true;
         }
+
+        private T RemoveAtPrivate(int index)
+        {
+            UpdateVersion();
+
+            index += Offset;
+            FixViewsBeforeSingleRemovePrivate(index);
+
+            Count--;
+            if (_underlying != null) {
+                _underlying.Count--;
+            }
+
+            var item = _items[index];
+            if (index < UnderlyingCount)
+            {
+                Array.Copy(_items, index + 1, _items, index, UnderlyingCount - index);
+            }
+
+            _items[UnderlyingCount] = default(T);
+            return item;
+        }
+
+        private void UpdateVersion() => _version++;
 
         #region Position, PositionComparer and ViewHandler nested types
 
         [Serializable]
-        class PositionComparer : SCG.IComparer<Position>
+        private class PositionComparer : SCG.IComparer<Position>
         {
             public int Compare(Position a, Position b)
             {
@@ -1591,11 +1604,10 @@ namespace C6.Collections
             }
         }
 
-
         /// <summary>
-        /// During RemoveAll, we need to cache the original endpoint indices of views (??? also for ArrayList?)
+        /// During RemoveAll, we need to cache the original endpoint indices of views 
         /// </summary>
-        struct Position
+        private struct Position
         {
             public readonly ArrayList<T> view;
             public readonly int index;
@@ -1613,11 +1625,10 @@ namespace C6.Collections
             }
         }
 
-
         /// <summary>
         /// Handle the update of (other) views during a multi-remove operation.
         /// </summary>
-        struct ViewHandler
+        private struct ViewHandler
         {
             ArrayList<Position> leftEnds;
             ArrayList<Position> rightEnds;
@@ -1630,8 +1641,10 @@ namespace C6.Collections
                 leftEnds = rightEnds = null;
                 if (list._views != null)
                     foreach (ArrayList<T> v in list._views)
-                        if (v != list) {
-                            if (leftEnds == null) {
+                        if (v != list)
+                        {
+                            if (leftEnds == null)
+                            {
                                 leftEnds = new ArrayList<Position>();
                                 rightEnds = new ArrayList<Position>();
                             }
@@ -1652,15 +1665,18 @@ namespace C6.Collections
             /// <param name="realindex"></param>
             internal void skipEndpoints(int removed, int realindex)
             {
-                if (viewCount > 0) {
+                if (viewCount > 0)
+                {
                     Position endpoint;
-                    while (leftEndIndex < viewCount && (endpoint = leftEnds[leftEndIndex]).index <= realindex) {
+                    while (leftEndIndex < viewCount && (endpoint = leftEnds[leftEndIndex]).index <= realindex)
+                    {
                         var view = endpoint.view;
                         view.Offset = view.Offset - removed;
                         view.Count += removed;
                         leftEndIndex++;
                     }
-                    while (rightEndIndex < viewCount && (endpoint = rightEnds[rightEndIndex]).index < realindex) {
+                    while (rightEndIndex < viewCount && (endpoint = rightEnds[rightEndIndex]).index < realindex)
+                    {
                         endpoint.view.Count -= removed;
                         rightEndIndex++;
                     }
@@ -1669,16 +1685,19 @@ namespace C6.Collections
 
             internal void updateViewSizesAndCounts(int removed, int realindex)
             {
-                if (viewCount > 0) {
+                if (viewCount > 0)
+                {
                     Position endpoint;
-                    while (leftEndIndex < viewCount && (endpoint = leftEnds[leftEndIndex]).index <= realindex) {
+                    while (leftEndIndex < viewCount && (endpoint = leftEnds[leftEndIndex]).index <= realindex)
+                    {
                         ArrayList<T> view = endpoint.view;
                         view.Offset = view.Offset - removed;
                         view.Count += removed;
                         leftEndIndex++;
                     }
 
-                    while (rightEndIndex < viewCount && (endpoint = rightEnds[rightEndIndex]).index < realindex) {
+                    while (rightEndIndex < viewCount && (endpoint = rightEnds[rightEndIndex]).index < realindex)
+                    {
                         endpoint.view.Count -= removed;
                         rightEndIndex++;
                     }
@@ -1687,106 +1706,6 @@ namespace C6.Collections
         }
 
         #endregion
-
-        private static bool IsCompatibleObject(object value) => value is T || value == null && default(T) == null;
-
-        private bool RemoveAllWhere(Func<T, bool> predicate)
-        {
-            // If result is false, the collection remains unchanged
-
-            #region Code Contract            
-
-            Ensures(Result<bool>() || this.IsSameSequenceAs(OldValue(ToArray())));
-
-            #endregion
-
-            // updatecheck() ???
-
-            if (IsEmpty) {
-                return false;
-            }
-
-            var shouldRememberItems = ActiveEvents.HasFlag(Removed); // ??? 
-            IExtensible<T> itemsRemoved = null;
-            var cntRemoved = 0;
-            var viewHandler = new ViewHandler(this);
-
-            // TODO: Use bulk moves - consider using predicate(item) ^ something ???
-            var j = Offset;
-            for (var i = Offset; i < Offset + Count; i++) {
-                var item = _items[i];
-                var predicateResult = predicate(item);
-
-                if (!predicateResult) {
-                    // Avoid overriding an item with itself
-                    if (j != i) {
-                        _items[j] = item;
-                    }
-                    j++;
-                    //viewHandler.skipEndpoints(cntRemoved, i + 1); // not effective ???
-                }
-
-                viewHandler.skipEndpoints(cntRemoved, i);
-
-                if (predicateResult) {
-                    if (shouldRememberItems) {
-                        (itemsRemoved ?? (itemsRemoved = new ArrayList<T>(allowsNull: AllowsNull))).Add(item); // TODO: Test allows null
-                    }
-                    cntRemoved++;
-                    viewHandler.updateViewSizesAndCounts(cntRemoved, i + 1);
-                }
-            }
-
-            // No items were removed
-            if (cntRemoved == 0) // (Count == j) 
-            {
-                Assert(itemsRemoved == null);
-                return false;
-            }
-
-            viewHandler.updateViewSizesAndCounts(cntRemoved, UnderlyingCount);
-
-            Array.Copy(_items, Offset + Count, _items, j, UnderlyingCount - Offset - Count);
-            Count -= cntRemoved;
-            if (_underlying != null) {
-                _underlying.Count -= cntRemoved;
-            }
-
-
-            UpdateVersion(); // Only update version if items are actually removed
-
-            // Clean up            
-            Array.Clear(_items, UnderlyingCount, cntRemoved); // underlyingCount != j !!!
-            //Count = j;
-
-            (_underlying ?? this).RaiseForRemoveAllWhere(itemsRemoved);
-
-            return true;
-        }
-
-        private T RemoveAtPrivate(int index)
-        {
-            UpdateVersion();
-
-            index += Offset;
-            FixViewsBeforeSingleRemovePrivate(index);
-
-            Count--;
-            if (_underlying != null) {
-                _underlying.Count--;
-            }
-
-            var item = _items[index];
-            if (index < UnderlyingCount) // if (--Count > index)
-            {
-                Array.Copy(_items, index + 1, _items, index, UnderlyingCount - index);
-            }
-
-            _items[UnderlyingCount] = default(T);
-            return item;
-        }
-
-        private void UpdateVersion() => _version++;
 
         #region Event Helpers
 
@@ -1935,10 +1854,8 @@ namespace C6.Collections
 
         #endregion
 
-        #endregion
-
         #region Nested Types
-        
+
         // TODO: Explicitly check against null to avoid using the (slower) equality comparer
         [Serializable]
         [DebuggerTypeProxy(typeof(CollectionValueDebugView<>))]
@@ -2004,7 +1921,8 @@ namespace C6.Collections
 
             public override int Count
             {
-                get {
+                get
+                {
                     CheckVersion();
 
                     return List.Count;
@@ -2013,7 +1931,8 @@ namespace C6.Collections
 
             public override Speed CountSpeed
             {
-                get {
+                get
+                {
                     CheckVersion();
                     // TODO: Always use Linear?
                     return _list == null ? Linear : Constant;
@@ -2049,14 +1968,17 @@ namespace C6.Collections
                 #endregion
 
                 // If a list already exists, enumerate that
-                if (_list != null) {
+                if (_list != null)
+                {
                     var enumerator = _list.GetEnumerator();
-                    while (CheckVersion() & enumerator.MoveNext()) {
+                    while (CheckVersion() & enumerator.MoveNext())
+                    {
                         yield return enumerator.Current;
                     }
                 }
                 // Otherwise, evaluate lazily
-                else {
+                else
+                {
                     var list = new ArrayList<T>(allowsNull: AllowsNull);
                     Func<T, T, bool> equals = _base.Equals;
 
@@ -2064,9 +1986,11 @@ namespace C6.Collections
 
 
                     T item;
-                    while ( /*CheckVersion() &*/ enumerator.MoveNext()) {
+                    while ( /*CheckVersion() &*/ enumerator.MoveNext())
+                    {
                         // Only return duplicate items
-                        if (equals(item = enumerator.Current, _item)) {
+                        if (equals(item = enumerator.Current, _item))
+                        {
                             list.Add(item);
                             yield return item;
                         }
@@ -2163,7 +2087,8 @@ namespace C6.Collections
 
             public override int Count
             {
-                get {
+                get
+                {
                     CheckVersion();
                     return Set.Count;
                 }
@@ -2171,7 +2096,8 @@ namespace C6.Collections
 
             public override Speed CountSpeed
             {
-                get {
+                get
+                {
                     CheckVersion();
                     // TODO: Always use Linear?
                     return _set == null ? Linear : Constant;
@@ -2196,27 +2122,30 @@ namespace C6.Collections
                 Set.CopyTo(array, arrayIndex);
             }
 
-            // ???? Equals comes from where. Ok - from Object class
             public override bool Equals(object obj) => CheckVersion() & base.Equals(obj);
 
-            // ??? Why do we need it? Isn't that enough to overrire GetEnumerator()?
             public override SCG.IEnumerator<T> GetEnumerator()
             {
                 // If a set already exists, enumerate that
-                if (_set != null) {
+                if (_set != null)
+                {
                     var enumerator = Set.GetEnumerator();
-                    while (CheckVersion() & enumerator.MoveNext()) {
+                    while (CheckVersion() & enumerator.MoveNext())
+                    {
                         yield return enumerator.Current;
                     }
                 }
                 // Otherwise, evaluate lazily
-                else {
+                else
+                {
                     var set = new SCG.HashSet<T>(_base.EqualityComparer);
 
                     var enumerator = _base.GetEnumerator();
-                    while (CheckVersion() & enumerator.MoveNext()) {
+                    while (CheckVersion() & enumerator.MoveNext())
+                    {
                         // Only return new items
-                        if (set.Add(enumerator.Current)) {
+                        if (set.Add(enumerator.Current))
+                        {
                             yield return enumerator.Current;
                         }
                     }
@@ -2226,7 +2155,6 @@ namespace C6.Collections
                 }
             }
 
-            // Where is that from?
             public override int GetHashCode()
             {
                 CheckVersion();
@@ -2320,7 +2248,7 @@ namespace C6.Collections
                 _base = list;
                 _version = list._version;
 
-                _sign = (int) direction;
+                _sign = (int)direction;
                 _startIndex = startIndex;
                 _count = count;
                 _direction = direction;
@@ -2334,7 +2262,8 @@ namespace C6.Collections
 
             public override int Count
             {
-                get {
+                get
+                {
                     CheckVersion();
                     return _count;
                 }
@@ -2342,7 +2271,8 @@ namespace C6.Collections
 
             public override Speed CountSpeed
             {
-                get {
+                get
+                {
                     CheckVersion();
                     return Constant;
                 }
@@ -2350,7 +2280,8 @@ namespace C6.Collections
 
             public EnumerationDirection Direction
             {
-                get {
+                get
+                {
                     CheckVersion();
                     return _direction;
                 }
@@ -2384,7 +2315,8 @@ namespace C6.Collections
                     // Copy array directly
                     Array.Copy(_base._items, _base.Offset + _startIndex, array, arrayIndex, _count); // Offset!!
                 }
-                else {
+                else
+                {
                     // Use enumerator instead of copying and then reversing
                     base.CopyTo(array, arrayIndex);
                 }
@@ -2395,7 +2327,8 @@ namespace C6.Collections
             public override SCG.IEnumerator<T> GetEnumerator()
             {
                 var items = _base._items;
-                for (var i = 0; i < Count; i++) {
+                for (var i = 0; i < Count; i++)
+                {
                     yield return items[_base.Offset + _startIndex + _sign * i];
                 }
             }
@@ -2447,7 +2380,8 @@ namespace C6.Collections
             internal Node Add(V view)
             {
                 Node newNode = new Node(view);
-                if (start != null) {
+                if (start != null)
+                {
                     start.prev = newNode;
                     newNode.next = start;
                 }
@@ -2457,12 +2391,14 @@ namespace C6.Collections
 
             internal void Remove(Node n)
             {
-                if (n == start) {
+                if (n == start)
+                {
                     start = start.next;
                     if (start != null)
                         start.prev = null;
                 }
-                else {
+                else
+                {
                     n.prev.next = n.next;
                     if (n.next != null)
                         n.next.prev = n.prev;
@@ -2482,10 +2418,11 @@ namespace C6.Collections
             public SCG.IEnumerator<V> GetEnumerator()
             {
                 Node n = start;
-                while (n != null) {
+                while (n != null)
+                {
                     //V view = n.weakview.Target as V; //This provokes a bug in the beta1 verifyer
                     object o = n.weakview.Target;
-                    V view = o is V ? (V) o : null;
+                    V view = o is V ? (V)o : null;
                     if (view == null)
                         Remove(n);
                     else
@@ -2499,6 +2436,8 @@ namespace C6.Collections
                 return GetEnumerator();
             }
         }
+
+        #endregion
 
         #endregion
     }

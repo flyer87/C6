@@ -1916,7 +1916,6 @@ namespace C6.Collections
             }
         }
 
-
         private void RaiseForReversed() => OnCollectionChanged();
 
         private void RaiseForInsert(T item, int index)
@@ -2082,7 +2081,6 @@ namespace C6.Collections
             public override string ToString()
                 => $"TagGroup(tag={Tag}, cnt={Count}, fst={First}, lst={Last})";
         }
-
 
         // ??? in Fields region or Private methods
 
@@ -2537,8 +2535,7 @@ namespace C6.Collections
         [Serializable]
         private sealed class WeakViewList<V> : SCG.IEnumerable<V> where V : class
         {
-            Node start;
-
+            Node _start;
 
             [Serializable]
             internal class Node
@@ -2555,21 +2552,21 @@ namespace C6.Collections
 
             internal Node Add(V view)
             {
-                Node newNode = new Node(view);
-                if (start != null) {
-                    start.prev = newNode;
-                    newNode.next = start;
+                var newNode = new Node(view);
+                if (_start != null) {
+                    _start.prev = newNode;
+                    newNode.next = _start;
                 }
-                start = newNode;
+                _start = newNode;
                 return newNode;
             }
 
             internal void Remove(Node n)
             {
-                if (n == start) {
-                    start = start.next;
-                    if (start != null)
-                        start.prev = null;
+                if (n == _start) {
+                    _start = _start.next;
+                    if (_start != null)
+                        _start.prev = null;
                 }
                 else {
                     n.prev.next = n.next;
@@ -2585,7 +2582,7 @@ namespace C6.Collections
             /// <returns></returns>
             public SCG.IEnumerator<V> GetEnumerator()
             {
-                Node n = start;
+                Node n = _start;
                 while (n != null) {
                     //V view = n.weakview.Target as V; //This provokes a bug in the beta1 verifyer
                     object o = n.weakview.Target;
