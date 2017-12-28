@@ -53,22 +53,31 @@
 		- double limit = 1, bigt = Math.Pow(Taggroups, 1.0 / 30); //?????
 	- ItemSet
 		- public override int GetHashCode()
-==========						   }
+==========
+- Addrange() in the constructor with Code Contracts included, fails.
+- RaiseForAddRange(array) - not correct
+	- some of array items can't bo added, since they're already there. Should raise only for the added ones.
+-     if (_underlying == null) or  if (_underlying == null) {
+			return true; 				return true;
+								   }
 								   
 - insideview or Isinsideview
 - Improve GetUnsequencedHashCode() ???
 - public static bool UnsequencedEquals<T>(this ICollection<T> first, ICollection<T> second, SCG.IEqualityComparer<T> equalityComparer = null)
 	- Why ICollection, but no IEnumerable?
-- isValid in privae classes like ItemSet, Duplicates, ...s
+- isValid in privae classes like ItemSet, Duplicates, ...
+- General: set, insert of an extsing item in hashed version -> exception or ?
 - General: public void RemoveIndexRange(int startIndex, int count), Code contracts
 	Requires(!IsEmpty) ???
-
+- General: when do we set ActiveEvents to something
+- General: why SC. methods should be explicitly implemented
 - ActiveEvents.HasFlag() passed for:
 	- private void RaiseForIndexSetter(T oldItem, T item, int index), RaiseForRemove(T item, int count)
 		Add a test
 - General: CollectionExtensions - check for: // TODO: Test
 - InsertNodeBeforePrivate()	should be used with FindOrAddToHash()
 	if there is _itemNode.Contains BEFORE InsertNodeBeforePrivate(), replace it with FindOrAddToHash()
+- Insert 
 - General: Remove() methods: if Count <= 0 return false;
 - General: methods getting SCG.IEnumerable<T>, f.ex. ContainsRange(SCG.IEnumerable<T> items)
 	- should we call items.toArray() in the beginning of the method ?

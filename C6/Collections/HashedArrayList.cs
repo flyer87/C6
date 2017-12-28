@@ -333,7 +333,6 @@ namespace C6.Collections
 
             #endregion
 
-
             if (FindOrAddToHashPrivate(item, Offset + Count)) {
                 return false;
             }
@@ -371,13 +370,15 @@ namespace C6.Collections
 
             // copy the relevants
             var oldIndex = index;
+            //var itemsAdded = new ArrayList<T>();
             var countAdded = 0;
-            foreach (var item in items) {
+            foreach (var item in array) {
                 if (FindOrAddToHashPrivate(item, index)) {
                     continue;
                 }
                 _items[index++] = item;
                 countAdded++;
+                //itemsAdded.Add(item);
             }
 
             // shrink the space if too much space is allocated
@@ -399,7 +400,8 @@ namespace C6.Collections
 
             ReindexPrivate(index);
             FixViewsAfterInsertPrivate(countAdded, index - countAdded); //View; index - countAdded == oldIndex
-            (_underlying ?? this).RaiseForAddRange(array); // View
+            //(_underlying ?? this).RaiseForAddRange(items);
+            (_underlying ?? this).RaiseForAddRange(index - countAdded, countAdded);
 
             return true;
         }
@@ -1647,11 +1649,12 @@ namespace C6.Collections
             OnCollectionChanged();
         }
 
-        private void RaiseForAddRange(T[] array)
+        private void RaiseForAddRange(int index, int count)
         {
             if (ActiveEvents.HasFlag(Added)) {
-                foreach (var item in array) {
-                    OnItemsAdded(item, 1);
+                var end = index + count;
+                for (var i = index; i < end; i++) {
+                    OnItemsAdded(_items[i], 1);
                 }
             }
 

@@ -484,6 +484,7 @@ namespace C6
         /// <param name="items">
         ///     The enumerable whose items should be inserted into the list. The enumerable itself cannot be <c>null</c>, but its
         ///     items can, if <see cref="ICollectionValue{T}.AllowsNull"/> is <c>true</c>.
+        ///     The items of the enumerable should be unique If <see cref="IExtensible{T}.AllowsDuplicates"/> is <c>false</c>.
         /// </param>
         /// <remarks>
         ///     <para>
@@ -1495,7 +1496,7 @@ namespace C6
             Ensures(item.IsSameAs(this[index]));
 
             // The item is inserted into the list without replacing other items            
-            //!@ Ensures(this.IsSameSequenceAs(OldValue(this.Take(index).Append(item).Concat(this.Skip(index)).ToList())));
+            Ensures(this.IsSameSequenceAs(OldValue(this.Take(index).Append(item).Concat(this.Skip(index)).ToList())));
 
             return;
         }
@@ -1603,6 +1604,8 @@ namespace C6
             // Collection must not already contain the items if collection disallows duplicate values
             Requires(AllowsDuplicates || ForAll(items, item => !Contains(item)), CollectionMustAllowDuplicates);
 
+            // enumrable to add must not contain duplicates
+            Requires(AllowsDuplicates || items.ItemsAreUnique(), CollectionMustAllowDuplicates);
 
             // The items are inserted into the list without replacing other items
             Ensures(this.IsSameSequenceAs(OldValue(this.Take(index).Concat(items).Concat(this.Skip(index)).ToList())));
@@ -1653,7 +1656,7 @@ namespace C6
             return default(bool);
         }
 
-        public T RemoveAt(int index) //
+        public T RemoveAt(int index) 
         {
             // is Valid, not disposed
             Requires(IsValid);
@@ -1679,7 +1682,7 @@ namespace C6
             Ensures(AllowsNull || Result<T>() != null);
 
             // Removing an item decreases the count by one
-            Ensures(Count == OldValue(Count) - 1);            
+            Ensures(Count == OldValue(Count) - 1);
 
             return default(T);
         }
@@ -2079,7 +2082,7 @@ namespace C6
         #region SC.ICollection
 
         public abstract object SyncRoot { get; }
-        public abstract void CopyTo(Array array, int index);
+        public abstract void CopyTo(Array array, int index);        
 
         #endregion
 
@@ -2133,7 +2136,7 @@ namespace C6
         public abstract int Add(object value);
         public abstract bool Contains(object value);
         public abstract int IndexOf(object value);
-        public abstract void Insert(int index, object value);
+        void SC.IList.Insert(int index, object value) {}
         public abstract void Remove(object value);
         void SC.IList.RemoveAt(int index) {}
 

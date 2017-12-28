@@ -359,5 +359,27 @@ namespace C6.Contracts
             }
             return true;
         }
+
+        [Pure]
+        public static bool ItemsAreUnique<T>(this SCG.IEnumerable<T> items)
+        {
+            #region Code Contracts
+
+            // Must not be null
+            Requires(items != null);
+
+            #endregion
+
+            // TODO: Replace with C5's HashTable once implemented
+            var set = new SCG.HashSet<T>();
+            foreach (var item in items) {
+                if (set.Contains(item)) {
+                    return false;
+                }
+                set.Add(item);
+            }
+
+            return true;
+        }
     }
 }

@@ -2,41 +2,88 @@
 	- Introduction
 	- Abstract
 	- Conclussion	
-	====
-	SCG.IEnumerable<T> items
-	Prioritized:		
-
-		// no! - write about: RemoveAt_violatesPrecondtions, isGoodEnuerable()
-		//- ToArray() in view methods; written in the report
-								
-		//- documentation
-		//- fill: Conclusion
-		Nedelya:				
-		- fluctuating tests still	
-		- re-read the project - Microsoft's code contracts.
-		- small  staff in .cs files with ??
-		- _version ++				
-		//- AddRange()
-		// User examples		
-		// 		- SCG.IEnumerable<T> items -> call .toArray() in the beginning of the method;
-				isGoodEnuerable() added, KEEP IT! Update the tests (their names + violate precondition, instead of throws exception).
-	=========
+	- C6 Continued - github rep!!!
+	====	
 	Writing:
-		overlapping nitem views or what.
-		//- RemoveAt_violatesPrecondtions - failed
-			IList.RemoveAt(int), normally no preconditions allowed, but it is new in IList
-			Added the preconditions, it worked.
-		- Sort fails for LL and HLL
+		//- From C5 to C6 Continued
+		
+		- Code Contracts in C6
+			- Pitfalls
+				//- RemoveAt_violatesPrecondtions - failed
+				//IList.RemoveAt(int), normally no preconditions allowed, but it is new (hiding) in IList. Added the //preconditions, it worked.
+				
+			//- new Contracts Helper method 
+				//- yes: items.ItemsAreUnique()							
+			- ?????s & TODOs
+				- \subsection{Interface contracts}
+					//Empty or ????											
+				//- TODO in \subsection{Views}	???		
+				//- \textbf{Underlying and Offset} TODO
+				//- so they don't hide any interface methods placed higher in the hierarchy.
+				//- re-read
+						
+		//- Implementation data structures					
+			//- One TODO:
+				- about the checking before raising events
+			//- Stack and Queues - do and write it in "Implementation of data structure" (1)				
+				//- Add that Stack is not implemented in HAL							
+			//- re-read and rearrange the structure				
+					
+		- Unit Testing
+			//- overlapping nitem views or what.
+			- Find the question marks
+				- ??? future work: tests for the rest nor covered methods and scenario - Peter's test with matrix with view.s
+				- All the scenarios available for a list + extra methods... \lstinline{TODO}
+				//- TODO: Anything more about C5's WRONG view (testing) approach
+				//- but I gave fixed parameters to some of the view methods. TODO code
+				-// \subsection{New test helpers introduced}
+					// TODO Getview, GetCount. 
+				- Assert.Mutliple ???
+				- //check the captions				
+				- re-read
+				- rename the GetNItemViews -> GetNItemOverlappingViews
+			- Bugs, move it out
+				Add: 
+					//- Sort() fails for LL and HLL; end sentinel is not updated
+			- Run.If:
+				- public void ItemGet_RandomCollectionWithNull_Null()			
+						
+	====
+	Prioritized:	
+		- HLL: write invariants with helper [Pure] methods !!!!!!!!!!!
+		- small  staff in .cs files with ?? HLL, LL, HAL, AL
+			//HLL, HAL: AddRange() - raising events with the added items
+		- fluctuating tests still			
+		- _version ++								
+	=========
+	Writing notes:		
+		- C6.Code Contracts
+			- look: Core library Contracts - should be overwritten or ... SC.IList problem
+		- Skip qunatifiers for release configuration 
+		
+		- Chapter 3. 
+			- C6 creates completely new solution (???) explain?		
+			
+		- General:
+			- Be clear: HLL.View is finished or not
+		
+	===================
+	Last checks:
+		- Create random collection for test. You wrote that in the report.
+		- Implementation the data strucutre
+			- "but without completing the view support and testing for the latter on" (!!!!!!!!!!!!1)
+		- "see figure x" and figure captions - put dots.
+		- the names of the fig in section: changes made to C6's tests
+		- "ll. Although I was expecting that the time will not be enough, the view invariants was adapted to their Code Contracts shape"
+				
+			
 		
 	====
 	- The structure of the report is influenced by C6
 	- The rest of the tests for views (!!!!!)				
 		- view tests - only updating ones	
 		- Stack: Run.If() - needed		
-	- Assert.Multiple() (1)	
-	- Stack and Queues - do and write it in "Implementation of data structure" (1)
-	- Run.If:
-		- public void ItemGet_RandomCollectionWithNull_Null()
+	- Assert.Multiple() (1)		
 	- version question, Peter	
 	- LL.ClearPrivate()
 		- UpdateVersion() - naeaeaeh. Move it up ?!

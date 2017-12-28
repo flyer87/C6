@@ -28,7 +28,7 @@ namespace C6.Tests.Collections
     [TestFixture]
     public class HashedArrayListListTests : IListTests
     {
-        protected override EventTypes ListenableEvents => All; // Why All? -Up to us, could be changed to non-All for some tests
+        protected override EventTypes ListenableEvents => All;
 
         protected override bool AllowsNull => false;
         protected override bool AllowsDuplicates => false;

@@ -268,6 +268,7 @@ namespace C6
             // Argument must be non-null if collection disallows null values
             Requires(AllowsNull || item != null, ItemMustBeNonNull);
 
+
             // The collection becomes non-empty
             Ensures(!IsEmpty);
 
@@ -287,7 +288,8 @@ namespace C6
             Ensures(Result<bool>() || this.IsSameSequenceAs(OldValue(ToArray())));
 
             // Returns true if bag semantic, otherwise the opposite of whether the collection already contained the item
-            Ensures(AllowsDuplicates ? Result<bool>() : OldValue(!this.Contains(item, EqualityComparer)));            
+            Ensures(AllowsDuplicates ? Result<bool>() : OldValue(this.Contains(item, EqualityComparer)) ? !Result<bool>() : Result<bool>());            
+            //Ensures(AllowsDuplicates ? Result<bool>() : !Result<bool>());
 
             return default(bool);
         }
@@ -307,8 +309,7 @@ namespace C6
             Requires(items != null, ArgumentMustBeNonNull);            
 
             // All items must be non-null if collection disallows null values
-            Requires(AllowsNull || ForAll(items, item => item != null), ItemsMustBeNonNull);            
-
+            Requires(AllowsNull || ForAll(items, item => item != null), ItemsMustBeNonNull);
 
             // The collection becomes non-empty, if items are non-empty
             Ensures(items.IsEmpty() || !IsEmpty);

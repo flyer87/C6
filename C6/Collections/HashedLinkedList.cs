@@ -93,7 +93,7 @@ namespace C6.Collections
                               v._underlying == (_underlying ?? this)
                       ));
 
-            // TODO: Find better way for doing that 
+            // TODO: Not allowed with the current version of Code Contracts
             /* var nodes = new Node[UnderlyingCount];  
             var index = 0;            
             var cursor = _startSentinel.Next;
@@ -299,6 +299,7 @@ namespace C6.Collections
 
             // ??? C6.LinkedList: All this below is in a private method InsertRangePrivate
             var countAdded = 0;
+            //var itemsAdded = new LinkedList<T>();
             var pred = _endSentinel.Prev;
             foreach (var item in array) // or items???
             {
@@ -307,6 +308,7 @@ namespace C6.Collections
                     continue;
                 }
 
+                //itemsAdded.Add(item);
                 InsertNodeBeforePrivate(false, _endSentinel, node); // why false ???
                 countAdded++;
             }
@@ -318,7 +320,7 @@ namespace C6.Collections
             UpdateVersion();
 
             FixViewsAfterInsertPrivate(_endSentinel, pred, countAdded, 0);
-            (_underlying ?? this).RaiseForAddRange(array); // wrong! Not array, only the added ones ???
+            (_underlying ?? this).RaiseForAddRange(pred, Count - countAdded, countAdded);
             return true;
         }
 
@@ -778,9 +780,7 @@ namespace C6.Collections
         public virtual void InsertLast(T item) => Insert(Count, item);
 
         public virtual void InsertRange(int index, SCG.IEnumerable<T> items)
-        {
-            //TODO: some toArray() operations ???
-
+        {            
             var array = items.ToArray(); // if it is enumerable we can't check with a method that it is Empty ???
 
             if (array.IsEmpty()) {
@@ -788,9 +788,7 @@ namespace C6.Collections
             }
 
             InsertRangePrivate(index, array);
-            (_underlying ?? this).RaiseForInsertRange(Offset + index, array);
-            //  not corect should raise only for really inserted
-            // !!! it is correct, since we have a precondition checking that all the items are not in the list
+            (_underlying ?? this).RaiseForInsertRange(Offset + index, array);            
         }
 
         public virtual bool IsSorted(Comparison<T> comparison)
@@ -1894,21 +1892,27 @@ namespace C6.Collections
 
         private void FixViewsBeforeSingleRemovePrivate(Node node, int realRemovalIndex)
         {
-            if (_views == null)
+            if (_views == null) {
                 return;
+            }
 
             foreach (var view in _views) {
-                if (view == this)
+                if (view == this) {
                     continue;
+                }
 
-                if (view._startSentinel.Precedes(node) && node.Precedes(view._endSentinel))
+                if (view._startSentinel.Precedes(node) && node.Precedes(view._endSentinel)) {
                     view.Count--;
-                if (!view._startSentinel.Precedes(node))
+                }
+                if (!view._startSentinel.Precedes(node)) {
                     view.Offset--;
-                if (view._startSentinel == node)
+                }
+                if (view._startSentinel == node) {
                     view._startSentinel = node.Prev;
-                if (view._endSentinel == node)
+                }
+                if (view._endSentinel == node) {
                     view._endSentinel = node.Next;
+                }
             }
         }
 
@@ -2013,13 +2017,13 @@ namespace C6.Collections
             OnCollectionChanged();
         }
 
-        private void RaiseForAddRange(SCG.IEnumerable<T> array)
+        private void RaiseForAddRange(Node node, int index, int count)
         {
-            Requires(array != null);
-
-            if (ActiveEvents.HasFlag(Added)) {
-                foreach (var item in array) {
-                    OnItemsAdded(item, 1);
+            if (ActiveEvents.HasFlag(Added)) {                
+                var end = index + count;
+                for (var i = index; i < end; i++) {
+                    OnItemsAdded(node.item, 1);
+                    node = node.Next;                    
                 }
             }
 

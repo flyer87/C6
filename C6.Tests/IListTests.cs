@@ -97,7 +97,7 @@ namespace C6.Tests
         }
 
         // at the beginning        
-        private static IList<string>[] GetNItemViewsInTheBeginning(IList<string> coll)
+        private static IList<string>[] GetNItemViewsAtTheBeginning(IList<string> coll)
         {
             var nItemViews = new IList<string>[5];
             const int index = 0;
@@ -157,7 +157,7 @@ namespace C6.Tests
         }
 
         // at the end        
-        private static IList<string>[] GetNItemViewsAtTheEnd(IList<string> coll)
+        private static IList<string>[] GetNItemOverlappingViewsAtTheEnd(IList<string> coll)
         {
             var nItemViews = new IList<string>[5];
             var index = coll.Count - 10; // need enough for RemoveAt
@@ -315,7 +315,7 @@ namespace C6.Tests
         public void Viewthis_NItemViewsInTheBeginning_BothViewsOffsetNotChanged()
         {
             var index = 0;
-            var views = GetNItemViewsInTheBeginning(list);
+            var views = GetNItemViewsAtTheBeginning(list);
             foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
@@ -375,7 +375,7 @@ namespace C6.Tests
         public void Viewthis_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
         {
             var index = 0;
-            var views = GetNItemViewsAtTheEnd(list);
+            var views = GetNItemOverlappingViewsAtTheEnd(list);
             foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
@@ -507,10 +507,10 @@ namespace C6.Tests
         }
 
         [Test]
-        public void ViewAdd_NItemViewsInTheBeginning_RightAuxViewsOffsetAffected()
+        public void ViewAdd_NItemOverlappingViewsAtTheBeginning_RightAuxViewsOffsetAffected()
         {
             var index = 0;
-            var views = GetNItemViewsInTheBeginning(list);
+            var views = GetNItemViewsAtTheBeginning(list);
             foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
@@ -578,7 +578,7 @@ namespace C6.Tests
         public void ViewAdd_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
         {
             var index = 0;
-            var views = GetNItemViewsAtTheEnd(list);
+            var views = GetNItemOverlappingViewsAtTheEnd(list);
             foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
@@ -706,7 +706,7 @@ namespace C6.Tests
         public void ViewRemoveAt_NItemViewsInTheBeginning_RightAuxViewsOffsetAffected()
         {
             var index = 0;
-            var views = GetNItemViewsInTheBeginning(list);
+            var views = GetNItemViewsAtTheBeginning(list);
             foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
@@ -759,7 +759,7 @@ namespace C6.Tests
         public void ViewRemoveAt_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
         {
             var index = 0;
-            var views = GetNItemViewsAtTheEnd(list);
+            var views = GetNItemOverlappingViewsAtTheEnd(list);
             foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
@@ -885,7 +885,7 @@ namespace C6.Tests
         public void ViewInsertWithIndexZero_NItemViewsInTheBeginning_BothViewsOffsetAffected()
         {
             var index = 0;
-            var views = GetNItemViewsInTheBeginning(list);
+            var views = GetNItemViewsAtTheBeginning(list);
             foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
@@ -953,7 +953,7 @@ namespace C6.Tests
         public void ViewInsertWithIndexCount_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
         {
             var index = 0;
-            var views = GetNItemViewsAtTheEnd(list);
+            var views = GetNItemOverlappingViewsAtTheEnd(list);
             foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
@@ -1095,7 +1095,7 @@ namespace C6.Tests
         public void ViewInsertFirst_NItemViewsInTheBeginning_BothViewsOffsetAffected()
         {
             var index = 0;
-            var views = GetNItemViewsInTheBeginning(list);
+            var views = GetNItemViewsAtTheBeginning(list);
             foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
@@ -1163,7 +1163,7 @@ namespace C6.Tests
         public void ViewInsertFirst_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
         {
             var index = 0;
-            var views = GetNItemViewsAtTheEnd(list);
+            var views = GetNItemOverlappingViewsAtTheEnd(list);
             foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
@@ -1305,7 +1305,7 @@ namespace C6.Tests
         public void ViewInsertLast_NItemViewsInTheBeginning_RightAuxViewsOffsetAffected()
         {
             var index = 0;
-            var views = GetNItemViewsInTheBeginning(list);
+            var views = GetNItemViewsAtTheBeginning(list);
             foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
@@ -1373,7 +1373,7 @@ namespace C6.Tests
         public void ViewInsertLast_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
         {
             var index = 0;
-            var views = GetNItemViewsAtTheEnd(list);
+            var views = GetNItemOverlappingViewsAtTheEnd(list);
             foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
@@ -1500,7 +1500,7 @@ namespace C6.Tests
         public void ViewRemoveFirst_NItemViewsInTheBeginning_RightAuxViewsOffsetAffected()
         {
             var index = 0;
-            var views = GetNItemViewsInTheBeginning(list);
+            var views = GetNItemViewsAtTheBeginning(list);
             foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
@@ -1553,7 +1553,7 @@ namespace C6.Tests
         public void ViewRemoveFirst_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
         {
             var index = 0;
-            var views = GetNItemViewsAtTheEnd(list);
+            var views = GetNItemOverlappingViewsAtTheEnd(list);
             foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
@@ -1664,7 +1664,7 @@ namespace C6.Tests
         public void ViewRemoveLast_NItemViewsInTheBeginning_RightAuxViewsOffsetAffected()
         {
             var index = 0;
-            var views = GetNItemViewsInTheBeginning(list);
+            var views = GetNItemViewsAtTheBeginning(list);
             foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
@@ -1717,7 +1717,7 @@ namespace C6.Tests
         public void ViewRemoveLast_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
         {
             var index = 0;
-            var views = GetNItemViewsAtTheEnd(list);
+            var views = GetNItemOverlappingViewsAtTheEnd(list);
             foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
@@ -1839,7 +1839,7 @@ namespace C6.Tests
         public void ViewReverse_NItemViewsInTheBeginningLeftAuxContainedInView_BothViewsOffsetNotChanged()
         {
             var index = 0;
-            var views = GetNItemViewsInTheBeginning(list);
+            var views = GetNItemViewsAtTheBeginning(list);
             foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
@@ -1905,7 +1905,7 @@ namespace C6.Tests
         public void ViewReverse_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
         {
             var index = 0;
-            var views = GetNItemViewsAtTheEnd(list);
+            var views = GetNItemOverlappingViewsAtTheEnd(list);
             foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
@@ -2040,7 +2040,7 @@ namespace C6.Tests
         {
             // Arrange 
             var index = 0;
-            var views = GetNItemViewsInTheBeginning(list);
+            var views = GetNItemViewsAtTheBeginning(list);
             var view = views.Choose(Random);
             var offsetLeft = auxViewLeft.Offset;
             var offsetRight = auxViewRight.Offset;
@@ -2101,7 +2101,7 @@ namespace C6.Tests
         public void ViewShuffle_NItemViewsAtTheEndViewsContainedInRightAuxView_BothViewsOffsetNotChanged()
         {
             var index = 0;
-            var views = GetNItemViewsAtTheEnd(list);
+            var views = GetNItemOverlappingViewsAtTheEnd(list);
             foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
@@ -2238,7 +2238,7 @@ namespace C6.Tests
         {
             // Arrange 
             var index = 0;
-            var views = GetNItemViewsInTheBeginning(list);
+            var views = GetNItemViewsAtTheBeginning(list);
             var view = views.Choose(Random);
             var offsetLeft = auxViewLeft.Offset;
             var offsetRight = auxViewRight.Offset;
@@ -2300,7 +2300,7 @@ namespace C6.Tests
         public void ViewSort_NItemViewsAtTheEndViewsContainedInRightAuxView_BothViewsOffsetNotChanged()
         {
             var index = 0;
-            var views = GetNItemViewsAtTheEnd(list);
+            var views = GetNItemOverlappingViewsAtTheEnd(list);
             foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
@@ -2364,7 +2364,7 @@ namespace C6.Tests
 
         [Test]
         // TODO: For LinkedList<T> and HashedLinkedList<T> might fail until Sort() is fixed!
-        public void Sort_NonOverlappingNeighbourViews_Corect()
+        public void ViewSort_NonOverlappingNeighbourViews_Corect()
         {
             // Arrange
             var items = GetUppercaseStrings(Random);
@@ -2372,14 +2372,14 @@ namespace C6.Tests
 
             var view1  = collection.View(0, Random.Next(1, collection.Count - 1));
             var view1RightEndPoint = view1.Offset + view1.Count;
-            var view2 = collection.View(view1RightEndPoint, Random.Next(1, collection.Count - view1RightEndPoint));
+            var view2 = collection.View(view1RightEndPoint, Random.Next(1, collection.Count - view1RightEndPoint)); // neighbor of view1 - nonoverlapping
             var view2Old = GetList(view2);
 
             // Act
             view1.Sort();
 
             // Assert
-            Assert.That(view2, Is.EqualTo(view2Old));
+            Assert.That(view2, Is.EqualTo(view2Old).Using(ReferenceEqualityComparer));
         }
         
 
@@ -2446,7 +2446,7 @@ namespace C6.Tests
         public void ViewRemoveIndexRange_NItemViewsInTheBeginning_RightAuxViewsOffsetAffected()
         {
             var index = 0;
-            var views = GetNItemViewsInTheBeginning(list);
+            var views = GetNItemViewsAtTheBeginning(list);
             foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
@@ -2499,7 +2499,7 @@ namespace C6.Tests
         public void ViewRemoveIndexRange_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
         {
             var index = 0;
-            var views = GetNItemViewsAtTheEnd(list);
+            var views = GetNItemOverlappingViewsAtTheEnd(list);
             foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
@@ -2625,7 +2625,7 @@ namespace C6.Tests
         public void ViewUpdateOut_NItemViewsInTheBeginning_BothViewsOffsetNotChanged()
         {
             var index = 0;
-            var views = GetNItemViewsInTheBeginning(list);
+            var views = GetNItemViewsAtTheBeginning(list);
             foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
@@ -2697,7 +2697,7 @@ namespace C6.Tests
         public void ViewUpdateOut_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
         {
             var index = 0;
-            var views = GetNItemViewsAtTheEnd(list);
+            var views = GetNItemOverlappingViewsAtTheEnd(list);
             foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
@@ -2840,7 +2840,7 @@ namespace C6.Tests
         public void ViewUpdate_NItemViewsInTheBeginning_BothViewsOffsetNotChanged()
         {
             var index = 0;
-            var views = GetNItemViewsInTheBeginning(list);
+            var views = GetNItemViewsAtTheBeginning(list);
             foreach (var view in views) {
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
@@ -2909,7 +2909,7 @@ namespace C6.Tests
         public void ViewUpdate_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
         {
             var index = 0;
-            var views = GetNItemViewsAtTheEnd(list);
+            var views = GetNItemOverlappingViewsAtTheEnd(list);
             foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
@@ -3118,7 +3118,7 @@ namespace C6.Tests
         {
             // Arrange
             var index = 0;
-            var views = GetNItemViewsAtTheEnd(list);
+            var views = GetNItemOverlappingViewsAtTheEnd(list);
             var offsetLeft = auxViewLeft.Offset;
             var offsetRight = auxViewRight.Offset;
 
@@ -3259,7 +3259,7 @@ namespace C6.Tests
             var offsetLeft = auxViewLeft.Offset;
             var offsetRight = auxViewRight.Offset;
 
-            var views = GetNItemViewsInTheBeginning(list);
+            var views = GetNItemViewsAtTheBeginning(list);
             var i = Random.Next(0, views.Length);
             var view = views[i];
             var item = view.Choose();
@@ -3319,10 +3319,10 @@ namespace C6.Tests
         }
 
         [Test]
-        public void ViewRemove_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
+        public void ViewRemove_NItemOverlappingViewsAtTheEnd_BothViewsOffsetNotChanged()
         {
             var index = 0;
-            var views = GetNItemViewsAtTheEnd(list);
+            var views = GetNItemOverlappingViewsAtTheEnd(list);
             foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
@@ -3465,7 +3465,7 @@ namespace C6.Tests
             var offsetLeft = auxViewLeft.Offset;
             var offsetRight = auxViewRight.Offset;
 
-            var views = GetNItemViewsInTheBeginning(list);
+            var views = GetNItemViewsAtTheBeginning(list);
             var i = Random.Next(0, views.Length);
             var view = views[i];
             var item = view.Choose();
@@ -3531,7 +3531,7 @@ namespace C6.Tests
         public void ViewRemoveOut_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
         {
             var index = 0;
-            var views = GetNItemViewsAtTheEnd(list);
+            var views = GetNItemOverlappingViewsAtTheEnd(list);
             foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
@@ -3678,7 +3678,7 @@ namespace C6.Tests
             var offsetLeft = auxViewLeft.Offset;
             var offsetRight = auxViewRight.Offset;
 
-            var views = GetNItemViewsInTheBeginning(list);
+            var views = GetNItemViewsAtTheBeginning(list);
             var i = Random.Next(0, views.Length);
             var view = views[i];
             var item = view.Choose();
@@ -3744,7 +3744,7 @@ namespace C6.Tests
         public void ViewRemoveRange_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
         {
             var index = 0;
-            var views = GetNItemViewsAtTheEnd(list);
+            var views = GetNItemOverlappingViewsAtTheEnd(list);
             foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
@@ -3890,7 +3890,7 @@ namespace C6.Tests
             var offsetLeft = auxViewLeft.Offset;
             var offsetRight = auxViewRight.Offset;
 
-            var views = GetNItemViewsInTheBeginning(list);
+            var views = GetNItemViewsAtTheBeginning(list);
             var i = Random.Next(0, views.Length);
             var view = views[i];
             var item = view.Choose();
@@ -3953,7 +3953,7 @@ namespace C6.Tests
         public void ViewRemoveDuplicates_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
         {
             var index = 0;
-            var views = GetNItemViewsAtTheEnd(list);
+            var views = GetNItemOverlappingViewsAtTheEnd(list);
             foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;
@@ -4096,7 +4096,7 @@ namespace C6.Tests
             var offsetLeft = auxViewLeft.Offset;
             var offsetRight = auxViewRight.Offset;
 
-            var views = GetNItemViewsInTheBeginning(list);
+            var views = GetNItemViewsAtTheBeginning(list);
             var i = Random.Next(0, views.Length);
             var view = views[i];
             var retainItems = view.Skip(1).Take(view.Count - 1).ToList();
@@ -4158,7 +4158,7 @@ namespace C6.Tests
         public void ViewRetainRange_NItemViewsAtTheEnd_BothViewsOffsetNotChanged()
         {
             var index = 0;
-            var views = GetNItemViewsAtTheEnd(list);
+            var views = GetNItemOverlappingViewsAtTheEnd(list);
             foreach (var view in views) {
                 // Arrange                       
                 var offsetLeft = auxViewLeft.Offset;

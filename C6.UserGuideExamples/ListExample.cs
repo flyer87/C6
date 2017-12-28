@@ -21,28 +21,42 @@ namespace C6.UserGuideExamples
             //    SCG.EqualityComparer<string>.Default.GetHashCode);
 
             //var items = new[] { "-8", "Ab", "6", "-4", "5", "-2", "-1", "1", "10", "8" };
-            //var al = new LinkedList<string>(items);
-            //var v1 = al.View(2, 2);
-            //var v2 = al.View(3, 2);
-            //v1.Sort();
-            //Console.WriteLine(v2);
+            //var al = new ArrayList<string>(items);
+            //var v1 = al.View(al.Count - 2, 2);
+            //var v2 = al.View(al.Count - 2, 2);
 
-
-            
             var items = new[] { "-8", "Ab", "6", "-4", "5", "-2", "-1", "1", "10", "8" };
-            var collection = new HashedLinkedList<string>(items);
-
-            var v0 = collection.View(0, 2);
-
-            var v4 = collection.View(4, 2);
-            var v6 = collection.View(6, 2);
-
-            var vCount2 = collection.View(collection.Count - 2, 2);
+            var collection = new HashedArrayList<string>(items);
+            Console.WriteLine(collection.Contains("10"));
+            Console.WriteLine(collection.Add("10"));
 
 
-            v4.Sort();
-            Console.WriteLine(v4);
-            Console.WriteLine(v6);
+
+            // BUG: Sorting
+            //var items = new[] { "-8", "Ab", "6", "-4", "5", "-2", "-1", "1", "10", "8" };
+            //var collection = new HashedLinkedList<string>(items);
+
+            //var v0 = collection.View(0, 2);
+            //var v2 = collection.View(1, 2);
+            //var v4 = collection.View(4, 2);
+            //var v6 = collection.View(7, 1);
+            //var vCount2 = collection.View(collection.Count - 2, 2);
+
+            //Console.WriteLine("Views before calling Sort()");
+            //Console.WriteLine($"v0 = {v0}");
+            //Console.WriteLine($"v2 = {v2}");
+            //Console.WriteLine($"v4 = {v4}");
+            //Console.WriteLine($"v6 = {v6}");
+            //Console.WriteLine($"vCount2 = {vCount2}");
+
+            //v4.Sort();
+
+            //Console.WriteLine("Views after calling Sort()");
+            //Console.WriteLine($"v0 = {v0}");
+            //Console.WriteLine($"v2 = {v2}");
+            //Console.WriteLine($"v4 = {v4}");
+            //Console.WriteLine($"v6 = {v6}");
+            //Console.WriteLine($"vCount2 = {vCount2}");
 
 
 
