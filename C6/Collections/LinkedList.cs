@@ -1711,7 +1711,14 @@ namespace C6.Collections
             Count = 0;
         }
 
-        private void UpdateVersion() => _version++;
+        private void UpdateVersion()
+        {
+            _version++;
+            if (_underlying != null)
+            {
+                _underlying._version++;
+            }
+        }
 
         private bool CheckVersion(int version)
         {

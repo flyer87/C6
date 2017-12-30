@@ -1702,15 +1702,12 @@ namespace C6.Collections
             Count = 0;
         }
 
-        private void UpdateVersion(bool updateUnderlying = true)
+        private void UpdateVersion()
         {
             _version++;
-            if (updateUnderlying)
-            {
-                if (_underlying != null)
-                {
-                    _underlying._version++;
-                }
+
+            if (_underlying != null) {
+                _underlying._version++;
             }
         }
 
@@ -2479,7 +2476,6 @@ namespace C6.Collections
         }
 
         #endregion
-
 
         /// <summary>
         /// Node ???

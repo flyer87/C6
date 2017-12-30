@@ -1596,7 +1596,14 @@ namespace C6.Collections
             return item;
         }
 
-        private void UpdateVersion() => _version++;
+        private void UpdateVersion()
+        {
+            _version++;
+            if (_underlying != null)
+            {
+                _underlying._version++;
+            }
+        }
 
         private static bool IsCompatibleObject(object value) => value is T || value == null && default(T) == null;
 

@@ -32,20 +32,20 @@
 		- Unit Testing
 			//- overlapping nitem views or what.
 			- Find the question marks
-				- ??? future work: tests for the rest nor covered methods and scenario - Peter's test with matrix with view.s
-				- All the scenarios available for a list + extra methods... \lstinline{TODO}
+				//- ??? future work: tests for the rest nor covered methods and scenario - Peter's test with matrix with view.s
+				//- All the scenarios available for a list + extra methods... \lstinline{TODO}
 				//- TODO: Anything more about C5's WRONG view (testing) approach
 				//- but I gave fixed parameters to some of the view methods. TODO code
 				-// \subsection{New test helpers introduced}
 					// TODO Getview, GetCount. 
 				- Assert.Mutliple ???
 				- //check the captions				
-				- re-read
+				//- re-read
 				- rename the GetNItemViews -> GetNItemOverlappingViews
-			- Bugs, move it out
+			//- Bugs, move it out
 				Add: 
 					//- Sort() fails for LL and HLL; end sentinel is not updated
-			- Run.If:
+			//- Run.If:
 				- public void ItemGet_RandomCollectionWithNull_Null()			
 						
 	====
@@ -54,11 +54,22 @@
 		- small  staff in .cs files with ?? HLL, LL, HAL, AL
 			//HLL, HAL: AddRange() - raising events with the added items
 		- fluctuating tests still			
-		- _version ++								
+		- _version ++	
+		- rename NonOverlapping
+		====
+		
+		- Intro, 		
+		//- Abstract, 
+		//- Conclusion.
+		//- release and debug configuration.
+			- After installing Visual Studio Code Contracts extension
+		//- somewhere I wrote I strenghtend postconditions - should add I tried to strenghten, but it was not possible.
+		//- (???)
 	=========
 	Writing notes:		
 		- C6.Code Contracts
 			- look: Core library Contracts - should be overwritten or ... SC.IList problem
+			
 		- Skip qunatifiers for release configuration 
 		
 		- Chapter 3. 
@@ -69,17 +80,21 @@
 		
 	===================
 	Last checks:
+		- missing: this chapter gives an overview of 
 		- Create random collection for test. You wrote that in the report.
 		- Implementation the data strucutre
 			- "but without completing the view support and testing for the latter on" (!!!!!!!!!!!!1)
 		- "see figure x" and figure captions - put dots.
 		- the names of the fig in section: changes made to C6's tests
 		- "ll. Although I was expecting that the time will not be enough, the view invariants was adapted to their Code Contracts shape"
+			- The structure of the report is influenced by C6
+		- Proof reading 
+			- Code Contracts/contracts
+			- caption names
 				
 			
 		
 	====
-	- The structure of the report is influenced by C6
 	- The rest of the tests for views (!!!!!)				
 		- view tests - only updating ones	
 		- Stack: Run.If() - needed		

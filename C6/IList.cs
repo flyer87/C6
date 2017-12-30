@@ -1757,7 +1757,8 @@ namespace C6
             Requires(!IsReadOnly, CollectionMustBeNonReadOnly);
 
             // The collection is reversed                        
-            Ensures(this.IsSameSequenceAs(OldValue(Enumerable.Reverse(this).ToList())));            
+            Ensures(this.IsSameSequenceAs(OldValue(Enumerable.Reverse(this).ToList())));    
+                    
             return;
         }
 

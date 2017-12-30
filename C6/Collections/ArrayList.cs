@@ -811,7 +811,8 @@ namespace C6.Collections
             Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
             // TODO: When Code Contracts get updated and allows OldValue(T) of enumerable
-            //Ensures(ForAll(_views, v => !Contained(v) || Reversed(OldValue(DuplicateView(v)), v)) ) ;            
+            // Each view contained in the reversed one should be mirrored
+            //Ensures(ForAll(_views, v => !this.Contained(v) || Mirrored(OldValue(DuplicateView(v)), v)) ) ;            
 
             #endregion
 
@@ -1591,7 +1592,14 @@ namespace C6.Collections
             return item;
         }
 
-        private void UpdateVersion() => _version++;
+        private void UpdateVersion()
+        {
+            _version++;
+            if (_underlying != null)
+            {
+                _underlying._version++;
+            }
+        }
 
         #region Position, PositionComparer and ViewHandler nested types
 
