@@ -29,7 +29,7 @@ namespace C6.Tests.Collections
     }
 
     [TestFixture]
-    public class LinkedListViewTests : GeneralViewTest
+    public class LinkedListViewTests : GeneralViewTests
     {
         protected override IList<T> GetEmptyList<T>(SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
             => new LinkedList<T>(equalityComparer, allowsNull);

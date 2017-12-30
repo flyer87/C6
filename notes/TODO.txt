@@ -54,8 +54,8 @@
 		- small  staff in .cs files with ?? HLL, LL, HAL, AL
 			//HLL, HAL: AddRange() - raising events with the added items
 		- fluctuating tests still			
-		- _version ++	
-		- rename NonOverlapping
+		//- _version ++	
+		//- rename NonOverlapping
 		====
 		
 		- Intro, 		

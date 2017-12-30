@@ -367,31 +367,8 @@ namespace C6.Tests.Collections
 
         #endregion
 
-        #region View
-        [Test]
-        public void ViewTest()
-        {
-            // Arrange
-            //var items = GetStrings(Random);
-            int[] numbers = { 10, 20, 30, 40, 50 };
-            var collection = new ArrayList<int>(numbers);
-            var expected = new ArrayList<int>(new int[] { 10, 20 });
-
-            // Act
-            var view = collection.View(0, 2);
-            System.Console.WriteLine("myViewtest");
-            System.Console.WriteLine(view.ToString());
-
-            // Assert
-            //Assert.That(view, Is.EqualTo(1));
-            Assert.Equals(view, expected);
-        }
-
-        #endregion
-
         #endregion
     }
-
 
     [TestFixture]
     public class ArrayListListTests : IListTests
@@ -425,7 +402,7 @@ namespace C6.Tests.Collections
     }
 
     [TestFixture]
-    public class ArrayListGeneralViewTests : GeneralViewTest
+    public class ArrayListGeneralViewTests : GeneralViewTests
     {
         protected override IList<T> GetEmptyList<T>(SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
             => new ArrayList<T>(equalityComparer: equalityComparer, allowsNull: allowsNull);

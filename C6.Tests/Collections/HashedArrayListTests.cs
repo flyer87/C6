@@ -11,12 +11,7 @@ using NUnit.Framework;
 namespace C6.Tests.Collections
 {
     [TestFixture]
-    public class HashedArrayListTests :TestBase
-    {
-    }
-
-    [TestFixture]
-    public class HashedArrayListGeneralViewTests : GeneralViewTest
+    public class HashedArrayListGeneralViewTests : GeneralViewTests
     {
         protected override IList<T> GetEmptyList<T>(IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
             => new HashedArrayList<T>(equalityComparer);
@@ -45,7 +40,7 @@ namespace C6.Tests.Collections
             => new HashedArrayList<T>(enumerable, equalityComparer);
     }
 
-
+    [TestFixture]
     public class HashedArrayListStackTests : IStackTests
     {
         protected override bool AllowsNull => false;        

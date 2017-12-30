@@ -11,7 +11,7 @@ using static C6.Speed;
 
 namespace C6.Tests.Collections
 {
-    public class HashedLinkedListGeneralViewTests : GeneralViewTest
+    public class HashedLinkedListGeneralViewTests : GeneralViewTests
     {
         protected override IList<T> GetEmptyList<T>(IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
             => new HashedLinkedList<T>(equalityComparer);
