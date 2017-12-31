@@ -108,7 +108,7 @@ namespace C6.Collections
             Invariant((_underlying ?? this)._views == null ||
                       ForAll((_underlying ?? this)._views, v =>
                           v.Offset >= 0 &&
-                          // ??? v.IsValid &&                                                                                    
+                          // v.IsValid &&                                                                                    
                           v.Offset + v.Count >= 0 &&
                           v.Offset + v.Count <= UnderlyingCount
                       ));
@@ -117,12 +117,10 @@ namespace C6.Collections
             // Each view have the correct underlying list
             Invariant((_underlying ?? this)._views == null ||
                       ForAll((_underlying ?? this)._views, v =>
-                          // ??? v.IsValid &&                                                                                
+                          // v.IsValid &&                                                                                
                               v._views == (_underlying ?? this)._views &&
                               v._underlying == (_underlying ?? this))
-            );
-
-            // ??? if (view.stamp != stamp)
+            );            
 
             #endregion
 
@@ -454,7 +452,7 @@ namespace C6.Collections
                 CopyTo(itemsRemoved, 0);
                 if (_underlying == null) // proper list     
                 {
-                    ClearPrivate(); // Clear() was here! But tests passed, altough Clear() rasises its own events ???                    
+                    ClearPrivate(); 
                 }
                 else // view
                 {
@@ -601,7 +599,7 @@ namespace C6.Collections
                 : ~Result<int>() == Count);
 
             // Item at index is the first equal to item
-            // !@ Ensures(Result<int>() < 0 || !this.Skip(Result<int>() + 1).Contains(item, EqualityComparer) && EqualityComparer.Equals(item, this.ElementAt(Result<int>())));
+            Ensures(Result<int>() < 0 || !this.Skip(Result<int>() + 1).Contains(item, EqualityComparer) && EqualityComparer.Equals(item, this.ElementAt(Result<int>())));
 
             #endregion
 
@@ -639,7 +637,7 @@ namespace C6.Collections
             }
 
             RemoveIndexRangePrivate(startIndex, count);
-            // TODO: Removed, becase .Clear() in RemoveIndexRangePrivate reaiss the events
+            // Commented, becase .Clear() in RemoveIndexRangePrivate reaiss the events
             //(_underlying ?? this).RaiseForRemoveIndexRange(Offset + startIndex, count);
         }
 
@@ -683,8 +681,8 @@ namespace C6.Collections
                 return;
             }
 
-            InsertRangePrivate(index, items); // ??? C5.LinkedList has last bool parameter
-            (_underlying ?? this).RaiseForInsertRange(Offset + index, items);
+            InsertRangePrivate(index, array); 
+            (_underlying ?? this).RaiseForInsertRange(Offset + index, array);
         }
 
         public virtual bool IsSorted(Comparison<T> comparison)
@@ -950,8 +948,7 @@ namespace C6.Collections
 
             GetPairPrivate(index - 1, index + count, out view._startSentinel, out view._endSentinel,
                 new[] { -1, Count }, new Node[] { _startSentinel, _endSentinel });
-
-            //TODO: for the purpose of Dispose, we need to retain a ref to the node
+            
             view._myWeakReference = _views.Add(view);
             return view;
         }
@@ -1127,13 +1124,13 @@ namespace C6.Collections
 
             #endregion
 
-            try // why try ???
+            try 
             {
                 foreach (var item in this) {
                     array.SetValue(item, index++);
                 }
             }
-            catch (InvalidCastException) //catch (ArrayTypeMismatchException) ???
+            catch (InvalidCastException) //catch (ArrayTypeMismatchException)
             {
                 throw new ArgumentException("Target array type is not compatible with the type of items in the collection.");
             }
@@ -1431,8 +1428,7 @@ namespace C6.Collections
             Position pos;
 
             while (poslow <= poshigh && (pos = positions[poslow]).Index == aindex) {
-                //TODO: Note: in the case og hashed linked list, if this.offset == null, but pos.View.offset!=null
-                //we may at this point compute this.offset and non-null values of aindex and bindex
+                //TODO: Note: in the case og hashed linked list, if this.offset == null, but pos.View.offset!=null                
                 if (pos.Left)
                     pos.View._endSentinel = b.Next;
                 else {
@@ -1680,7 +1676,7 @@ namespace C6.Collections
                 cursor = tmp;
             }
 
-            if (count == 0) // no need ??? The same reason as down!
+            if (count == 0) // no need 
                 return;
 
             succ.Prev = cursor;
@@ -1690,7 +1686,7 @@ namespace C6.Collections
             if (_underlying != null)
                 _underlying.Count += count;
 
-            if (count > 0) // no need! We have array.IsEmpty() check in the public methods ???
+            if (count > 0) // no need!
             {
                 FixViewsAfterInsertPrivate(succ, pred, count, Offset + index);
             }
@@ -1945,17 +1941,14 @@ namespace C6.Collections
 
         #region Nested types
 
-        /// <summary>
-        /// Node ???
-        /// </summary>
-        /// <typeparam name="V"></typeparam>
-        private sealed class Node // Why not Node<T> ??
+        
+        private sealed class Node 
         {
-            public Node Next; // why public ???
-            public Node Prev; // why public ???
+            public Node Next; 
+            public Node Prev; 
             public T item;
 
-            internal Node(T item) // Why internal ???; else :
+            internal Node(T item)
             {
                 this.item = item;
             }
@@ -2044,28 +2037,11 @@ namespace C6.Collections
 
             SC.IEnumerator SC.IEnumerable.GetEnumerator() => GetEnumerator();
         }
-
-
-        /*
-    ActiveEvents 
-    All 		
-    Apply 		
-    Choose - ok		
-    CopyTo - ok 
-    Count - ok		
-    CountSpeed - ok
-    Exists 		
-    Filter 		
-    Find 
-    IsEmpty - ok
-    ListenableEvents 
-    ToArray - ok         
-*/
-        // TODO: Introduce base class?
+        
         [Serializable]
         [DebuggerTypeProxy(typeof(CollectionValueDebugView<>))]
         [DebuggerDisplay("{DebuggerDisplay}")]
-        private sealed class ItemSet : CollectionValueBase<T>, ICollectionValue<T> // ??? CollectionValues base
+        private sealed class ItemSet : CollectionValueBase<T>, ICollectionValue<T>
         {
             #region Fields
 
@@ -2073,7 +2049,7 @@ namespace C6.Collections
 
             private readonly int _version;
 
-            // TODO: Replace with C6.HashSet<T> in future
+            // TODO: Replace with C5.HashTable<T> in future
             private SCG.HashSet<T> _set;
 
             #endregion
@@ -2097,8 +2073,7 @@ namespace C6.Collections
             #endregion
 
             #region Constructors
-
-            // TODO: Document
+            
             public ItemSet(LinkedList<T> list)
             {
                 #region Code Contracts
@@ -2115,8 +2090,7 @@ namespace C6.Collections
             #endregion
 
             #region Properties
-
-            // Where is that from?
+            
             public override bool AllowsNull => CheckVersion() & _base.AllowsNull;
 
             public override int Count
@@ -2145,7 +2119,7 @@ namespace C6.Collections
             public override T Choose()
             {
                 CheckVersion();
-                return _base.Choose(); // TODO: Is this necessarily an item in the collection value?!
+                return _base.Choose();
             }
 
             public override void CopyTo(T[] array, int arrayIndex)
@@ -2155,8 +2129,7 @@ namespace C6.Collections
             }
 
             public override bool Equals(object obj) => CheckVersion() & base.Equals(obj);
-
-            // ? Why do we need it? Isn't that enough to overrire GetEnumerator()?
+            
             public override SCG.IEnumerator<T> GetEnumerator()
             {
                 // If a set already exists, enumerate that
@@ -2204,7 +2177,7 @@ namespace C6.Collections
 
             private bool CheckVersion() => _base.CheckVersion(_version);
 
-            // TODO: Replace with C6.HashSet<T>!
+            // TODO: Replace with C5.HashTable<T> when implemented
             private SCG.ISet<T> Set => _set ?? (_set = new SCG.HashSet<T>(_base, _base.EqualityComparer));
 
             #endregion
@@ -2340,12 +2313,10 @@ namespace C6.Collections
             {
                 CheckVersion();
 
-                base.CopyTo(array, arrayIndex); // ??? works? In base.CopyTo() we have this. What is "this" - 
-                // the current(class) one, the parrent or the underlying ??
-                // longer version on C6.ArrayList
+                base.CopyTo(array, arrayIndex); 
             }
 
-            public override bool Equals(object obj) => CheckVersion() & base.Equals(obj); // base. ???
+            public override bool Equals(object obj) => CheckVersion() & base.Equals(obj);
 
             public override SCG.IEnumerator<T> GetEnumerator()
             {
@@ -2367,13 +2338,13 @@ namespace C6.Collections
             public override int GetHashCode()
             {
                 CheckVersion();
-                return base.GetHashCode(); // ??? calls again Object.GetHashCode(); base.
+                return base.GetHashCode();
             }
 
-            public override T[] ToArray() // ??? test it
+            public override T[] ToArray() 
             {
                 CheckVersion();
-                return base.ToArray(); // ??? base
+                return base.ToArray();
             }
 
             #endregion
@@ -2387,8 +2358,7 @@ namespace C6.Collections
             #endregion
         }
 
-
-        // TODO: Explicitly check against null to avoid using the (slower) equality comparer
+        
         [Serializable]
         [DebuggerTypeProxy(typeof(CollectionValueDebugView<>))]
         [DebuggerDisplay("{DebuggerDisplay}")]
@@ -2422,8 +2392,7 @@ namespace C6.Collections
             #endregion
 
             #region Constructors
-
-            // TODO: Document
+            
             public Duplicates(LinkedList<T> list, T item)
             {
                 #region Code Contracts
@@ -2478,7 +2447,7 @@ namespace C6.Collections
             public override T Choose()
             {
                 CheckVersion();
-                return _base.Choose(); // TODO: Is this necessarily an item in the collection value?!
+                return _base.Choose();
             }
 
             public override void CopyTo(T[] array, int arrayIndex)
@@ -2578,7 +2547,6 @@ namespace C6.Collections
             }
         }
 
-
         /// <summary>
         /// 
         /// </summary>
@@ -2592,7 +2560,6 @@ namespace C6.Collections
 
             public int Compare(Position a, Position b) => a.Index.CompareTo(b.Index);
         }
-
 
         //TODO: merge the two implementations using Position values as arguments
         /// <summary>
