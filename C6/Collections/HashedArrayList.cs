@@ -28,7 +28,7 @@ namespace C6.Collections
         private const int MaxArrayLength = 0x7FEFFFFF;
 
         private T[] _items;
-        private SCG.Dictionary<T, int> _itemIndex; // TODO: use C6.Hashset, when implemented
+        private SCG.Dictionary<T, int> _itemIndex; // TODO: use C5.HashTable, when implemented
         private WeakViewList<HashedArrayList<T>> _views;
         private WeakViewList<HashedArrayList<T>>.Node _myWeakReference;
         private HashedArrayList<T> _underlying;
@@ -120,27 +120,13 @@ namespace C6.Collections
             // ReSharper enable InvocationIsSkipped
 
             #endregion
-            
+
             IsValid = true;
-            EqualityComparer = equalityComparer ?? SCG.EqualityComparer<T>.Default;            
+            EqualityComparer = equalityComparer ?? SCG.EqualityComparer<T>.Default;
 
-            //var collectionValues = items as ICollectionValue<T>;
-            //var collection = items as SCG.ICollection<T>;
-
-            //if (collectionValues != null) {
-            //    _items = collectionValues.IsEmpty ? EmptyArray : collectionValues.ToArray();
-            //    Count = Capacity;
-            //}
-            //else if (collection != null) {
-            //    Count = collection.Count;
-            //    _items = Count == 0 ? EmptyArray : new T[Count];                
-            //    collection.CopyTo(_items, 0);
-            //}
-            //else {
-                _items = EmptyArray;
-                _itemIndex = new SCG.Dictionary<T, int>(EqualityComparer); // EqualityComparer as paramter ??               
-                AddRange(items); 
-            //}
+            _items = EmptyArray;
+            _itemIndex = new SCG.Dictionary<T, int>(EqualityComparer);
+            AddRange(items);
         }
 
         public HashedArrayList(int capacity = 0, SCG.IEqualityComparer<T> equalityComparer = null)
@@ -293,8 +279,7 @@ namespace C6.Collections
 
             #endregion
 
-            var version = _version;
-            //yield return default(T); ???
+            var version = _version;            
             for (var i = Offset; CheckVersion(version) && i < Offset + Count; i++) {
                 yield return _items[i];
             }
@@ -352,7 +337,7 @@ namespace C6.Collections
 
             #endregion
 
-            // TODO: insert range ???
+            // TODO: insert range
             // TODO: Handle ICollectionValue<T> and ICollection<T>
             var array = items.ToArray();
             if (array.IsEmpty()) {
@@ -360,31 +345,29 @@ namespace C6.Collections
             }
 
             var countToAdd = array.Length;
-            EnsureCapacity(UnderlyingCount + countToAdd); // View: underl.Count           
+            EnsureCapacity(UnderlyingCount + countToAdd); 
 
-            var index = Offset + Count; // make it better
-            if (index < UnderlyingCount) // make space - irrelevant for Add(: from the end)
+            var index = Offset + Count; 
+            if (index < UnderlyingCount) 
             {
                 Array.Copy(_items, index, _items, index + countToAdd, UnderlyingCount - index);
             }
-
-            // copy the relevants
-            var oldIndex = index;
-            //var itemsAdded = new ArrayList<T>();
+            
+            var oldIndex = index;            
             var countAdded = 0;
             foreach (var item in array) {
                 if (FindOrAddToHashPrivate(item, index)) {
                     continue;
                 }
+
                 _items[index++] = item;
                 countAdded++;
-                //itemsAdded.Add(item);
             }
 
             // shrink the space if too much space is allocated
             if (countAdded < countToAdd) {
                 Array.Copy(_items, oldIndex + countToAdd, _items, index, UnderlyingCount - oldIndex);
-                Array.Clear(_items, UnderlyingCount + countAdded, countToAdd - countAdded); //#to_delete: kolkoto sa ostanali ne zapalnati
+                Array.Clear(_items, UnderlyingCount + countAdded, countToAdd - countAdded); 
             }
 
             if (countAdded <= 0) {
@@ -393,14 +376,13 @@ namespace C6.Collections
 
             UpdateVersion();
 
-            Count += countAdded; // Views:
+            Count += countAdded;
             if (_underlying != null) {
                 _underlying.Count += countAdded;
             }
 
             ReindexPrivate(index);
-            FixViewsAfterInsertPrivate(countAdded, index - countAdded); //View; index - countAdded == oldIndex
-            //(_underlying ?? this).RaiseForAddRange(items);
+            FixViewsAfterInsertPrivate(countAdded, index - countAdded);            
             (_underlying ?? this).RaiseForAddRange(index - countAdded, countAdded);
 
             return true;
@@ -411,8 +393,7 @@ namespace C6.Collections
         #region ICollection
 
         public virtual ICollectionValue<KeyValuePair<T, int>> ItemMultiplicities()
-        {
-            // ???
+        {            
             throw new NotImplementedException();
         }
 
@@ -539,11 +520,8 @@ namespace C6.Collections
             // If collection changes, the version is updated
             Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
-            #endregion
-
-            // ??? No duplicates => LastIndexOf(item) - What?!
-
-            // Remove (last) instance of item, since this moves the fewest items
+            #endregion            
+            
             var index = IndexOf(item);
             if (index < 0) {
                 removedItem = default(T);
@@ -571,8 +549,7 @@ namespace C6.Collections
                 return false;
             }
 
-            // TODO: Replace ArrayList<T> with more efficient data structure like HashBag<T>
-            //var itemsToRemove = new ArrayList<T>(items, EqualityComparer, AllowsNull); // ???
+            // TODO: Replace ArrayList<T> with more efficient data structure like HashBag<T>            
             var itemsToRemove = new SCG.HashSet<T>(items, EqualityComparer);
             return RemoveAllWherePrivate(item => itemsToRemove.Remove(item));
         }
@@ -586,17 +563,7 @@ namespace C6.Collections
             if (IsEmpty) {
                 return false;
             }
-
-            // TODO: ???Replace ArrayList<T> with more efficient data structure like HashBag<T>
-            //var itemsToContain = new ArrayList<T>(items, EqualityComparer);
-            //bool containsRange = true;
-            //foreach (var item in items)
-            //{
-            //    containsRange = containsRange && _itemIndex.ContainsKey(item); 
-            //}
-
-            //return containsRange;
-
+            
             return items.All(item => _itemIndex.ContainsKey(item));
         }
 
@@ -613,7 +580,7 @@ namespace C6.Collections
                 return;
             }
 
-            UpdateVersion(); // here, not before: a proper list is calling Clear() ???     
+            UpdateVersion(); 
 
             // a view is calling Clear()
             if (_underlying != null) {
@@ -715,33 +682,24 @@ namespace C6.Collections
 
         public virtual T this[int index]
         {
-            get { return _items[Offset + index]; } // View: offset +
+            get { return _items[Offset + index]; } 
             set {
-                #region Code Contracst
-
-                // No Require for the stter at IIndexed level ???
-
-                #endregion
-
                 UpdateVersion();
 
-                index += Offset; // View: 
+                index += Offset; 
                 var oldItem = _items[index];
 
-                if (EqualityComparer.Equals(value, oldItem)) {
-                    // ???
+                if (EqualityComparer.Equals(value, oldItem)) {                    
                     _items[index] = value;
                     _itemIndex[value] = index;
                 }
-                else {
-                    // ???
+                else {                    
                     _items[index] = value;
                     _itemIndex.Remove(oldItem);
                     _itemIndex[value] = index;
-                }
-                // Allready there: Exception; C5 throws, but why ???
+                }                
 
-                (_underlying ?? this).RaiseForIndexSetter(oldItem, value, index); // View: 
+                (_underlying ?? this).RaiseForIndexSetter(oldItem, value, index); 
             }
         }
 
@@ -793,7 +751,7 @@ namespace C6.Collections
             startIndex += Offset;
             FixViewsBeforeRemovePrivate(startIndex, count);
 
-            // ??? Alternative: View(start, count).Clear();
+            // Alternative: View(start, count).Clear();
 
             // clean _itemIndex
             var end = startIndex + count;
@@ -851,7 +809,7 @@ namespace C6.Collections
 
             #endregion
 
-            // TODO: Use InsertPrivate() ??? 
+            // TODO: Use InsertPrivate()
 
             // TODO: Handle ICollectionValue<T> and ICollection<T>
             // TODO: Avoid creating an array? Requires a lot of extra code, since we need to properly handle items already added from a bad enumerable
@@ -902,15 +860,11 @@ namespace C6.Collections
                 FixViewsAfterInsertPrivate(countAdded, index - countAdded); //View; index - countAdded == oldIndex
                 (_underlying ?? this).RaiseForInsertRange(Offset + inIndex, array);
             }
-            finally {
-                //System.Console.WriteLine(e);
-
-            }
-
-            //throw new NotImplementedException();
+            finally {                
+            }            
         }
 
-        public virtual bool IsSorted(Comparison<T> comparison) // View:
+        public virtual bool IsSorted(Comparison<T> comparison) 
         {
             #region Code Contract
 
@@ -919,7 +873,7 @@ namespace C6.Collections
             #endregion
 
             // TODO: Can we check that comparison doesn't alter the collection?
-            for (var i = Offset + 1; i < Offset + Count; i++) // View: 
+            for (var i = Offset + 1; i < Offset + Count; i++) 
             {
                 if (comparison(_items[i - 1], _items[i]) > 0) {
                     return false;
@@ -952,15 +906,16 @@ namespace C6.Collections
 
             UpdateVersion();
 
-            //Array.Reverse(_items, Offset, Count); // Why ???
+            //Array.Reverse(_items, Offset, Count); 
             for (int i = 0, length = Count / 2, end = Offset + Count - 1; i < length; i++) {
                 var swap = _items[Offset + i];
 
                 _items[Offset + i] = _items[end - i];
                 _items[end - i] = swap;
             }
+
             ReindexPrivate(Offset, Offset + Count);
-            DisposeOverlappingViewsPrivate(true); //View: 
+            DisposeOverlappingViewsPrivate(true); 
             (_underlying ?? this).RaiseForReverse();
         }
 
@@ -1265,18 +1220,14 @@ namespace C6.Collections
         #region Private
 
         private bool RemoveAllWherePrivate(Func<T, bool> predicate)
-        {
-            // If result is false, the collection remains unchanged
-
+        {            
             #region Code Contract            
 
             Ensures(Result<bool>() || this.IsSameSequenceAs(OldValue(ToArray())));
 
-            #endregion
+            #endregion            
 
-            //TODO: updatecheck() ???
-
-            var shouldRememberItems = ActiveEvents.HasFlag(Removed); // ??? 
+            var shouldRememberItems = ActiveEvents.HasFlag(Removed);
             IExtensible<T> itemsRemoved = null;
             var cntRemoved = 0;
             var viewHandler = new ViewHandler(this);
@@ -1545,8 +1496,7 @@ namespace C6.Collections
             }
 
             var newCapacity = Capacity * 2;
-            if ((uint) newCapacity > MaxArrayLength) {
-                // why uint ???
+            if ((uint) newCapacity > MaxArrayLength) {                
                 newCapacity = MaxArrayLength;
             }
             else if (newCapacity < MinArrayLength) {
@@ -1567,8 +1517,7 @@ namespace C6.Collections
         {
             _items = EmptyArray;
             _itemIndex.Clear();
-            Count = 0;
-            // ???
+            Count = 0;            
         }
 
         private T RemoveAtPrivate(int index)
@@ -1616,27 +1565,26 @@ namespace C6.Collections
             if (_underlying != null) // view calls Dispose
             {
                 IsValid = false;
-                if (!disposingUnderlying)
-                    // disposingUnderlying == true: comes from the else part 
+                if (!disposingUnderlying)                    
                     _views?.Remove(_myWeakReference);
+
                 _underlying = null;
-                _views = null; // shared ref. for _view! Does this set other views to null ??? No!
-                // only the current view's field (_view) starts to point to null.
+                _views = null; 
                 _myWeakReference = null;
             }
             else // proper list call
             {
-                //isValid = false;
+                
                 if (_views != null) {
                     foreach (var view in _views)
-                        view.DisposePrivate(true); // How can we assure that the nodes are deleted?
-                    //_views = null; // !!! ??? notes
+                        view.DisposePrivate(true);                     
                 }
-                Clear(); // proper list
+
+                Clear(); 
             }
         }
 
-        private void RaiseForInsertRange(int index, T[] array) // ??? the index of the view or the _items
+        private void RaiseForInsertRange(int index, T[] array)
         {
             if (ActiveEvents.HasFlag(Inserted | Added)) {
                 for (var i = 0; i < array.Length; i++) {
@@ -1645,6 +1593,7 @@ namespace C6.Collections
                     OnItemsAdded(item, 1);
                 }
             }
+
             OnCollectionChanged();
         }
 
@@ -1776,9 +1725,8 @@ namespace C6.Collections
             }
         }
 
-
         /// <summary>
-        /// During RemoveAll, we need to cache the original endpoint indices of views (??? also for ArrayList?)
+        /// During RemoveAll, we need to cache the original endpoint indices of views 
         /// </summary>
         private struct Position
         {
@@ -1797,7 +1745,6 @@ namespace C6.Collections
                 view = null;
             }
         }
-
 
         /// <summary>
         /// Handle the update of (other) views during a multi-remove operation.
@@ -1909,8 +1856,7 @@ namespace C6.Collections
             #endregion
 
             #region Constructors
-
-            // TODO: Document
+            
             public Duplicates(HashedArrayList<T> list, T item)
             {
                 #region Code Contracts
@@ -1950,9 +1896,7 @@ namespace C6.Collections
             public override Speed CountSpeed
             {
                 get {
-                    CheckVersion();
-                    // TODO: Always use Linear?
-                    //return _list == null ? Linear : Constant;
+                    CheckVersion();                                        
                     return Constant;
                 }
             }
@@ -1966,7 +1910,7 @@ namespace C6.Collections
             public override T Choose()
             {
                 CheckVersion();
-                return _base.Choose(); // TODO: Is this necessarily an item in the collection value?!
+                return _base.Choose(); 
             }
 
             public override void CopyTo(T[] array, int arrayIndex)
@@ -2033,15 +1977,14 @@ namespace C6.Collections
         [Serializable]
         [DebuggerTypeProxy(typeof(CollectionValueDebugView<>))]
         [DebuggerDisplay("{DebuggerDisplay}")]
-        private sealed class ItemSet : CollectionValueBase<T>, ICollectionValue<T> // ??? CollectionValueBase
+        private sealed class ItemSet : CollectionValueBase<T>, ICollectionValue<T> 
         {
             #region Fields
 
             private readonly HashedArrayList<T> _base;
 
             private readonly int _version;
-
-            // TODO: Replace with HashedArrayList<T>
+            
             //private SCG.HashSet<T> _set;
             private HashedArrayList<T> _set;
 
@@ -2066,8 +2009,7 @@ namespace C6.Collections
             #endregion
 
             #region Constructors
-
-            // TODO: Document
+            
             public ItemSet(HashedArrayList<T> list)
             {
                 #region Code Contracts
@@ -2114,7 +2056,7 @@ namespace C6.Collections
             public override T Choose()
             {
                 CheckVersion();
-                return _base.Choose(); // TODO: Is this necessarily an item in the collection value?!
+                return _base.Choose();
             }
 
             public override void CopyTo(T[] array, int arrayIndex)
@@ -2122,11 +2064,9 @@ namespace C6.Collections
                 CheckVersion();
                 Set.CopyTo(array, arrayIndex);
             }
-
-            // ???? Equals comes from where. Ok - from Object class
+            
             public override bool Equals(object obj) => CheckVersion() & base.Equals(obj);
-
-            // ? Why do we need it? Isn't that enough to overrire GetEnumerator()?
+            
             public override SCG.IEnumerator<T> GetEnumerator()
             {
                 // If a set already exists, enumerate that
@@ -2173,8 +2113,7 @@ namespace C6.Collections
             private string DebuggerDisplay => _version == _base._version ? ToString() : "Expired collection value; original collection was modified since range was created.";
 
             private bool CheckVersion() => _base.CheckVersion(_version);
-
-            // TODO: Replace with HashedArrayList<T>!
+            
             private ICollectionValue<T> Set => _set ?? (_set = new HashedArrayList<T>(_base, _base.EqualityComparer));
 
             #endregion
@@ -2296,7 +2235,7 @@ namespace C6.Collections
                 CheckVersion();
                 // Select the highest index in the range
                 var index = _direction.IsForward() ? _startIndex + _count - 1 : _startIndex;
-                return _base._items[index]; // ??? Offset
+                return _base._items[index]; 
             }
 
             public override void CopyTo(T[] array, int arrayIndex)
@@ -2318,7 +2257,7 @@ namespace C6.Collections
             {
                 var items = _base._items;
                 for (var i = 0; i < Count; i++) {
-                    yield return items[_startIndex + _sign * i]; //View:  _base.Offset???
+                    yield return items[_startIndex + _sign * i]; 
                 }
             }
 
@@ -2344,12 +2283,7 @@ namespace C6.Collections
 
             #endregion
         }
-
-
-        /// <summary>
-        /// Something ???
-        /// </summary>
-        /// <typeparam name="V"></typeparam>
+        
         private sealed class WeakViewList<V> : SCG.IEnumerable<V> where V : class
         {
             Node start;
