@@ -55,16 +55,27 @@
 			//HLL, HAL: AddRange() - raising events with the added items
 		- fluctuating tests still			
 		//- _version ++	
-		//- rename NonOverlapping
+		//- rename NonOverlapping		
 		====
 		
-		- Intro, 		
+		//- Intro, 		
 		//- Abstract, 
 		//- Conclusion.
 		//- release and debug configuration.
-			- After installing Visual Studio Code Contracts extension
+			//- After installing Visual Studio Code Contracts extension
 		//- somewhere I wrote I strenghtend postconditions - should add I tried to strenghten, but it was not possible.
 		//- (???)
+		// - Medina
+		// - This chapter ...
+		//- chapter + listing
+		- General:
+			- Be clear: HLL.View is finished or not		
+		- First page
+		- Ch.5 "This approach avoids the duplication of test."
+		- Chp HLL - too short
+		===
+		- clean the code of ???
+		- public repo
 	=========
 	Writing notes:		
 		- C6.Code Contracts
@@ -72,11 +83,6 @@
 			
 		- Skip qunatifiers for release configuration 
 		
-		- Chapter 3. 
-			- C6 creates completely new solution (???) explain?		
-			
-		- General:
-			- Be clear: HLL.View is finished or not
 		
 	===================
 	Last checks:

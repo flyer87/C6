@@ -329,22 +329,7 @@ namespace C6.Collections
             (_underlying ?? this).RaiseForAdd(item);
             
             return true;
-        }
-
-        private void InvalidateCollectionValuesPrivate()
-        {
-            //if (_collValues == null) return;            
-
-            //foreach (var value in _collValues)
-            //{
-            //    value.IsValid = false;                
-            //}
-
-            // _collValues.Clear(); // new!!!
-
-            // Should we dispose value by value? Coz Views are disposed!
-            // Should we implement IDisposable            
-        }
+        }        
 
         public virtual bool AddRange(SCG.IEnumerable<T> items)
         {
@@ -411,8 +396,7 @@ namespace C6.Collections
         public virtual bool Contains(T item) => IndexOf(item) >= 0;
 
         public virtual bool ContainsRange(SCG.IEnumerable<T> items)
-        {
-            // ToDo: .toArray()
+        {            
             if (items.IsEmpty()) {
                 return true;
             }
@@ -524,8 +508,7 @@ namespace C6.Collections
         public virtual int IndexOf(T item)
         {
             #region Code Contracts                        
-
-            // TODO: Add contract to IList<T>.IndexOf
+            
             // Result is a valid index
             Ensures(Contains(item)
                 ? 0 <= Result<int>() && Result<int>() < Count
@@ -568,9 +551,9 @@ namespace C6.Collections
             (_underlying ?? this).RaiseForInsert(Offset + index, item);
         }
 
-        public virtual void InsertFirst(T item) => Insert(0, item); // Offset ? No!
+        public virtual void InsertFirst(T item) => Insert(0, item); 
 
-        public virtual void InsertLast(T item) => Insert(Count, item); // Offset ? No!
+        public virtual void InsertLast(T item) => Insert(Count, item); 
 
         public virtual void InsertRange(int index, SCG.IEnumerable<T> items)
         {
@@ -625,8 +608,7 @@ namespace C6.Collections
         public virtual int LastIndexOf(T item)
         {
             #region Code Contracts
-
-            // TODO: Add contract to IList<T>.LastIndexOf
+            
             // Result is a valid index                                    
             Ensures(Contains(item)
                 ? 0 <= Result<int>() && Result<int>() < Count
@@ -810,7 +792,7 @@ namespace C6.Collections
             // If collection changes, the version is updated
             Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
 
-            // TODO: When Code Contracts get updated and allows OldValue(T) of enumerable
+            // TODO: Uncomment when Code Contracts allows OldValue(T) of enumerable
             // Each view contained in the reversed one should be mirrored
             //Ensures(ForAll(_views, v => !this.Contained(v) || Mirrored(OldValue(DuplicateView(v)), v)) ) ;            
 
@@ -1394,8 +1376,7 @@ namespace C6.Collections
 
             // Only update version if items are actually added
             UpdateVersion();
-
-            // TODO: Check if Count == Capacity?
+            
             EnsureCapacity(UnderlyingCount + 1);
 
             index += Offset;
@@ -1864,7 +1845,6 @@ namespace C6.Collections
 
         #region Nested Types
 
-        // TODO: Explicitly check against null to avoid using the (slower) equality comparer
         [Serializable]
         [DebuggerTypeProxy(typeof(CollectionValueDebugView<>))]
         [DebuggerDisplay("{DebuggerDisplay}")]
@@ -1898,8 +1878,7 @@ namespace C6.Collections
             #endregion
 
             #region Constructors
-
-            // TODO: Document
+            
             public Duplicates(ArrayList<T> list, T item)
             {
                 #region Code Contracts
@@ -2033,9 +2012,7 @@ namespace C6.Collections
 
             #endregion
         }
-
-
-        // TODO: Introduce base class?
+        
         [Serializable]
         [DebuggerTypeProxy(typeof(CollectionValueDebugView<>))]
         [DebuggerDisplay("{DebuggerDisplay}")]
@@ -2047,7 +2024,7 @@ namespace C6.Collections
 
             private readonly int _version;
 
-            // TODO: Replace with HashedArrayList<T>
+            // TODO: Replace with HashedTable<T> when implemented
             private SCG.HashSet<T> _set;
 
             #endregion
@@ -2071,8 +2048,7 @@ namespace C6.Collections
             #endregion
 
             #region Constructors
-
-            // TODO: Document
+            
             public ItemSet(ArrayList<T> list)
             {
                 #region Code Contracts
@@ -2106,8 +2082,7 @@ namespace C6.Collections
             {
                 get
                 {
-                    CheckVersion();
-                    // TODO: Always use Linear?
+                    CheckVersion();                    
                     return _set == null ? Linear : Constant;
                 }
             }
@@ -2121,7 +2096,7 @@ namespace C6.Collections
             public override T Choose()
             {
                 CheckVersion();
-                return _base.Choose(); // TODO: Is this necessarily an item in the collection value?!
+                return _base.Choose(); 
             }
 
             public override void CopyTo(T[] array, int arrayIndex)
@@ -2183,7 +2158,7 @@ namespace C6.Collections
 
             private bool CheckVersion() => _base.CheckVersion(_version);
 
-            // TODO: Replace with HashedArrayList<T>!
+            // TODO: Replace with C5.HashedTable<T>!
             private SCG.ISet<T> Set => _set ?? (_set = new SCG.HashSet<T>(_base, _base.EqualityComparer));
 
             #endregion
