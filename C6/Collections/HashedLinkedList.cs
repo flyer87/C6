@@ -1189,7 +1189,7 @@ namespace C6.Collections
 
             #endregion
 
-            // var version = (_underlying ?? this)._version; // ??? underlying !!!
+            //var version = (_underlying ?? this)._version;  underlying ?
             var version = _version;
 
             var cursor = _startSentinel.Next;
