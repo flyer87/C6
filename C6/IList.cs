@@ -1420,7 +1420,7 @@ namespace C6
             // Result is a valid index
             Ensures(Contains(item)
                 ? 0 <= Result<int>() && Result<int>() < Count
-                : ~Result<int>() == Count, "mess");
+                : ~Result<int>() == Count);
 
             return default(int);
         }

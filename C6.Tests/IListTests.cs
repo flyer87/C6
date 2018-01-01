@@ -225,13 +225,15 @@ namespace C6.Tests
         {
             // Arrange
             // !!! Replaced it with GetStringArray
-            var array = new[] {
-                "aa", "cc", "bb", "dd", "ee", "ff", "gg", "hh", "ii", "jj", "kk", "ll",
-                "mm", "nn", "oo", "pp", "qq", "rr", "ss", "tt", "uu", "vv", "ww", "xx",
-                "yy", "zz", "bbb", "aaa", "ccc", "ddd", "eee", "fff", "ggg", "hhh", "iii", "jjj",
-                "kkk", "lll", "mmm", "nnn", "ooo", "ppp", "qqq", "rrr", "sss", "ttt", "uuu", "vvv",
-                "www", "xxx", "zzz", "yyy"
-            };
+            //var array = new[] {
+            //    "aa", "cc", "bb", "dd", "ee", "ff", "gg", "hh", "ii", "jj", "kk", "ll", // 12
+            //    "mm", "nn", "oo", "pp", "qq", "rr", "ss", "tt", "uu", "vv", "ww", "xx", // 12
+            //    "yy", "zz", "bbb", "aaa", "ccc", "ddd", "eee", "fff", "ggg", "hhh", "iii", "jjj", // 12
+            //    "kkk", "lll", "mmm", "nnn", "ooo", "ppp", "qqq", "rrr", "sss", "ttt", "uuu", "vvv", // 12
+            //    "www", "xxx", "zzz", "yyy"
+            //};
+
+            var array = GetStrings(Random, Random.Next(60,70));
 
             // Arrange the collection 
             list = GetList(array);

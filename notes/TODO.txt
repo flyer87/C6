@@ -68,35 +68,34 @@
 		// - Medina
 		// - This chapter ...
 		//- chapter + listing
-		- General:
-			- Be clear: HLL.View is finished or not		
-		- First page
-		- Ch.5 "This approach avoids the duplication of test."
-		- Chp HLL - too short
+	
+		//- First page
+
 		===
-		- clean the code of ???
-		- public repo
+
 	=========
 	Writing notes:		
 		- C6.Code Contracts
 			- look: Core library Contracts - should be overwritten or ... SC.IList problem
 			
 		- Skip qunatifiers for release configuration 
-		
-		
+				
 	===================
 	Last checks:
-		- missing: this chapter gives an overview of 
-		- Create random collection for test. You wrote that in the report.
-		- Implementation the data strucutre
-			- "but without completing the view support and testing for the latter on" (!!!!!!!!!!!!1)
-		- "see figure x" and figure captions - put dots.
-		- the names of the fig in section: changes made to C6's tests
-		- "ll. Although I was expecting that the time will not be enough, the view invariants was adapted to their Code Contracts shape"
+		//- missing: this chapter gives an overview of 
+									
+		- Proof reading 			
+			- Acknolewdgments
+		
+		- General:			
+			//- Be clear: Ch. 6: HLL.View is finished or not				
+			- Chp HLL - too short			
 			- The structure of the report is influenced by C6
-		- Proof reading 
-			- Code Contracts/contracts
-			- caption names
+		
+		- Code
+			- Create random collection for test. You wrote that in the report.
+			- public repo
+			- the names of the fig in section: changes made to C6's tests
 				
 			
 		

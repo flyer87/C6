@@ -117,8 +117,8 @@ namespace C6.Collections
 
             // not the same instance
             Ensures(!ReferenceEquals(_items, items));
-            // ReSharper enable InvocationIsSkipped
 
+            // ReSharper enable InvocationIsSkipped
             #endregion
 
             IsValid = true;
@@ -190,19 +190,19 @@ namespace C6.Collections
                     _itemIndex = new SCG.Dictionary<T, int>(EqualityComparer); // EqualityComparer !!!
                 }
             }
-        } //from HAL
+        } 
 
         #region ICollectionValue
 
         public bool IsValid { get; private set; }
 
-        public int Count { get; protected set; } // to_base
+        public int Count { get; protected set; }
 
-        public bool AllowsNull => false; // by defintion!
+        public bool AllowsNull => false; 
 
-        public Speed CountSpeed => Constant; // to_base: abstract        
+        public Speed CountSpeed => Constant;
 
-        public bool IsEmpty => Count == 0; // to base:virtual
+        public bool IsEmpty => Count == 0; 
 
         public T Choose() => _items[Offset];
 
@@ -337,7 +337,7 @@ namespace C6.Collections
 
             #endregion
 
-            // TODO: insert range
+            // TODO: insert range private
             // TODO: Handle ICollectionValue<T> and ICollection<T>
             var array = items.ToArray();
             if (array.IsEmpty()) {

@@ -1038,30 +1038,8 @@ namespace C6.Collections
             return (_underlying ?? this).View(Offset, other.Offset + other.Count - Offset);
         }
 
-        public virtual void Dispose()
-        {
-            Dispose(false);
-        }
-
-        public string Print()
-        {
-            //if (!IsValid)
-            //{
-            //    throw new NotSupportedException();
-            //}
-            //else
-            //{
-            //    throw new NotImplementedException();
-            //}
-            Requires(IsValid);
-
-            var s = "";
-            for (var i = Offset; i < Count; i++) {
-                s += _items[i] + ", ";
-            }
-            return s;
-        }
-
+        public virtual void Dispose() => Dispose(false);
+               
         #endregion
 
         #region Events
