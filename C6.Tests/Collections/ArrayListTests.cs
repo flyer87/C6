@@ -367,31 +367,8 @@ namespace C6.Tests.Collections
 
         #endregion
 
-        #region View
-        [Test]
-        public void ViewTest()
-        {
-            // Arrange
-            //var items = GetStrings(Random);
-            int[] numbers = { 10, 20, 30, 40, 50 };
-            var collection = new ArrayList<int>(numbers);
-            var expected = new ArrayList<int>(new int[] { 10, 20 });
-
-            // Act
-            var view = collection.View(0, 2);
-            System.Console.WriteLine("myViewtest");
-            System.Console.WriteLine(view.ToString());
-
-            // Assert
-            //Assert.That(view, Is.EqualTo(1));
-            Assert.Equals(view, expected);
-        }
-
-        #endregion
-
         #endregion
     }
-
 
     [TestFixture]
     public class ArrayListListTests : IListTests
@@ -405,10 +382,11 @@ namespace C6.Tests.Collections
         protected override bool IsReadOnly => false;
         protected override EventTypes ListenableEvents => All;
 
-        protected override IList<T> GetEmptyList<T>(SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false) => new ArrayList<T>(equalityComparer: equalityComparer, allowsNull: allowsNull);
-        protected override IList<T> GetList<T>(SCG.IEnumerable<T> enumerable, SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false) => new ArrayList<T>(enumerable, equalityComparer, allowsNull);        
+        protected override IList<T> GetEmptyList<T>(SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false) 
+            => new ArrayList<T>(equalityComparer: equalityComparer, allowsNull: allowsNull);
+        protected override IList<T> GetList<T>(SCG.IEnumerable<T> enumerable, SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false) 
+            => new ArrayList<T>(enumerable, equalityComparer, allowsNull);        
     }
-
 
     [TestFixture]
     public class ArrayListStackTests : IStackTests
@@ -421,5 +399,15 @@ namespace C6.Tests.Collections
         protected override IStack<T> GetEmptyStack<T>(bool allowsNull = false) => new ArrayList<T>(allowsNull: allowsNull);
         // ??? GetStack
         protected override IStack<T> GetStack<T>(SCG.IEnumerable<T> enumerable, bool allowsNull = false) => new ArrayList<T>(enumerable, allowsNull: allowsNull);
+    }
+
+    [TestFixture]
+    public class ArrayListGeneralViewTests : GeneralViewTests
+    {
+        protected override IList<T> GetEmptyList<T>(SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
+            => new ArrayList<T>(equalityComparer: equalityComparer, allowsNull: allowsNull);
+
+        protected override IList<T> GetList<T>(SCG.IEnumerable<T> enumerable, SCG.IEqualityComparer<T> equalityComparer = null, bool allowsNull = false)
+            => new ArrayList<T>(enumerable, equalityComparer, allowsNull);
     }
 }

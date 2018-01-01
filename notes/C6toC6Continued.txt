@@ -1,0 +1,38 @@
+C5:
+	 - collection library  meets or exceeds the available ones
+	 - provide all the well-known data abstractions
+	 - the implementations thereof (array-based, linked list-based, hashbased, tree-based)
+	 - existing C# patterns (like IEnumerable<T>, the foreach statement, and events)
+	 - convenient but hard-to-implement features, all done in a program-to-interface-not-implementation style. 
+		- extensive interface hierarchy
+C6:
+	- best and easiest way to upgrade C5 is to start anew.
+		- Instead of blindly adding contracts to every part of C5
+	- a new Visual Studio solution – a new library
+	
+=================
+Old latex code:
+	Desgin goals of C5
+		" library whose functionality, efficiency and quality meets or exceeds that available for similar, contemporary programming platforms" 
+		// data structures and implementations
+		// ??? program-to-interface-not-implementation
+		
+	C5 -> C6
+		C6 started from scratch instead of adding just contracts
+    
+		No backwards compatibility with C5
+		
+		// Interface Hierarchy
+		
+		// a new namespace structure introduced; ??? Moving functionality into different namespace; ???data structure development framework
+		
+		// c\# 6.0 - can be compiled to older .net, but the project should be compiled in vs 2015
+		
+		// github - to manage the code 
+		
+		// code conventions and resharper - latest desgin guidelines; coding style a bit different - doesn't support readablity; enforced by Resharper 
+		
+		// testing and documentation - test completely code suits; 
+		
+		// documentation - well and poor; the technical report - very well, the code - sparse and inconsistent XML documentation => the library documentation updated; matching Microsoft’s documentation style and language; copied from the technical report and .NET Framework Class Library documentation on Microsoft’s Developer Network; Code Contracts is able to emit contracts into the XML documentation files
+		Doxygen for documents !!!

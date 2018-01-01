@@ -1,0 +1,42 @@
+IList.cs // Code Contracts section
+	Why do we have extra Add here for SCG.ICollection and SCG.IList ?
+        #region SCG.ICollection<T>
+
+        void SCG.ICollection<T>.Add(T item) {}
+        void SCG.IList<T>.Insert(int index, T item) {}
+
+        #endregion
+		
+IIndexed.cs:
+	    public T this[int index]
+        {
+            get {
+                // Argument must be within bounds (collection must be non-empty)
+                Requires(0 <= index, ArgumentMustBeWithinBounds);
+                Requires(index < Count, ArgumentMustBeWithinBounds);
+
+                // Result is item at index
+                Ensures(Result<T>().IsSameAs(this.ElementAt(index)));
+
+                return default(T);
+            }
+			...
+		}
+		
+		BUT in IList.cs:
+		// ?!?!? Double preconditions:
+		get {
+                // Argument must be within bounds
+                Requires(0 <= index, ArgumentMustBeWithinBounds);
+                Requires(index < Count, ArgumentMustBeWithinBounds);
+
+                // Result is the same as skipping the first index items
+                Ensures(Result<T>().IsSameAs(this.ElementAt(index)));
+
+                return default(T);
+            }
+
+		
+Invarinats, user guide:
+	- "Invariants are conditionally defined on the full-contract symbol. " ???
+	- ! "Automatic properties are getters and setters without an explicit implementation. Due to the lack of a code body, it isn’t possible to write Requires or Ensures directly on such auto-properties. Instead, we use invariants on auto-properties to indirectly write such pre- and postconditions on the setters and getters of auto-properties."

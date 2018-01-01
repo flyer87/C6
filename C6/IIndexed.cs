@@ -232,6 +232,8 @@ namespace C6
             // is Valid, not disposed
             Requires(IsValid);
 
+
+
             // Result is non-null
             Ensures(Result<IDirectedCollectionValue<T>>() != null);
 
@@ -253,10 +255,8 @@ namespace C6
             // Result is empty if this is
             Ensures(Result<IDirectedCollectionValue<T>>().IsEmpty == (count == 0));
 
-            // Result array is backwards            
-            // !@            
+            // Result array is backwards                        
             Ensures(Result<IDirectedCollectionValue<T>>().ToArray().IsSameSequenceAs(this.Skip(startIndex).Take(count)));
-
 
             return default(IDirectedCollectionValue<T>);
         }
@@ -317,8 +317,7 @@ namespace C6
             Requires(index < Count, ArgumentMustBeWithinBounds);
 
 
-            // Result is the item previously at the specified index
-            // !@ 
+            // Result is the item previously at the specified index            
             Ensures(Result<T>().IsSameAs(OldValue(this[index])));
 
             // Only the item at index is removed
@@ -329,7 +328,6 @@ namespace C6
 
             // Removing an item decreases the count by one
             Ensures(Count == OldValue(Count) - 1);
-
 
             return default(T);
         }

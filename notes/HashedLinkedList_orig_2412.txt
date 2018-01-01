@@ -1,0 +1,116 @@
+//updateversion
+//Code Contracts in the beginnig
+====
+??? & TODOs from .cs
+	- private SCG.IDictionary<T, Node> _itemNode; // ??? initialize here or somewhere else
+	- public int Taggroups // ??? private 
+	- public virtual bool Add(T item)
+		- InsertNodeBeforePrivate(true, _endSentinel, node); // why true ???
+	- public virtual bool AddRange(SCG.IEnumerable<T> items)
+		// ??? C6.LinkedList: All this below is in a private method InsertRangePrivate 
+		- InsertNodeBeforePrivate(false, _endSentinel, node); // why false ???
+		- (_underlying ?? this).RaiseForAddRange(array); // wrong! Not array, only the added ones ???
+	- public virtual bool ContainsRange(SCG.IEnumerable<T> items)
+		- var array = items.ToArray(); // ??? to array(). Why ???
+	- public virtual bool Remove(T item, out T removedItem)
+		- if (Count <= 0) // ??? maybe remove it
+		- var index = 0; // ??? Not changed at all
+	- public virtual bool UnsequencedEquals(ICollection<T> otherCollection) // ??? version check
+	- public virtual void RemoveIndexRange(int startIndex, int count)
+		// clean the list; ??? lines down can be replaced with RemoveFromListPrivate()
+	- public virtual void Insert(int index, T item)
+		- if (FindOrAddToHashPrivate(item, node)) // ??? return, Update or throw and excpetion 
+		- InsertNodeBeforePrivate(true, succ, node); // why true ???
+	- public virtual void Reverse()
+		- UpdateVersion(); // ??? here or 
+		- if (_views != null) // the code down - in a private method ???
+	- public virtual bool TrySlide(int offset, int count)
+		- // if (this.offset == null) in C5 offset is nullable ??? So what ?
+	- public SCG.IEnumerator<T> GetEnumerator() // overrides valuebase 
+		- // var version = (_underlying ?? this)._version; // ??? underlying !!!
+	- void SC.ICollection.CopyTo(Array array, int index)
+		- try // why try ???
+	- private bool RemoveAllWhere(Func<T, bool> predicate)
+		- var canRemove = predicate(node.item); //updatecheck(); ??? replace with somthing
+		- RemoveFromListPrivate(node, 119); // ??? 119
+		- Assert(itemsRemoved == null); // why Assert ???
+	- private void MirrorViewSentinelsForReverse(Position[] positions, ref int poslow, ref int poshigh, 
+		- int? aindex = Offset + i, bindex = Offset + Count - 1 - i; // ??? int? aindex. Non of the vaues is nullable here
+		- pos.View.Offset = bindex.GetValueOrDefault();// ??? would this brake the logic of thr code?
+	- private bool FindNodeAndIndexByItemPrivate(T item, ref Node node, ref int index, EnumerationDirection direction) // FIFO style ???
+	- private bool TryRemoveFromHash(T item, out Node node) // ??? from Hash or Dict
+	- private bool ContainsItemPrivate(T item, out Node node)   // ??? remove: out Node node         
+    - private void ClearPrivate()
+		- // ??? Create a method for the first part ??? like FixView ...
+	- private void InsertNodeBeforePrivate(bool updateViews, Node succ, Node node) // ??? updateViews
+	- private void RaiseForInsertRange(int index, SCG.IEnumerable<T> items)
+		- OnItemInserted(item, index + i++); // View: ??? Offset
+	- private void RaiseForAddRange(SCG.IEnumerable<T> array) // ??? not correct; raise for really added ones.
+	- private class TagGroup
+		- internal int Tag, Count; // ??? Capital
+	- // ??? in Fields region or Private methods
+	- private void RedistributeTagGroupsPrivate(TagGroup taggroup)
+		- double limit = 1, bigt = Math.Pow(Taggroups, 1.0 / 30); //?????
+	- ItemSet
+		- public override int GetHashCode()
+==========
+- Addrange() in the constructor with Code Contracts included, fails.
+- RaiseForAddRange(array) - not correct
+	- some of array items can't bo added, since they're already there. Should raise only for the added ones.
+-     if (_underlying == null) or  if (_underlying == null) {
+			return true; 				return true;
+								   }
+								   
+- insideview or Isinsideview
+- Improve GetUnsequencedHashCode() ???
+- public static bool UnsequencedEquals<T>(this ICollection<T> first, ICollection<T> second, SCG.IEqualityComparer<T> equalityComparer = null)
+	- Why ICollection, but no IEnumerable?
+- isValid in privae classes like ItemSet, Duplicates, ...
+- General: set, insert of an extsing item in hashed version -> exception or ?
+- General: public void RemoveIndexRange(int startIndex, int count), Code contracts
+	Requires(!IsEmpty) ???
+- General: when do we set ActiveEvents to something
+- General: why SC. methods should be explicitly implemented
+- ActiveEvents.HasFlag() passed for:
+	- private void RaiseForIndexSetter(T oldItem, T item, int index), RaiseForRemove(T item, int count)
+		Add a test
+- General: CollectionExtensions - check for: // TODO: Test
+- InsertNodeBeforePrivate()	should be used with FindOrAddToHash()
+	if there is _itemNode.Contains BEFORE InsertNodeBeforePrivate(), replace it with FindOrAddToHash()
+- Insert 
+- General: Remove() methods: if Count <= 0 return false;
+- General: methods getting SCG.IEnumerable<T>, f.ex. ContainsRange(SCG.IEnumerable<T> items)
+	- should we call items.toArray() in the beginning of the method ?
+- General: set doesn't have Code Contracts preconditions in its Interface hierarchy
+===========
+Thesis notes:
+	//- RemoveAllWhere, ...
+	???- void C5.AddNode() => bool C6.AddNode()
+	//- object initializer used in:
+		private  void SplitTagGroupPrivate(TagGroup taggroup) {
+			...
+			var newtaggroup = new TagGroup { ... }
+		}
+		
+	//- private methods renamed: - contains => containsItem
+	//-+ LINQ for ContainsRange()
+	- ???public static bool UnsequencedEquals<T>(this ICollection<T> first, ICollection<T> second, SCG.IEqualityComparer<T> equalityComparer = null)
+		updated; C5 re-used. BUT DO WE NEED it?
+		C6.4.3.6 Sequenced and Unsequenced Equality
+			4.1.1 Order-Indifferent Equality
+	- ???C5.HLL new Range()
+		- field: endNode - needless
+	//-+ InsertRangePrivate:
+		else C5.HLL: throw new DuplicateNotAllowedException("Item already in indexed list"); removed()
+	//- C5.Shuffle: count <= 0; now: C5.Shuffle: count <= 1
+	//- inconsistency: C6.Sort() accepts null for comparer; but Shuffle() doesn't accept Random as null
+	//-+ in Reverse:
+		Sorting.IntroSort<Position>(positions, 0, positions.Length, PositionComparer.Default);
+		change with Array.Sort()
+	- ???Tests, improvements: C6.ArrayList doesn't contain tests for thring an expcetion when 
+	- ???HLL.View(i,c) I didn't write it correct
+		was: view.index = index;
+		should be: view.index = Offset + index
+	- ???AllowsDuplicate is false. Even if set AllowsDuplicate to false in ArrayList. Write test with AllowsDuplicate = true and expexted behvaior, which fails.
+	//- in public virtual void Sort(SCG.IComparer<T> comparer): // include in minor improvements
+		if (IsSorted(comparer)) return; 

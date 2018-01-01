@@ -765,7 +765,7 @@ namespace C6.Tests
             // Arrange
             var collection = GetStringIndexed(Random);
             var items = collection.ToArray();
-            var index = 0;
+            const int index = 0;
             var firstItem = collection[index];
 
             // Act
@@ -796,6 +796,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void RemoveAt_ReadOnlyCollection_Fail()
         {
             Assert.That(IsReadOnly, Is.False, "Tests have not been written yet");
@@ -803,6 +804,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void RemoveAt_DuplicatesByCounting_Fail()
         {
             // TODO: Only one item is replaced based on AllowsDuplicates/DuplicatesByCounting
@@ -997,6 +999,7 @@ namespace C6.Tests
             var count = Random.Next(1, collection.Count);
             var startIndex = Random.Next(0, collection.Count - count); // +1 ??? See notebook page "t9"
             var expectedEvents = new[] {
+                //Cleared(false, count, null, collection),
                 Cleared(false, count, startIndex, collection),
                 Changed(collection)
             };
@@ -1040,6 +1043,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void RemoveIndexRange_ReadOnlyCollection_Fail()
         {
             Assert.That(IsReadOnly, Is.False, "Tests have not been written yet");
@@ -1047,6 +1051,7 @@ namespace C6.Tests
 
         [Test]
         [Category("Unfinished")]
+        [Ignore("Unfinished")]
         public void RemoveIndexRange_DuplicatesByCounting_Fail()
         {
             Assert.That(DuplicatesByCounting, Is.False, "Tests have not been written yet");

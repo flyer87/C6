@@ -1,0 +1,20 @@
+gives an overview of
+describes shortly about
+introduce the 
+provides an overall presentation of
+explains 
+consider how 
+evaluates 
+presents
+gives conclusion about the overal work within this project
+=============
+express that
+precondition for the setter/getter/method
+write precondition on a method
+method's precondition holds
+methods members
+such methods
+
+======
+Better use:
+expression body -> expression-bodied functions mebers

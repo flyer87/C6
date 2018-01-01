@@ -1,5 +1,34 @@
 creat your own nested instead of using other class from IDictionary
 =============
+- ??? from .cs
+	// TODO: If there are views all should the same underlying(???) _items 
+	- public HashedArrayList(int capacity = 0, SCG.IEqualityComparer<T> equalityComparer = null) // why 0 ???
+	- public bool Add(T item)
+	- public bool AddRange(SCG.IEnumerable<T> items)
+		- // TODO: insert range ???
+	- public ICollectionValue<KeyValuePair<T, int>> ItemMultiplicities()
+	- public virtual bool Remove(T item, out T removedItem)
+		// ??? No duplicates => LastIndexOf(item) - What?!
+	- public virtual bool RemoveRange(SCG.IEnumerable<T> items)
+		//var itemsToRemove = new ArrayList<T>(items, EqualityComparer, AllowsNull); // ???
+	- public T this[int index]
+		- // No Require for the stter at IIndexed level ???
+	- public void RemoveIndexRange(int startIndex, int count)
+		// ??? Alternative: View(start, count).Clear();
+	- public virtual void Insert(int index, T item)
+		- // ???? Check for duplicates
+	- public virtual void InsertRange(int index, SCG.IEnumerable<T> items)
+		- // TODO: Use InsertPrivate() ??? 
+		- continue; // throw an exception ???
+	- private bool RemoveAllWhere(Func<T, bool> predicate)
+		- //TODO: updatecheck() ???
+	- private void ClearPrivate()
+		// ???
+	- private void Dispose(bool disposingUnderlying)
+		- _views = null; // !!! ??? notes
+	- private void RaiseForInsertRange(int index, T[] array) // ??? the index of the view or the _items
+	- public override T Choose()
+		- return _base._items[index]; // ??? Offset
 - HashSet<T> itemIndex:
 	- !!class HashSet<T> : CollectionBase<T>, ICollection<T>
 	
@@ -11,33 +40,20 @@ Q:
 - C5.13.6 Implementation of hashed array lists
 - Constant time for: Find, IndexOf, Contains, ... (instead of iterating over the items)
 
-	
-- What is int for in KeyValuePair<T, int> for? Is It real index in the _items?
-	- yes!
-	
-
-!- HashSet<KeyValuePair<T>> - UnitTests, Code Contracts
-	- class restructure???
-	- itemIndex.Find(), itemIndex.FindorAdd(), itemIndex.Remove(), itemIndex.UpdateOrAdd(),
-		itemIndex.Update(), itemIndex.Clear()
-		- I should re-write that class as well or not ?
-		
-- ?ListenableEvents - Why? Do we need?
-
 - ?FindorAddToHash - any other operations to support ???
 
 - Contains, Remove
 	- from SCG and ICollection<T> - I put virtual, since they have the same signature. Is it fine?
 		
 - Test:
-	- What is the properties in HALTests for? Cos when we create HAL, it already has the values
+	//- What is the properties in HALTests for? Cos when we create HAL, it already has the values
 	
 Tips:
 	Clear()
-		prop. list -> Clear(); 
-		view -> RemoveIndexRange(0, Count);
+		if prop. list -> Clear(); 
+		if view -> RemoveIndexRange(0, v.Count);
 	Add() -> InsertPrivate
-		AddRange -> InsertRange
+		AddRange -> InsertRange()
 	Remove() -> RemoveAt
 =======================
 TODO:
@@ -47,9 +63,9 @@ TODO:
 	- Add Code contracts to:
 		private methods
 		additional postconditions: look at Mikkel's implementations.
-	- Properties: no Code Contracts for set {}
-	- Some methods are the same as in ArrayList: Dispose() and others. Re-use them?
-	- in Dispose(), else{} section, added: _views = null; Otherwise Clear(), calling 					FixViewsBeforeRemovePrivate() throws isValid should be true for the views. Is it fine?
+	- Properties: no Requires for set {}
+	- Some methods are the same as in ArrayList: Dispose() and others. Re-use them? N
+	- in Dispose(), else{} section, added: _views = null; Otherwise Clear(), calling 					FixViewsBeforeRemovePrivate(), throws: isValid should be true for the views. Is it fine?
 		Code to reproduce:
 		var collection = new HashedArrayList<string> { "1", "2", "3", "4" };
 		var v = collection.View(1, 2);
@@ -62,5 +78,3 @@ TODO:
 			...
 			RaiseForAddRange(items) //Are all items actually added?
 		}
-	- ADD: ObjectInvariants
-		incl: the nested types in all classes

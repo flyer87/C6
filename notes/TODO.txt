@@ -1,38 +1,152 @@
-- .Net Framework design guidelines
-- Patterns - p.149
-	- C#6.0 additions
----Prelez---
-====
-- try to get how the tag staff in the views work	
-	
-- Double, triplle check C6.ArrayList with the view extensions I did.
-	//- remove RequierValidity
-		//- put isValid
-	//- fixViews... - on their places
-		Where: look C5
-	//- Offset+, where:
-		index, i, count
-		// GetHashCode never used ?
+- RESTS:			
+	- Introduction
+	- Abstract
+	- Conclussion	
+	- C6 Continued - github rep!!!
+	====	
+	Writing:
+		//- From C5 to C6 Continued
+		
+		- Code Contracts in C6
+			- Pitfalls
+				//- RemoveAt_violatesPrecondtions - failed
+				//IList.RemoveAt(int), normally no preconditions allowed, but it is new (hiding) in IList. Added the //preconditions, it worked.
 				
-	//- implement private void Dipose()
-	//- run the tests
-	- private indexOf, lastIndexOf
-	============
-	- invalidate
+			//- new Contracts Helper method 
+				//- yes: items.ItemsAreUnique()							
+			- ?????s & TODOs
+				- \subsection{Interface contracts}
+					//Empty or ????											
+				//- TODO in \subsection{Views}	???		
+				//- \textbf{Underlying and Offset} TODO
+				//- so they don't hide any interface methods placed higher in the hierarchy.
+				//- re-read
+						
+		//- Implementation data structures					
+			//- One TODO:
+				- about the checking before raising events
+			//- Stack and Queues - do and write it in "Implementation of data structure" (1)				
+				//- Add that Stack is not implemented in HAL							
+			//- re-read and rearrange the structure				
+					
+		- Unit Testing
+			//- overlapping nitem views or what.
+			- Find the question marks
+				//- ??? future work: tests for the rest nor covered methods and scenario - Peter's test with matrix with view.s
+				//- All the scenarios available for a list + extra methods... \lstinline{TODO}
+				//- TODO: Anything more about C5's WRONG view (testing) approach
+				//- but I gave fixed parameters to some of the view methods. TODO code
+				-// \subsection{New test helpers introduced}
+					// TODO Getview, GetCount. 
+				- Assert.Mutliple ???
+				- //check the captions				
+				//- re-read
+				- rename the GetNItemViews -> GetNItemOverlappingViews
+			//- Bugs, move it out
+				Add: 
+					//- Sort() fails for LL and HLL; end sentinel is not updated
+			//- Run.If:
+				- public void ItemGet_RandomCollectionWithNull_Null()			
+						
+	====
+	Prioritized:	
+		- HLL: write invariants with helper [Pure] methods !!!!!!!!!!!
+		- small  staff in .cs files with ?? HLL, LL, HAL, AL
+			//HLL, HAL: AddRange() - raising events with the added items
+		- fluctuating tests still			
+		//- _version ++	
+		//- rename NonOverlapping		
+		====
+		
+		//- Intro, 		
+		//- Abstract, 
+		//- Conclusion.
+		//- release and debug configuration.
+			//- After installing Visual Studio Code Contracts extension
+		//- somewhere I wrote I strenghtend postconditions - should add I tried to strenghten, but it was not possible.
+		//- (???)
+		// - Medina
+		// - This chapter ...
+		//- chapter + listing
 	
-- fix: Insert and this[] - they shoudl either throw an exception or require a precondition.
+		//- First page
 
-- look at the test patterns of C6
-- look at the C5's view tests
-- write tests for the views
-	- ArrayList
-		- implement Span
-	- HashedArrayList
-	- LinkedList
-	- HashedLinkedList
-- implemnt some missing tests
-	those with suffix _fail, ...
-- collect the "???" from the .cs files
+		===
+
+	=========
+	Writing notes:		
+		- C6.Code Contracts
+			- look: Core library Contracts - should be overwritten or ... SC.IList problem
+			
+		- Skip qunatifiers for release configuration 
+				
+	===================
+	Last checks:
+		//- missing: this chapter gives an overview of 
+									
+		- Proof reading 			
+			- Acknolewdgments
+		
+		- General:			
+			//- Be clear: Ch. 6: HLL.View is finished or not				
+			- Chp HLL - too short			
+			- The structure of the report is influenced by C6
+		
+		- Code
+			- Create random collection for test. You wrote that in the report.
+			- public repo
+			- the names of the fig in section: changes made to C6's tests
+				
+			
+		
+	====
+	- The rest of the tests for views (!!!!!)				
+		- view tests - only updating ones	
+		- Stack: Run.If() - needed		
+	- Assert.Multiple() (1)		
+	- version question, Peter	
+	- LL.ClearPrivate()
+		- UpdateVersion() - naeaeaeh. Move it up ?!
+	- Code Contracts 
+		- only in the private methods ???
+		- look at private methods and try to add pre-conditions			
+			- additional postconditions: look at Mikkel's implementations.				
+		- C. contracts warned me for what?
+			Before tests to fail Code Contracts failed (!!!!!!!!!!!!!!!!!!!!!!)
+				- View enumerator.Skip.take and bam!
+				- HAL... => [Offset]; it was HAL... =>[0]
+				- There were cases when the Code Contracts passed, but the test failed. This is the case with view, where there are many aspects to check and missed some of them.
+		- HLL: tag invarinats
+		"offers guarantees regarding the state of an object"	
+		
+	- Tests:
+		- iExtensible for HAL, HLL: Ensures(AllowsDuplicates ? Result<bool>() : OldValue(!this.Contains(item, EqualityComparer)));								
+		
+	
+- Al+HAL in array; LL + HLL in linkedlists???	
+- try to get how the tag staff in the views work	
+
+================================================	
+//- look at the test patterns of C6
+//- look at the C5's view tests
+- write tests for the views (of ArrayList; HashedArrayList; LinkedList; HashedLinkedList)
+	- test refernce list tests for
+		Peter's tests // View, ViewOf, LastViewOf, TrySlide x2, Slide x2	
+			Test case 1/9 using
+			View
+			ViewOf
+			LastViewOf			
+			Slide1, Slide2, 
+			TrySlide1, TrySlide2
+	//- Span - implement tests
+	
+	
+	
+- read for Test Driven ??? TDD - links
+- implement some missing tests in C6
+	_ReadOnlyCollection_
+	_FixedSizeCollection_	
+		Added: public void ShuffleRandom_IsFixedSizedCollection_ThrowsNothing()
+	//_DuplicatesByCounting_ - will not be considered
+	_Set_ what is that ???		
 =================
-- Code Contracts for private methods - look and do it the same way for the rest.
-=========

@@ -1,0 +1,7 @@
+Enumerable methods:
+
+First() // returns: T
+Last() // returns: T
+TakeWhile(pricate) // returns: Enumerable
+Take(n) // Enumerable
+Skip(n) // Enumerable

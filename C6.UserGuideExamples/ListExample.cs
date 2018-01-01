@@ -3,21 +3,16 @@
 
 using System;
 using System.Linq;
-using System.Collections.Generic;
-using System.Text;
 
 using C6.Collections;
-using C6.Contracts;
-
-using static C6.Contracts.ContractMessage;
-
+using C6.Tests.Helpers;
 
 using SCG = System.Collections.Generic;
 using SC = System.Collections;
 
 
 namespace C6.UserGuideExamples
-{    
+{
     public class ListExample
     {
         public static void Main()
@@ -25,27 +20,106 @@ namespace C6.UserGuideExamples
             //var eq = new C6.ComparerFactory.EqualityComparer<string>(ReferenceEquals,
             //    SCG.EqualityComparer<string>.Default.GetHashCode);
 
-            //var ec = CaseInsensitiveStringComparer.Default;
-            //var items = new[] { "8", "Ab", "3", "4", "5", "6", "7" };            
-            //var collection = new HashedLinkedList<string>(items, ec);                
+            //var items = new[] { "-8", "Ab", "6", "-4", "5", "-2", "-1", "1", "10", "8" };
+            //var al = new ArrayList<string>(items);
+            //var v1 = al.View(al.Count - 2, 2);
+            //var v2 = al.View(al.Count - 2, 2);
 
-            
-            var v = 1 << 1;
-            Console.WriteLine(v);
-
-            var l = new LinkedList<int>();
-
+            var items = new[] { "-8", "Ab", "6", "-4", "5", "-2", "-1", "1", "10", "8" };
+            var collection = new HashedArrayList<string>(items);
+            Console.WriteLine(collection.Contains("10"));
+            Console.WriteLine(collection.Add("10"));
 
 
-            // Act            
+
+            // BUG: Sorting
+            //var items = new[] { "-8", "Ab", "6", "-4", "5", "-2", "-1", "1", "10", "8" };
+            //var collection = new HashedLinkedList<string>(items);
+
+            //var v0 = collection.View(0, 2);
+            //var v2 = collection.View(1, 2);
+            //var v4 = collection.View(4, 2);
+            //var v6 = collection.View(7, 1);
+            //var vCount2 = collection.View(collection.Count - 2, 2);
+
+            //Console.WriteLine("Views before calling Sort()");
+            //Console.WriteLine($"v0 = {v0}");
+            //Console.WriteLine($"v2 = {v2}");
+            //Console.WriteLine($"v4 = {v4}");
+            //Console.WriteLine($"v6 = {v6}");
+            //Console.WriteLine($"vCount2 = {vCount2}");
+
+            //v4.Sort();
+
+            //Console.WriteLine("Views after calling Sort()");
+            //Console.WriteLine($"v0 = {v0}");
+            //Console.WriteLine($"v2 = {v2}");
+            //Console.WriteLine($"v4 = {v4}");
+            //Console.WriteLine($"v6 = {v6}");
+            //Console.WriteLine($"vCount2 = {vCount2}");
+
+
+
+
+
+
+
+
+            // ==============================
+            // RemoveRange
+            //var items = new[] { "8", "Ab", "3", "4", "5", "6", "7", "9" };
+            //var collection = new ArrayList<string>(items);
+            //var view1 = collection.View(0, 1); // longer
+            //var view2 = collection.View(0, 2);
+            //var item = view1.Choose();
+            //var itms = new ArrayList<string>(new[] { item });
+
+            //view1.RemoveRange(itms);
+            //Console.WriteLine(view2);
+
+
+            //var items = new[] { "8", "Ab", "3", "4", "5", "6", "7", "9" };     
+            // HLL.Reverse        
+            //var items = new[] { "a", "b", "c", "d", "e" };
+            //var linkedList = new ArrayList<string>(items);            
+            //var v1 = linkedList.View(0, linkedList.Count);
+            //var v2 = linkedList.View(0, 2);
+            //v1.Reverse();
+            //v1.Reverse();
+            //Console.WriteLine(v2); 
+
+            // HLL.Sort 
+            //var items = new[] { "b", "a", "c", "e", "d" };
+            //var linkedList = new HashedLinkedList<string>(items);
+            //var v1 = linkedList.View(0, 3);
+            //var v2 = linkedList.View(3, 2);
+            //v1.Sort();
+            //Console.WriteLine(v1);
+            //Console.WriteLine(v2);
+
+            // HAL.Add()
+            //var items = new[] { "8", "Ab", "3", "4", "5", "6", "7", "9" };                             
+            //var arrayList = new LinkedList<string>(items);
+            //var v1 = arrayList.View(0, 7);
+            //var v2 = arrayList.View(0, 7);
+            //v1.Add("333333333");
+            //Console.WriteLine(v1);
+            //Console.WriteLine(v2);
+
+
+            //Console.WriteLine(view1.IsValid);            
+            //Console.WriteLine(view);
+            //Console.WriteLine(collection);
+
+
 
 
             return;
             // Construct list using collection initializer
             //var list = new ArrayList<int>() { 2, 3, 5, 5, 7, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33};
-            var list = new ArrayList<int>() { 2, 3};
+            var list = new ArrayList<int>() { 2, 3 };
             var backList = list.Backwards();
-            backList.ToList().ForEach(x => Console.Write(x + ", ") );
+            backList.ToList().ForEach(x => Console.Write(x + ", "));
             Console.WriteLine(backList.IsValid);
 
             list.Add(10);
@@ -59,8 +133,8 @@ namespace C6.UserGuideExamples
             //var items = new ArrayList<int>() { 3, 13, 7, 17};
             //Console.WriteLine(ArrayList<int>.EmptyArray);           
 
-            
-            
+
+
             var dupl = list.FindDuplicates(5);
             Console.WriteLine(dupl);
             list.Add(-100);
@@ -85,8 +159,7 @@ namespace C6.UserGuideExamples
             var range = list.GetIndexRange(index, 4);
 
             // Print range in reverse order
-            foreach (var prime in range.Backwards())
-            {
+            foreach (var prime in range.Backwards()) {
                 Console.WriteLine(prime);
             }
 
@@ -167,7 +240,31 @@ namespace C6.UserGuideExamples
 
             return;
         }
+
+        private static IList<string>[] GetNItemViewsInTheMiddle(IList<string> coll)
+        {
+            var nItemViews = new IList<string>[5];
+            const int count = 3;
+            var index = coll.Count / 2 - 1; // from the middel
+
+            nItemViews[0] = coll.View(index, count); // View(int, int)
+
+            nItemViews[1] = coll.View(index, count);
+            nItemViews[1].Slide(-3); // Slide(int)
+
+            nItemViews[2] = coll.View(index, count);
+            nItemViews[2].Slide(3, count); // Slide(int, int)
+
+            nItemViews[3] = coll.View(index, count);
+            nItemViews[3].TrySlide(-6); // not overlapping with nItemViews[1]
+
+            nItemViews[4] = coll.View(index, count);
+            nItemViews[4].TrySlide(6, count); // not overlapping with nItemViews[2]            
+
+            return nItemViews;
+        }
     }
+
 
     public class CaseInsensitiveStringComparer : SCG.IEqualityComparer<string>, SCG.IComparer<string>
     {
@@ -184,4 +281,6 @@ namespace C6.UserGuideExamples
 
         private string ToLower(string item) => item?.ToLower() ?? string.Empty;
     }
+
+
 }

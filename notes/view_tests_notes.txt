@@ -1,0 +1,17 @@
+ViewRemoveFirst ?
+
+string outItem;
+
+
+BothViewsOffsetNotChanged()
+-----
+!!!!!! // right aux view has 2 item -> after 2 removeAt(0) right aux view's offset would not chnage ???
+var index = Random.Next(0, views.Length);
+!!! // Act & Assert - one-liners, not set correctly
+
+!!! Assert.That(v, Is.Empty, $"view {index}"); - the method name is probably wrong
+-----------
+?? The preconditions on IsValid
+
+var item = view.Choose();
+var items = GetList(new[] { item });

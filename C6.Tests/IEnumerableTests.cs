@@ -9,7 +9,6 @@ using SCG = System.Collections.Generic;
 
 using static C6.Tests.Helpers.TestHelper;
 
-
 namespace C6.Tests
 {
     [TestFixture]

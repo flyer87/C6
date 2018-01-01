@@ -1,0 +1,34 @@
+        [Pure]
+        private bool Contained(IList<T> view) => viewPosition(view.Offset, view.Count) == MutualViewPosition.ContainedIn;
+
+        [Pure]
+        private static bool Reversed(IList<T> oldView, IList<T> view) => 
+            view.Offset == 2 * oldView.Offset + oldView.Count - view.Count - view.Offset;
+
+        [Pure]
+        private static IList<T> DuplicateView(IList<T> view) => 
+            new ArrayList<T>(view.Underlying, view.Underlying.EqualityComparer).View(view.Offset, view.Count);
+
+public virtual void Reverse(){
+	#region Code Contracts            
+	// If collection changes, the version is updated
+	Ensures(this.IsSameSequenceAs(OldValue(ToArray())) || _version != OldValue(_version));
+
+	// !Contained || Reversed 
+	// ForAll(Enumerable, Predicate<>) - NOT allowed!
+	// Ensures(ForAll(_views, v => !Contained(v) || Reversed(OldValue(DuplicateView(v)), v)) );            
+	#endregion
+
+	if (Count <= 1)
+	{
+		return;
+	}
+
+	// Only update version if the collection is actually reversed
+	UpdateVersion();
+
+	Array.Reverse(_items, _offsetField, Count);
+	//TODO: be more forgiving wrt. disposing ???
+	DisposeOverlappingViewsPrivate(true);
+	(_underlying ?? this).RaiseForReverse();
+}

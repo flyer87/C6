@@ -1,0 +1,60 @@
+//Slide should have Ensure's although it re-uses TrySlide's code
+
+1.//- All return IList<T> - a lot of Ensures
+- Postconditions mainly for properties, but not for the methods - they are left to the tests
+2.//- Span, ViewOf and LastViewOf might return null unlike GetIndexRange()
+	//- more complicated implications: for Result<IList<T>> is null
+//- Slide() has side effect
+	//Result<IList<T>>'s members should be equal to the this
+	???implications with OldValue(...)	
+==
+All view method except the two overloads of TrySlide return an instance of the interface(correct???) IList<T>. An instance of IList<T> has many memebers (both from the interface itself and higher in the hierarchy) and each of them should be verified before the method exits. This requires a lot of extra work though.
+
+The number of the pure members are 30+ and they can be called in the code contracts. However, I didn't include none of the methods except ICollectionValue<T>.ToArray() in the postconditions, because that would mean too much code contracts' statements, which make the code contracts class unreasonable long and over(?pretrupan). The correctnes check of the methods is left to the Unit Tests (section ?). But for each pure property there is at least one call in the postconditions. 
+
+
+
+The two overloads of TrySlide() and the two overloads of Slide() by design have side effects. They update the calling view and then return the same view, instead of creating a new instance of IList<T>. ???
+	// code returns this
+The TrySlide methods return a boolean. If the method returns true, the slide operation on the calling view is successful and the view is updated accordingly. But when the value is false, than no change should happen and the view must remain unchanged. The postconditions for this two methods should take care of this. The view properties Offset, Count, IsEmpty, First and Last might be changed if the TrySlide() succeeds, but if the method returns false, than they should have the same values as before the method call. To check that these conditions hold both when the method returns true and false, I added mutualy exlcuding postconditions for each of these properties, see the code.
+// the code
+As we can see, any method with the behaviour similar to the TrySlide methods would require postconditions checking the state of the object in the case when it exits with true and false.
+
+
+2.Unlike the method View(), where the resulting view can be empty, but never null, the methods Span(), ViewOf() and LastViewOf() might return null. 
+		         
+		
+In code (??? Span) there is a postcondition describing that the property Underlying should be equal to this's Underlying after the method finishes. 
+// Result's underlying is the same as the underlying of this or this
+		Ensures(Result<IList<T>>().Underlying == Underlying);  
+
+However, it might throw an NullReferenceException, when we call Underlying on a null reference. To deal with this case an implication should be added to the postcondition, as shown in the code (???)
+
+		Ensures(Result<IList<T>>() == null || Result<IList<T>>().Underlying == Underlying);
+
+So, if the resulting view is null, Ensures() will evaluate to true and the postcondition would return successfully instead of throwing an exception.
+	
+	
+	
+In some more complicated cases we might need to chain two or more implications (??? chain an implication). An example for this is the postcondition in listing (???).
+			// Span
+            // Result's First is correct
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().First.Equals(this.First(x => x.Equals(item))));
+			
+			// Result's Last is correct
+            Ensures(Result<IList<T>>() == null || Result<IList<T>>().Last.Equals(this.Last(x => x.Equals(item))));
+			
+The properties First and Last returns accordingly the first and the last item of a view or a proper list. An empty view has neiter first, nor last item. If Span() returns an empty view the above postconditions would fail with "Precondition failed: !IsEmpty  Collection must be non-empty". This can be fixed by adding another ??part in the implication, checking if the view is empty or not, see the code below. 
+Ensures(Result<IList<T>>() == null || Result<IList<T>>().IsEmpty || Result<IList<T>>().First.Equals(this.First(x => x.Equals(item))));
+
+// Result's Last is correct
+Ensures(Result<IList<T>>() == null || Result<IList<T>>().IsEmpty || Result<IList<T>>().Last.Equals(this.Last(x => x.Equals(item))));
+			
+The final result of the postcondition now will be equal to the last part of the implication, when the first two parts evaluate to false (i.e. when the result is non-null and non-empty.) This code successfully deals with the case with empty view, but the postconditions get longer and a bit hard to grap at firs glimp compared with most postconditions. Therefore adding comments before the postconditions becomes necessary to make them more understandable.
+
+
+3. As I described above Slide() returns reference to the calling view itself, not a new object. So, it is enough to put a postcondition verfing that Result<IList> is the same as this.
+		// Result is the same as this
+		Ensures(Result<IList<T>>() == this);
+Because of that we can skip especially those postconditions, checking that the properties of the Result<IList> are the same as this's. This helps to save some unnecessary checking. For properties like Offset, Count and others, where the new value depends on the old one, we need to add the relevant postconditions. 
+When a method is published (has public modifier) we "promise" the client some functionality, no matter how the method is implemented. Internally it can use private methods or re-use other public methods. The current implementation of Slide() calls TrySlide() in its body, so it uses TrySlide()'s code, but avoiding code repetition. Having that in mind, we can decide not to add postconditions to Slide(), since it re-uses its code and a successful exit of the method TrySlide (meaning that all postconditions passed) would mean successful end of Slide(). But this would be a mistake, because the implementation of Slide() can be changed in the future, so that it no longer re-uses TrySlide(). And we need to assure that Slide(), that is a public method, finishes successfully no matter how it is implemented. For that reason I add all the necessary postconditions, clearly repeating some of TrySlide()'s postconditions, but quarantying that the Slide() keeps its public pomise.

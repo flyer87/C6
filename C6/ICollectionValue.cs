@@ -115,11 +115,13 @@ namespace C6
         /// </returns>
         [Pure]
         T[] ToArray();
-
-        // View
+        
         /// <summary>
-        /// TODO
+        ///     Gets if the structure is valid; 
         /// </summary>
+        /// <value>
+        ///     <c>true</c> if this is valid; otherwise <c>false</c>.
+        /// </value>
         [Pure]
         bool IsValid { get; }
     }
@@ -128,10 +130,13 @@ namespace C6
     internal abstract class ICollectionValueContract<T> : ICollectionValue<T>
     {
         // ReSharper disable InvocationIsSkipped
+        public bool IsValid => default(bool);
+
         public bool AllowsNull
         {
             get {
-                // No preconditions
+                // Must be valid
+                Requires(IsValid, MustBeValid);
 
                 // Value types must return false
                 Ensures(!typeof(T).IsValueType || !Result<bool>());
@@ -139,53 +144,42 @@ namespace C6
                 return default(bool);
             }
         }
-        public bool IsValid
-        {
-            get
-            {
-                // No preconditions
 
-                // TODO 
-                //Ensures(Result<bool>());
-
-                return default(bool);
-            }
-        }
         public int Count
         {
-            get {
-                // No preconditions
+            get {                
+                // Must be valid
                 Requires(IsValid);
 
                 // Returns a non-negative number
                 Ensures(Result<int>() >= 0);
 
                 // Returns the same as the number of items in the enumerator
-                // Ensures(Result<int>() == Count); // ??? Why Enumerator's Count is used here
-                // Ensures(Result<int>() == this.Count());
-
+                Ensures(Result<int>() == this.Count());
 
                 return default(int);
             }
         }
+
         public Speed CountSpeed
         {
             get {
-                // No preconditions
+                // Must be valid                
+                Requires(IsValid, MustBeValid);
 
 
                 // Result is a valid enum constant
                 Ensures(Enum.IsDefined(typeof(Speed), Result<Speed>()));
 
-
                 return default(Speed);
             }
         }
+
         public bool IsEmpty
         {
             get {
                 // No preconditions
-                Requires(IsValid, ListOrViewMustBeValid);
+                Requires(IsValid, MustBeValid);
 
 
                 // Returns true if Count is zero, otherwise false
@@ -219,7 +213,7 @@ namespace C6
         public void CopyTo(T[] array, int arrayIndex)
         {
             // is Valid, not disposed
-            // Requires(IsValid);
+            Requires(IsValid);
 
             // Argument must be non-null
             Requires(array != null, ArgumentMustBeNonNull);
@@ -242,8 +236,7 @@ namespace C6
         public T[] ToArray()
         {
             // No preconditions
-            Requires(IsValid, ListOrViewMustBeValid);
-
+            Requires(IsValid, MustBeValid);
 
             // Result is non-null
             Ensures(Result<T[]>() != null);
@@ -255,6 +248,7 @@ namespace C6
             return default(T[]);
         }
         // ReSharper restore InvocationIsSkipped
+
         #region Non-Contract Methods
 
         #region SCG.IEnumerable<T>

@@ -1,0 +1,99 @@
+Quest:
+	- C6: "It can sometimes be necessary to delay execution, for instance when testing preconditions (section 5.4.1.1) or events (section 5.4.2.1), in which case the act is inlined using a delegate"
+	- C6."Each test has its own random number generator accessible with TestContext.CurrentContext.Random"
+		- FsCheck ???
+	- C5.Check() -> into Invariants
+		??? MSDN."You must use the binary rewriter for run-time enforcement of this invariant."			
+		!!! heavy checks
+	- Scenarious:	
+		- Reverse() 0-item, 1-item, N-item view, check the list. Do it for all M methods ???			
+	- What is #if DEBUG directive?
+	- ??? _item ?= underlying or _underlying = underlying
+	- LL.view.Invariants 
+		- should I split them? Would't be heavy if I split them ?
+		- ??? if (view.stamp != stamp)
+		- ??? v.IsValid && 
+	- HLL.view.invariants - don't implement
+	- does Arrange replace [SetUp]
+	- C5 updates the underlying version even view.Slide would affect only the view's version;
+==========
+Fluctuating tests:
+	IListTest: Slide2_SlideDuringEnumerationOfView_ThrowsInvalidOperationException()
+			public void Slide_SlideDuringEnumerationOfView_ThrowsInvalidOperationException()
+			public void Sort_SortDuringEnumeration_ThrowsInvalidOperationException()
+	LL:
+		public void TrySlide_TrySlideDuringEnumerationOfView_ThrowsInvalidOperationException()
+		TrySlide_TrySlideDuringEnumerationOfView, res = True, withOffset = 0, Orig. Offset = 12, view Count = 1, Underlying Count = 18
+		
+		TrySlide_TrySlideDuringEnumerationOfView, res = True, withOffset = 0, Orig. Offset = 8, view Count = 1, Underlying Count = 11
+		
+		TrySlide_TrySlideDuringEnumerationOfView, res = True, withOffset = 1, Orig. Offset = 15, view Count = 3, Underlying Count = 19
+
+
+		
+=======
+TODO:	
+	//- C5.Check() -> into Invariants
+		//- HLL
+		Peters suggestion
+			- implement the the tests for the rest 8/9 situations
+			- test for the rest 
+		- test Invariants 
+			especially ForAll(node = node.next)
+		- C6.LL. Invariant(ForAll(_underlying._views, v => v.Offset >= 0 &&
+			?? v.IsValid 		
+	- create a view(UnderlyingCount, 0)		
+	- Raises expected events
+	- slow MS Studio					
+	- Read about the contribution of Code Contracts to the Testing
+=======
+Test Reference List for views:
+	" Most of the unit tests on the test reference list (section 5.3.1) were coded as a Live Templates."
+	ViewOf existing, non-exisitng item		
+====
+Thesis notes:
+	- public static string GetUppercaseString(Randomizer random) => random.GetString(25, "ABCDEFGHIJKLMNOPQRSTUVWXYZ"); - missing "I"
+	- public void TrySlide_NotAView_ViolatesPrecondition()
+		Assert.That(() => collection.TrySlide(index), Violates.Precondition);
+			??? Requires(Underlying != null, NotAView); 
+			
+	- Mikkel: was Last_RandomCollectionStartingWithNull_Null, but should by ...EndingWith...
+	- public void RemoveAt_RandomCollection_ItemAtIndex()
+		used: var expectedItem = collection[index];
+		better: var expectedItem = collection.ElementAt()
+	- private sealed class WeakViewList<V> : SCG.IEnumerable<V> where V : class. It was not implementing the IEnum... interface which was a problem for ForAll() in the invariants
+	- LL.Invariant(ForAll(_underlying._views, v => { ... })) includes many conditions. Otherwise it would be heavy	
+	- NUnit test: I found that in TrySlide(int, int) UpdateVersion was missing
+	- C5.LL int enumeratorstamp = underlying != null ? underlying.stamp : this.stamp; WRONG. It ate my whole day !!!!! Found by testing.
+	-  Code Contracts. Invariants helped me
+			var end = startIndex + count; // IT WAS: var end = Offset + count; Wrong!
+            for (var i = startIndex; i < end; i++)
+            {
+                var res = _itemIndex.Remove(_items[i]);
+                var res2 = res;
+            }
+	- Peter:
+		- Test strategy in the report - the photo - the effect on the other views, bla, bla
+		- Corner cases
+		- Thesis idea: C5.view_tests -> C6.view_tests
+			- Modern testing approach (1 Assert, random views/collections) - here are they. Ok, but not enough. 
+			- Combine with other test methods: check the effect on the neighbouring views
+			- I couldn't cover all the test cases, but generally, yes
+			- "The art of ..." (and C6) recommend one assert per test. C5 does the opposite. Mine is in the middle. Closer to C5 when I check the effect of a modifying operation to the other views.
+		- After executing a method on a view, many aspects of the data structure should be checked - the effect on the underlying list, the effect on the view, placed on a ?offset, and overlapping views. This makes the test more complicated. 
+			Multiples aserts are multiple tests (p.201), but not in our case. We check the correctness of other objects, possibli affected of the operation.
+			Avoiding testing multiple aspects of the same object(p.203), but we need to check not the aspects of one object, but the effect of the method on the other objects.
+		- Invariants - can't write too complicated ones
+			LL: Invariant((_underlying ?? this)._views == null || ForAll((_underlying ?? this)._views, v => ...
+			"The invariant methods must have no other code in it than a sequence of calls to Contract. Invariant"
+			may be bug: https://tutel.me/c/programming/questions/3597011/why+contract+is+malformed+when+using+defaulttype
+		- added: public void ShuffleRandom_IsFixedSizedCollection_ThrowsNothing()
+			- IsFixedSized -> shuffles and throws nothing
+		- Tests added: for Reverse, Shuffle, Sort, Clear?
+			Any difference with C5 tests
+        
+			
+- C5 updates the underlying version even view.Slide should only affect the view's version;
+	list.Add() - affects the current view, list and some (overlapping?) views
+	view.Add() - affects the current view, list and some (overlapping?) views
+	view.Slide() - only the current view; neither the list, nor the other views

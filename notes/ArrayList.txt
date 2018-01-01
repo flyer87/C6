@@ -1,4 +1,24 @@
+Quest:
 - General: methods with xxx(SCG.IEnumerable<T> items)
 	- do we need items.toArray() or what?
+	- check if an enureable is bad
+		Contract.Requires<WhatException>( items.toArray() != null, "x" );
 - C5.public override bool Check()
 			C6."We can solve the first problem by wrapping the method in an #if DEBUG directive to remove it from release versions of the assembly."
+=========
+??? from .cs
+		- _collValues.Add(duplicates); // ???  so far, no. Intsead of UpdateVersion() _collValues could be used, but ...; Keep ICollectionValues here
+		- public virtual ICollectionValue<KeyValuePair<T, int>> ItemMultiplicities()
+			implement or ???
+		- Reverse()
+			- //TODO: be more forgiving wrt. disposing ???
+		- public virtual void TrimExcess()
+			// local method. ??? IsValid            
+		- public virtual IList<T> ViewOf(T item)
+			// ??? IndexOf or indexOf
+		- public virtual IList<T> LastViewOf(T item)
+			// ??? calling private method
+		- private int GetHashCode(T x) => EqualityComparer.GetHashCode(x); // ??? Not used
+		- private bool RemoveAllWhere(Func<T, bool> predicate)
+			// TODO: Use bulk moves - consider using predicate(item) ^ something ???
+			viewHandler.skipEndpoints(cntRemoved, i+1); // not effective ???

@@ -204,7 +204,7 @@ namespace C6
                 // False by convention for collections with set semantics
                 Ensures(AllowsDuplicates || Result<bool>());
 
-                Ensures(!AllowsDuplicates || !Result<bool>());
+                // !!! @@@ Ensures(!AllowsDuplicates || !Result<bool>());
 
 
                 return default(bool);
@@ -268,6 +268,7 @@ namespace C6
             // Argument must be non-null if collection disallows null values
             Requires(AllowsNull || item != null, ItemMustBeNonNull);
 
+
             // The collection becomes non-empty
             Ensures(!IsEmpty);
 
@@ -287,8 +288,8 @@ namespace C6
             Ensures(Result<bool>() || this.IsSameSequenceAs(OldValue(ToArray())));
 
             // Returns true if bag semantic, otherwise the opposite of whether the collection already contained the item
-            // !!! Ensures(AllowsDuplicates ? Result<bool>() : OldValue(!this.Contains(item, EqualityComparer)));
-            //Ensures(AllowsDuplicates == Result<bool>());            
+            Ensures(AllowsDuplicates ? Result<bool>() : OldValue(this.Contains(item, EqualityComparer)) ? !Result<bool>() : Result<bool>());            
+            //Ensures(AllowsDuplicates ? Result<bool>() : !Result<bool>());
 
             return default(bool);
         }
@@ -305,17 +306,16 @@ namespace C6
             Requires(!IsFixedSize, CollectionMustBeNonFixedSize);
 
             // Argument must be non-null
-            Requires(items != null, ArgumentMustBeNonNull);
+            Requires(items != null, ArgumentMustBeNonNull);            
 
             // All items must be non-null if collection disallows null values
             Requires(AllowsNull || ForAll(items, item => item != null), ItemsMustBeNonNull);
-            
+
             // The collection becomes non-empty, if items are non-empty
             Ensures(items.IsEmpty() || !IsEmpty);
 
             // The collection will contain the items added            
-            Ensures(ForAll(items, item => this.Contains(item, EqualityComparer))); 
-            // XXX when range added to a view .this means View, but we can't say it here run ForAll for the underlying/proper list
+            Ensures(ForAll(items, item => this.Contains(item, EqualityComparer)));             
 
             // If items were added, the count increases; otherwise it stays the same
             Ensures(Result<bool>() ? Count > OldValue(Count) : Count == OldValue(Count));
@@ -330,7 +330,6 @@ namespace C6
             Ensures(Result<bool>() || this.IsSameSequenceAs(OldValue(ToArray())));
 
             // TODO: Make more exact check of added items - especially for sets
-
 
             return default(bool);
         }

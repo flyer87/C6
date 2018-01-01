@@ -125,7 +125,7 @@ namespace C6
         public T Pop()
         {
             // is Valid, not disposed
-            // Requires(IsValid);
+            Requires(IsValid);
 
             // Collection must be non-empty
             Requires(!IsEmpty, CollectionMustBeNonEmpty);
@@ -152,7 +152,7 @@ namespace C6
         public void Push(T item)
         {
             // is Valid, not disposed
-            // Requires(IsValid);
+            Requires(IsValid);
 
             // Argument must be non-null if collection disallows null values
             Requires(AllowsNull || item != null, ItemMustBeNonNull);

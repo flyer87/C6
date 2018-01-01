@@ -87,7 +87,6 @@ namespace C6.Tests.Helpers
         public override string ToString() => $"{_eventType} {_eventArgs} from {_sender}";
     }
 
-
     public static class CollectionEvent
     {
         public static CollectionEvent<T> Added<T>(T item, int count, ICollectionValue<T> sender) => new CollectionEvent<T>(EventTypes.Added, new ItemCountEventArgs<T>(item, count), sender);

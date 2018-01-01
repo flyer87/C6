@@ -144,7 +144,8 @@ namespace C6.Tests
             var collection = GetStringCollection(Random);
             var count = collection.Count;
             var expectedEvents = new[] {
-                Cleared(true, count, null, collection),
+                //Cleared(true, count, null, collection),
+                Cleared(false, count, 0, collection),
                 Changed(collection),
             };
 
@@ -176,11 +177,17 @@ namespace C6.Tests
         }
 
         [Test]
-        [Category("Unfinished")]
-        [Ignore("Unfinished")]
-        public void Clear_FixedSizeCollection_Fail()
+        //[Category("Unfinished")]
+        //[Ignore("Unfinished")]
+        public void Clear_FixedSizeCollection_Fail_ViolatesPreconditionSayingCollectionMustBeNonFixedSize()
         {
-            Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
+            Run.If(IsFixedSize);
+
+            var collection = GetStringCollection(Random);            
+
+            // Act & Assert
+            Assert.That(() => collection.Clear(), Violates.PreconditionSaying(CollectionMustBeNonFixedSize));
+            //Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
         }
 
         #endregion
@@ -1098,11 +1105,20 @@ namespace C6.Tests
         }
 
         [Test]
-        [Category("Unfinished")]
-        [Ignore("Unfinished")]
-        public void FindOrAdd_FixedSizeCollection_Fail()
+        //[Category("Unfinished")]
+        //[Ignore("Unfinished")]
+        public void FindOrAdd_FixedSizeCollection_Fail_ViolatesPreconditionSayingCollectionMustBeNonFixedSize()
         {
-            Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
+            Run.If(IsFixedSize);
+
+            var items = GetStrings(Random);
+            var collection = GetCollection(items);
+            var item = items.Choose(Random);
+            
+
+            // Act & Assert
+            Assert.That(() => collection.FindOrAdd(ref item), Violates.PreconditionSaying(CollectionMustBeNonFixedSize));
+            //Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
         }
 
         #endregion
@@ -1471,7 +1487,7 @@ namespace C6.Tests
 
             // Assert
             Assert.That(remove, Is.True);
-            Assert.That(removedItem, Is.SameAs(existingItem));
+            Assert.That(removedItem, Is.SameAs(existingItem));            
         }
 
         [Test]
@@ -1505,7 +1521,7 @@ namespace C6.Tests
             enumerator.MoveNext();
             collection.Remove(item, out removedItem);
 
-            // Assert
+            // Assert            
             Assert.That(() => enumerator.MoveNext(), Throws.InvalidOperationException.Because(CollectionWasModified));
         }
 
@@ -1810,11 +1826,19 @@ namespace C6.Tests
         }
 
         [Test]
-        [Category("Unfinished")]
-        [Ignore("Unfinished")]
-        public void RemoveRange_FixedSizeCollection_Fail()
+        //[Category("Unfinished")]
+        //[Ignore("Unfinished")]
+        public void RemoveRange_FixedSizeCollection_ViolatesPreconditionSayingCollectionMustBeNonFixedSize()
         {
-            Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
+            Run.If(IsFixedSize);
+
+            // Arrange
+            var collection = GetStringCollection(Random);
+            var itemsToRemove = GetStrings(Random);
+
+            // Act & Assert
+            Assert.That(() => collection.RemoveRange(itemsToRemove), Violates.PreconditionSaying(CollectionMustBeNonFixedSize));
+            //Assert.That(IsFixedSize, Is.False, "Tests have not been written yet");
         }
 
         [Test]
@@ -2660,11 +2684,13 @@ namespace C6.Tests
         [Test]
         public void Update_IntegerCollectionUpdateExistingItem_RaisesExpectedEvents()
         {
+
             // Arrange
             var items = new[] { 4, 54, 56, 8 };
             var collection = GetCollection(items, TenEqualityComparer.Default);
+            Run.If(!(collection is IList<int>));
+
             var count = DuplicatesByCounting ? 2 : 1;
-            //var count = AllowsDuplicates ? 2 : 1; ??? one of these
             var item = 53;
             var expectedEvents = new[] {
                 Removed(54, count, collection),
@@ -3053,8 +3079,9 @@ namespace C6.Tests
             // Arrange
             var items = new[] { 4, 54, 56, 8 };
             var collection = GetCollection(items, TenEqualityComparer.Default);
-            var count = DuplicatesByCounting ? 2 : 1;
-            //var count = AllowsDuplicates ? 2 : 1;
+            Run.If(!(collection is IList<int>));
+
+            var count = DuplicatesByCounting ? 2 : 1;            
             var item = 53;
             var expectedEvents = new[] {
                 Removed(54, count, collection),
@@ -3276,6 +3303,8 @@ namespace C6.Tests
             var collection = GetCollection(items, TenEqualityComparer.Default);
             var count = DuplicatesByCounting ? 2 : 1;
             //var count = AllowsDuplicates ? 2 : 1;
+            Run.If(!(collection is IList<int>));
+
             var item = 53;
             int oldItem;
             var expectedEvents = new[] {

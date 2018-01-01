@@ -27,8 +27,7 @@ namespace C6.Collections
 
         public virtual bool AllowsNull { get; }
 
-        public virtual bool IsValid { get; protected internal set; } = true;  // ??? protected internal because of: ArrayList: private void InvalidateCollectionValuesPrivate()
-        // is it CollectionValue property or ArrayView prop ???
+        public virtual bool IsValid { get; protected set; } = true;  // ??? protected internal because of: ArrayList: private void InvalidateCollectionValuesPrivate()        
 
         public virtual int Count { get; protected set; }
 

@@ -38,7 +38,8 @@ namespace C6.Contracts
         ///     This is only intended for code contracts, and is not optimal in any sense.
         /// </remarks>
         [Pure]
-        public static SCG.IEnumerable<T> SkipIndex<T>(this SCG.IEnumerable<T> enumerable, int index) => enumerable.SkipRange(index, 1);
+        public static SCG.IEnumerable<T> SkipIndex<T>(this SCG.IEnumerable<T> enumerable, int index) 
+            => enumerable.SkipRange(index, 1);
 
         /// <summary>
         ///     Returns a specified number of contiguous elements from the start of a sequence until index
@@ -103,8 +104,7 @@ namespace C6.Contracts
         {
             #region Code Contracts
 
-            // first remains unchanged
-            // !@ 
+            // first remains unchanged            
             Ensures(first == null || first.IsSameSequenceAs(OldValue(first.ToList())));
 
             // second remains unchanged
@@ -310,7 +310,8 @@ namespace C6.Contracts
 
 
         [Pure]
-        public static SCG.IEqualityComparer<T> CreateStructComparer<T>() => ComparerFactory.CreateEqualityComparer<T>(StructEquals, type => type.GetHashCode());
+        public static SCG.IEqualityComparer<T> CreateStructComparer<T>() 
+            => ComparerFactory.CreateEqualityComparer<T>(StructEquals, type => type.GetHashCode());
 
         [Pure]
         private static bool StructEquals<T>(T x, T y)
@@ -356,6 +357,28 @@ namespace C6.Contracts
                     }
                 }
             }
+            return true;
+        }
+
+        [Pure]
+        public static bool ItemsAreUnique<T>(this SCG.IEnumerable<T> items)
+        {
+            #region Code Contracts
+
+            // Must not be null
+            Requires(items != null);
+
+            #endregion
+
+            // TODO: Replace with C5's HashTable once implemented
+            var set = new SCG.HashSet<T>();
+            foreach (var item in items) {
+                if (set.Contains(item)) {
+                    return false;
+                }
+                set.Add(item);
+            }
+
             return true;
         }
     }
