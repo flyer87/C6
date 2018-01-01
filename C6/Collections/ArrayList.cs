@@ -469,9 +469,7 @@ namespace C6.Collections
 
             #endregion
 
-            var version = _version;
-            // Check version at each call to MoveNext() to ensure an exception is thrown even when the enumerator was really finished
-            // for (var i = 0; CheckVersion(version) & i < Count; i++)
+            var version = _version;            
             for (var i = Offset; CheckVersion(version) && i < Offset + Count; i++) {
                 yield return _items[i];
             }

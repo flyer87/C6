@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C6.Tests", "C6.Tests\C6.Tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C6.UserGuideExamples", "C6.UserGuideExamples\C6.UserGuideExamples.csproj", "{578F1302-76F1-4669-A44A-EC4E3883A27D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C6.MyTests", "C6.MyTests\C6.MyTests.csproj", "{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug with Static Contract Checking|Any CPU = Debug with Static Contract Checking|Any CPU
@@ -99,30 +97,6 @@ Global
 		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Release|x64.Build.0 = Release|Any CPU
 		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Release|x86.ActiveCfg = Release|Any CPU
 		{578F1302-76F1-4669-A44A-EC4E3883A27D}.Release|x86.Build.0 = Release|Any CPU
-		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Debug with Static Contract Checking|Any CPU.ActiveCfg = Debug|Any CPU
-		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Debug with Static Contract Checking|Any CPU.Build.0 = Debug|Any CPU
-		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Debug with Static Contract Checking|x64.ActiveCfg = Debug|Any CPU
-		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Debug with Static Contract Checking|x64.Build.0 = Debug|Any CPU
-		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Debug with Static Contract Checking|x86.ActiveCfg = Debug|x86
-		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Debug with Static Contract Checking|x86.Build.0 = Debug|x86
-		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Debug|x64.Build.0 = Debug|Any CPU
-		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Debug|x86.Build.0 = Debug|Any CPU
-		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Release with Contract Reference Assembly|Any CPU.ActiveCfg = Release|Any CPU
-		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Release with Contract Reference Assembly|Any CPU.Build.0 = Release|Any CPU
-		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Release with Contract Reference Assembly|x64.ActiveCfg = Release|Any CPU
-		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Release with Contract Reference Assembly|x64.Build.0 = Release|Any CPU
-		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Release with Contract Reference Assembly|x86.ActiveCfg = Release|Any CPU
-		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Release with Contract Reference Assembly|x86.Build.0 = Release|Any CPU
-		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Release|x64.ActiveCfg = Release|Any CPU
-		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Release|x64.Build.0 = Release|Any CPU
-		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Release|x86.ActiveCfg = Release|Any CPU
-		{FBEF784A-4F80-4AB2-9AEA-20CD8B0370CF}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

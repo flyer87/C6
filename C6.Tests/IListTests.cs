@@ -233,7 +233,7 @@ namespace C6.Tests
             //    "www", "xxx", "zzz", "yyy"
             //};
 
-            var array = GetStrings(Random, Random.Next(60,70));
+            var array = GetStrings(Random, Random.Next(55,60));
 
             // Arrange the collection 
             list = GetList(array);
@@ -1193,7 +1193,7 @@ namespace C6.Tests
                 // Arrange 
                 var offsetLeft = auxViewLeft.Offset;
                 var offsetRight = auxViewRight.Offset;
-                var item = GetUppercaseString(Random);
+                var item = GetLowercaseString(Random);
 
                 // Act
                 view.InsertFirst(item);

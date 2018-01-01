@@ -1247,7 +1247,7 @@ namespace C6.Collections
                     j++; // next "free" place                     
                 }
 
-                viewHandler.skipEndpoints(cntRemoved, i); // TODO: not effective
+                viewHandler.SkipEndpoints(cntRemoved, i); // TODO: not effective
 
                 if (predResult) {
                     if (shouldRememberItems) {
@@ -1255,7 +1255,7 @@ namespace C6.Collections
                     }
                     cntRemoved++;
                     _itemIndex.Remove(item);
-                    viewHandler.updateViewSizesAndCounts(cntRemoved, i + 1);
+                    viewHandler.UpdateViewSizesAndCounts(cntRemoved, i + 1);
                 }
             }
 
@@ -1269,7 +1269,7 @@ namespace C6.Collections
             // Only update version if items are actually removed
             UpdateVersion();
 
-            viewHandler.updateViewSizesAndCounts(cntRemoved, UnderlyingCount);
+            viewHandler.UpdateViewSizesAndCounts(cntRemoved, UnderlyingCount);
             // shrink the freed space
             Array.Copy(_items, Offset + Count, _items, j, UnderlyingCount - Offset - Count);
 
@@ -1332,9 +1332,7 @@ namespace C6.Collections
 
             // Argument must within bounds
             Requires(index >= 0, ArgumentMustBeWithinBounds);
-            Requires(index <= Count, ArgumentMustBeWithinBounds);
-
-            // no need: Requires(item != null, ArgumentMustBeNonNull);
+            Requires(index <= Count, ArgumentMustBeWithinBounds);            
 
             #endregion
 
@@ -1345,13 +1343,13 @@ namespace C6.Collections
 
             // Moves items one to the right
             if (index < UnderlyingCount) {
-                Array.Copy(_items, index, _items, index + 1, UnderlyingCount - index); // View:
+                Array.Copy(_items, index, _items, index + 1, UnderlyingCount - index);
             }
             _items[index] = item;
 
             Count++;
             if (_underlying != null) {
-                _underlying.Count++; // View: Under
+                _underlying.Count++;
             }
             // !Reindex is up            
             FixViewsAfterInsertPrivate(1, index);
@@ -1474,15 +1472,14 @@ namespace C6.Collections
             UpdateVersion();
 
             var count = array.Length;
-            (_underlying ?? this).EnsureCapacity(UnderlyingCount + count); // View: under. Count
+            (_underlying ?? this).EnsureCapacity(UnderlyingCount + count); 
 
             if (index < Count) {
                 Array.Copy(_items, index, _items, index + count, Count - index);
             }
 
             Array.Copy(array, 0, _items, index, count);
-            Count += count; // View:
-            // FixViewsAfterInsertPrivate(count, index);
+            Count += count; // View:            
         }
 
         private void EnsureCapacity(int requiredCapacity)
@@ -1524,17 +1521,17 @@ namespace C6.Collections
         {
             UpdateVersion();
 
-            index += Offset; //View:
-            FixViewsBeforeSingleRemovePrivate(index); //View:
+            index += Offset; 
+            FixViewsBeforeSingleRemovePrivate(index); 
 
             Count--;
-            if (_underlying != null) // View:
+            if (_underlying != null) 
             {
                 _underlying.Count--;
             }
 
             var item = _items[index];
-            if (index < UnderlyingCount) // Mikkel: no, if (--Count > index)
+            if (index < UnderlyingCount) 
             {
                 Array.Copy(_items, index + 1, _items, index, UnderlyingCount - index);
             }
@@ -1754,7 +1751,7 @@ namespace C6.Collections
             HashedArrayList<Position> leftEnds;
             HashedArrayList<Position> rightEnds;
             int _leftEndIndex, _rightEndIndex;
-            internal readonly int viewCount;
+            private readonly int viewCount;
 
             internal ViewHandler(HashedArrayList<T> list)
             {
@@ -1782,7 +1779,7 @@ namespace C6.Collections
             /// </summary>
             /// <param name="removed"></param>
             /// <param name="realindex"></param>
-            internal void skipEndpoints(int removed, int realindex)
+            internal void SkipEndpoints(int removed, int realindex)
             {
                 if (viewCount <= 0) {
                     return;
@@ -1801,7 +1798,7 @@ namespace C6.Collections
                 }
             }
 
-            internal void updateViewSizesAndCounts(int removed, int realindex)
+            internal void UpdateViewSizesAndCounts(int removed, int realindex)
             {
                 if (viewCount > 0) {
                     Position endpoint;
@@ -2026,8 +2023,7 @@ namespace C6.Collections
             #endregion
 
             #region Properties
-
-            // Where is that from?
+            
             public override bool AllowsNull => CheckVersion() & _base.AllowsNull;
 
             public override int Count

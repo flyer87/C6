@@ -87,15 +87,12 @@
 		- Proof reading 			
 			- Acknolewdgments
 		
-		- General:			
-			//- Be clear: Ch. 6: HLL.View is finished or not				
+		- General:						
 			- Chp HLL - too short			
 			- The structure of the report is influenced by C6
 		
-		- Code
-			- Create random collection for test. You wrote that in the report.
-			- public repo
-			- the names of the fig in section: changes made to C6's tests
+		- Code			
+			- public repo			
 				
 			
 		

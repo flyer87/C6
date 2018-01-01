@@ -430,7 +430,6 @@
     <Compile Include="Collections\CollectionValueDebugView.cs" />
     <Compile Include="Collections\HashedArrayList.cs" />
     <Compile Include="Collections\HashedLinkedList.cs" />
-    <Compile Include="Collections\IMyCollection.cs" />
     <Compile Include="ComparerFactory.cs" />
     <Compile Include="Contracts\ContractMessage.cs" />
     <Compile Include="Contracts\ContractHelperExtensions.cs" />

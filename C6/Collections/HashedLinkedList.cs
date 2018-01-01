@@ -2293,9 +2293,9 @@ namespace C6.Collections
         #region Position, PositionComparer and ViewHandler nested types
 
         [Serializable]
-        class PositionComparer : SCG.IComparer<Position>
+        private class PositionComparer : SCG.IComparer<Position>
         {
-            static PositionComparer _default;
+            private static PositionComparer _default;
             PositionComparer() { }
 
             public static PositionComparer Default
@@ -2314,7 +2314,7 @@ namespace C6.Collections
         /// <summary>
         /// During RemoveAll, we need to cache the original endpoint indices of views
         /// </summary>
-        struct Position
+        private struct Position
         {
             public readonly HashedLinkedList<T> View;
             public bool Left;
@@ -2342,7 +2342,7 @@ namespace C6.Collections
         /// <summary>
         /// Handle the update of (other) views during a multi-remove operation.
         /// </summary>
-        struct ViewHandler
+        private struct ViewHandler
         {
             ArrayList<Position> leftEnds;
             ArrayList<Position> rightEnds;
@@ -2510,7 +2510,7 @@ namespace C6.Collections
         [Serializable]
         private sealed class WeakViewList<V> : SCG.IEnumerable<V> where V : class
         {
-            Node _start;
+            private Node _start;
 
             [Serializable]
             internal class Node
